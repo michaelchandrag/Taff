@@ -8,6 +8,7 @@
 		<meta name="description" content="Materialize is a Material Design Admin Template,It's modern, responsive and based on Material Design by Google. ">
 		<meta name="keywords" content="materialize, admin template, dashboard template, flat admin template, responsive admin template,">
 		<title>Taff</title>
+        <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
 
 		<!-- Favicons-->
 		<link rel="icon" href="images/favicon/favicon-32x32.png" sizes="32x32">
@@ -26,7 +27,12 @@
 		<link href="css/layouts/style-horizontal.css" type="text/css" rel="stylesheet" media="screen,projection">
 		<!-- Custome CSS-->    
 		<link href="css/custom/custom.min.css" type="text/css" rel="stylesheet" media="screen,projection">
-        <!--<link href="css/layouts/page-center.css" type="text/css" rel="stylesheet" media="screen,projection">-->
+        <?php
+            if(isset($sessUser))
+            {
+              echo '<link href="css/layouts/page-center.css" type="text/css" rel="stylesheet" media="screen,projection">';
+            }
+        ?>
 
 
 		<!-- INCLUDED PLUGIN CSS ON THIS PAGE -->
@@ -56,7 +62,13 @@
     <script type="text/javascript" src="js/plugins.min.js"></script>
     <!--custom-script.js - Add your own theme custom JS-->
     <script type="text/javascript" src="js/custom-script.js"></script>
+     <!--sweetalert -->
+    <script type="text/javascript" src="js/plugins/sweetalert/sweetalert.min.js"></script> 
     <!-- Toast Notification -->
+    <!-- chartist -->
+    <script type="text/javascript" src="js/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery-validation/additional-methods.min.js"></script>
+    
     <script type="text/javascript">
     // Toast Notification
     $(window).load(function() {
@@ -71,8 +83,31 @@
         }, 15000);
     });
     </script>
+    <script>
+        function onSuccess(googleUser) {
+          console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+        }
+        function onFailure(error) {
+          console.log(error);
+        }
+        function renderButton() {
+          gapi.signin2.render('my-signin2', {
+            'scope': 'profile email',
+            'width': 240,
+            'height': 50,
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onSuccess,
+            'onfailure': onFailure
+          });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+    <!-- My JS-->
+    <script type="text/javascript" src="js/myjs/jsRegister.js"></script>
+    <script type="text/javascript" src="js/myjs/jsLogin.js"></script>
+    <script type="text/javascript" src="js/myjs/jsHome.js"></script>
+    <script type="text/javascript" src="js/myjs/jsBoard.js"></script>
     </head>
-    <body id="layouts-horizontal" class="cyan">
     <?php echo $this->getContent(); ?>
-    </body>
 </html>

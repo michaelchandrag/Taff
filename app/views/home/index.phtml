@@ -33,7 +33,7 @@
 					<a href="#!"><img src="images/user/user2.png" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
-					<a href="#!"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+					<a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
 				  </li>
 				  
 				</ul>
@@ -45,25 +45,27 @@
 			<div class="nav-wrapper">                  
 			  <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
 				<li>
-					<a href="index.html" class="cyan-text">
+					<a href="home" class="cyan-text">
 						<i class="mdi-action-dashboard"></i>
 						<span>Home</span>
 					</a>
 				</li>
 				<li>
-					<a href="app-email.html" class="cyan-text">
+					<?php
+						echo '<a href="#modalcreateboard" class="cyan-text modal-trigger" onclick="hiddenGroupId(\''.$userId.'\')">';
+					?>
 						<i class="mdi-action-note-add"></i>
 						<span>Create Board</span>
 					</a>
 				</li> 
 				<li>
-					<a href="app-email.html" class="cyan-text">
+					<a href="#modalcreategroup" class="cyan-text modal-trigger">
 						<i class="mdi-social-group"></i>
 						<span>Create Group Board</span>
 					</a>
 				</li>
 				<li>
-					<a href="app-email.html" class="cyan-text">
+					<a href="#modalclosedboards" class="cyan-text modal-trigger">
 						<i class="mdi-navigation-close"></i>
 						<span>Closed Boards</span>
 					</a>
@@ -76,6 +78,40 @@
 	<!-- end header nav-->
 </header>
 <!-- END HEADER -->
+
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="user-details cyan darken-2">
+            <div class="row">
+                <div class="col col s4 m4 l4">
+                    <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image">
+                </div>
+                <div class="col col s8 m8 l8">
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled>Steven Gerrard<i class="mdi-navigation-arrow-drop-down right"></i></a>
+                </div>
+            </div>
+        </li>
+        <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
+        </li>
+        <li class="bold active"><a href="#modalcreateboard" class="waves-effect waves-cyan modal-trigger"><i class="mdi-action-note-add"></i> Create Board</a>
+        </li>
+        <li class="bold active"><a href="#modalcreategroup" class="waves-effect waves-cyan modal-trigger"><i class="mdi-social-group"></i> Create Group Board</a>
+        </li>
+        <li class="bold active"><a href="#modalclosedboards" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-close"></i> Closed Boards</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Profile</a>
+        </li>
+        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+
 
 <!-- //////////////////////////////////////////////////////////////////////////// -->
 
@@ -90,7 +126,71 @@
 			<!--start container-->
 			<div class="container">
 				<div class="section">
-					<p class="caption"><img src="images/user/star.png" width="20px" height="20px" alt="Profile" /> Favorite Boards</p>
+					<div id="modalcreateboard" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Create a board..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<p>Title</p>
+		                    		<input type="text" placeholder="Title.." id="boardTitle">
+		                    		<input type="hidden" id="hiddenOwnerId">
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  	<a onclick="createBoard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  </div>
+	                </div>
+	                <div id="modalcreategroup" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Create a group board..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<p>Name</p>
+		                    		<input type="text" placeholder="Name.." id="groupName">
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  	<a onclick="createGroup()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  </div>
+	                </div>
+	                <div id="modalclosedboards" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Closed boards..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<div class="col s12 m6 l12">
+		                    			<p><b>Boards</b></p>
+		                    			<div class="divider"></div>
+		                    			<p>Board Satu <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+		                    			<p>Board Dua <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+		                    		</div>
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  </div>
+	                </div>
+	                <div class="col s12 m4 l8">
+							<p><b>Filter Board</b></p>
+							<input type="checkbox" id="filterred" />
+	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+                      		<input type="checkbox" id="filteryellow" />
+	                      	<label for="filteryellow"><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+                      		<input type="checkbox" id="filtergreen" />
+	                      	<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+                      		<input type="checkbox" id="filterblue" />
+	                      	<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+					</div>
+					<div class="divider"></div>
+					<p class="caption"><img src="images/user/star.png" width="20px" height="20px" alt="Profile" /> <b>Favorite Boards</b></p>
                     <div id="card-stats">
                         <div class="row">
                             <div class="col s12 m6 l3">
@@ -108,71 +208,96 @@
                         </div>
                     </div>
                     <div class="divider"></div>
-	            	<p class="caption"><img src="images/user/user5.png" width="20px" height="20px" alt="Profile" /> My Boards</p>
-                    <div id="card-stats">
-                        <div class="row">
-                            <div class="col s12 m6 l3">
-                                <div class="card">
+	            	<p class="caption"><img src="images/user/user5.png" width="20px" height="20px" alt="Profile" /><b> My Boards</b></p>
+                    
+                	<?php
+                		echo '<div id="card-stats">';
+               			echo '<div class="row">';
+                		foreach($listBoardUser as $r)
+                		{	
+                			
+                			echo '<div class="col s12 m6 l3">';
+                			echo '<a href="board?id='.$r->boardId.'" >';
+                    		echo 	'<div class="card">';
+                    		echo 		'<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
+                            echo    	'<div class="card-content  green white-text">';
+                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
+                            echo   		'</div>';
+                            echo    	'<div class="card-action  green darken-2">';
+                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
+                            echo    	'</div>';
+                    		echo 	'</div>';
+                    		echo '</a>';
+                    		echo '</div>';
+                    		//date_format($r->boardCreated,"d/M/Y");
+                		}
+                			
+                        echo '<div class="col s12 m6 l3">';
+                        echo     '<div class="card">';
+                        echo        '<div class="card-content grey white-text">';
+                        echo 			'<a href="#modalcreateboard" class="modal-trigger" onclick="hiddenGroupId(\''.$userId.'\')">';
+                        echo            '<h2 class="card-stats-title white-text">Create a new Board..</h2>';
+                        echo            '</a>';
+                        echo        '</div>';
+                        echo    '</div>';
+                        echo '</div>';
+                    	//echo '<div class="divider"></div>';
+                    	echo '</div>';
+                    	echo '</div>';
+            			echo '<div class="divider"></div>';
+                	?>
 
-                                    <a href="#" class="secondary-content yellow"><i class="mdi-action-grade"></i></a>
-                                    <div class="card-content  green white-text">
-                                        <h2 class="card-stats-title">Life Goals</h2>
-                                        
-                                    </div>
-                                    <div class="card-action  green darken-2">
-                                        <div id="invoice-line" class="center-align">Today</div>
-                                    </div>
-                                </div>
-                            </div>
-                       		<div class="col s12 m6 l3">
-                                <div class="card">
-                                    <div class="card-content  blue white-text">
-                                        <h2 class="card-stats-title">Bucket List</h2>
-                                        
-                                    </div>
-                                    <div class="card-action  blue darken-2">
-                                        <div id="invoice-line" class="center-align">Yesterday</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col s12 m6 l3">
-                                <div class="card">
-                                    <div class="card-content grey white-text">
-                                        <h2 class="card-stats-title">Create a new Board..</h2>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	            	<?php
 
+	            		foreach($groupMember as $r) //mendapatkan list group yang terdapat user
+	            		{
+	            			$groupName = "";
+	            			foreach($groupUser as $g) //mendapatkan nama group
+	            			{
+	            				if($r->groupUserId == $g->groupId)
+	            				{
+	            					$groupName = $g->groupName;
+	            				}
+	            			}
+	            			echo '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="#" class="black-text"> <b>'.$groupName.'</b> </a></p>';
+	            			echo '<div id="card-stats">';
+			                     	echo   '<div class="row">';
+	            			foreach($groupBoard as $b)
+	            			{
+	            				if($r->groupUserId == $b->boardOwner)
+	            				{
+			                        echo    	'<div class="col s12 m6 l3">';
+			                        echo '<a href="board?id='.$b->boardId.'" >';
+			                        echo        	'<div class="card">';
+			                        echo            	'<div class="card-content red white-text">';
+			                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
+			                        echo            	'</div>';
+			                        echo            	'<div class="card-action red darken-2">';
+			                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
+			                        echo           	 	'</div>';
+			                        echo       	 	'</div>';
+			                        echo '</a>';
+			                        echo   	 	'</div>';
+	            				}
+	            			}
 
+		            		
 
-
-	            	<div class="divider"></div>
-	            	<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /> STTS 2017 </p>
-                    <div id="card-stats">
-                        <div class="row">
-                            <div class="col s12 m6 l3">
-                                <div class="card">
-                                    <div class="card-content red white-text">
-                                        <h2 class="card-stats-title">Praktikum</h2>
-                                    </div>
-                                    <div class="card-action red darken-2">
-                                        <div id="invoice-line" class="center-align">Last Week</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col s12 m6 l3">
-                                <div class="card">
-                                    <div class="card-content grey white-text">
-                                        <h2 class="card-stats-title">Create a new Board..</h2>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	                        echo    	'<div class="col s12 m6 l3">';
+	                        echo        	'<div class="card">';
+	                        echo            	'<div class="card-content grey white-text">';
+	                        echo 						'<a href="#modalcreateboard" class="modal-trigger" onclick="hiddenGroupId(\''.$r->groupUserId.'\')">';
+	                        echo                		'<h2 class="card-stats-title white-text">Create a new Board..</h2>';
+	                        echo                	'</a>';
+	                        echo            	'</div>';
+	                        echo        	'</div>';
+	                        echo    	'</div>';
+	                        echo 	'</div>';
+	                   		echo '</div>';
+	                   		echo "<div class='divider'></div>";
+	            		}
+	            	?>
+	            	
             	</div>
 
 

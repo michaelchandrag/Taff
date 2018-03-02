@@ -7,6 +7,7 @@ use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Flash\Direct as Flash;
+use Phalcon\Http\Response\Cookies;
 
 /**
  * Shared configuration service
@@ -110,3 +111,15 @@ $di->setShared('session', function () {
 
     return $session;
 });
+
+
+$di->set(
+    'cookies',
+    function () {
+        $cookies = new Cookies();
+
+        $cookies->useEncryption(false);
+
+        return $cookies;
+    }
+);

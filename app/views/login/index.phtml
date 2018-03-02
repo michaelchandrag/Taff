@@ -20,8 +20,8 @@
       <div class="row margin">
         <div class="input-field col s12">
           <i class="mdi-social-person-outline prefix"></i>
-          <input id="username" type="text">
-          <label for="username" class="center-align">Username</label>
+          <input id="email" type="email">
+          <label for="email" class="center-align">Email</label>
         </div>
       </div>
       <div class="row margin">
@@ -33,22 +33,24 @@
       </div>
       <div class="row">          
         <div class="input-field col s12 m12 l12  login-text">
-            <input type="checkbox" id="remember-me" />
-            <label for="remember-me">Remember me</label>
+            <input type="checkbox" id="remember" />
+            <label for="remember">Remember me</label>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <a href="index.html" class="btn waves-effect waves-light col s12">Login</a>
+          <a class="btn waves-effect waves-light col s12" onclick="cekLogin()">Login</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <div id="my-signin2"></div>
         </div>
       </div>
       <div class="row">
         <div class="input-field col s6 m6 l6">
-          <p class="margin medium-small"><a href="page-register.html">Register Now!</a></p>
-        </div>
-        <div class="input-field col s6 m6 l6">
-            <p class="margin right-align medium-small"><a href="page-forgot-password.html">Forgot password ?</a></p>
-        </div>          
+          <p class="margin medium-small"><a href="register">Register Now!</a></p>
+        </div>        
       </div>
 
     </form>

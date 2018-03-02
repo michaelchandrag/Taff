@@ -1,0 +1,353 @@
+<!-- Start Page Loading -->
+<div id="loader-wrapper">
+	<div id="loader"></div>        
+	<div class="loader-section section-left"></div>
+	<div class="loader-section section-right"></div>
+</div>
+<!-- End Page Loading -->
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="user-details cyan darken-2">
+            <div class="row">
+                <div class="col col s4 m4 l4">
+                    <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image">
+                </div>
+                <div class="col col s8 m8 l8">
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled>Steven Gerrard<i class="mdi-navigation-arrow-drop-down right"></i></a>
+                </div>
+            </div>
+        </li>
+        <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
+        </li>
+        <li class="bold active"><a href="#modalcreateboard" class="waves-effect waves-cyan modal-trigger"><i class="mdi-action-note-add"></i> Create Board</a>
+        </li>
+        <li class="bold active"><a href="#modalcreategroup" class="waves-effect waves-cyan modal-trigger"><i class="mdi-social-group"></i> Create Group Board</a>
+        </li>
+        <li class="bold active"><a href="#modalclosedboards" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-close"></i> Closed Boards</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Profile</a>
+        </li>
+        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START HEADER -->
+<header id="header" class="page-topbar">
+	<!-- start header nav-->
+	<div class="navbar-fixed">
+		<nav class="navbar-color">
+			<div class="nav-wrapper">
+				<ul class="left">                      
+				  <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
+				</ul>
+				<div class="header-search-wrapper hide-on-med-and-down">
+					<i class="mdi-action-search"></i>
+					<input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+				</div>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+					</li>
+					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="images/user/gerrard.png" width="32px" height="32px" style="border-radius:50%" /></a>
+					</li>
+				</ul>
+				<!-- translation-button -->
+				<ul id="translation-dropdown" class="dropdown-content">
+				  <li>
+					<a href="#!"><img src="images/user/user2.png" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+				  </li>
+				  <li>
+					<a href="#!"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+				  </li>
+				  
+				</ul>
+			</div>
+		</nav>
+
+		<!-- HORIZONTL NAV START-->
+		 <nav id="horizontal-nav" class="white hide-on-med-and-down">
+			<div class="nav-wrapper">                  
+			  <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+				<li>
+					<a href="home" class="cyan-text">
+						<i class="mdi-action-dashboard"></i>
+						<span>Home</span>
+					</a>
+				</li>
+				<li>
+					<a href="#modalcreateboard" class="cyan-text modal-trigger">
+						<i class="mdi-action-note-add"></i>
+						<span>Create Board</span>
+					</a>
+				</li> 
+				<li>
+					<a href="#modalcreategroup" class="cyan-text modal-trigger">
+						<i class="mdi-social-group"></i>
+						<span>Create Group Board</span>
+					</a>
+				</li>
+				<li>
+					<a href="app-email.html" class="cyan-text">
+						<i class="mdi-navigation-close"></i>
+						<span>Closed Boards</span>
+					</a>
+				</li>
+			  </ul>
+			</div>
+		  </nav>
+		<!-- HORIZONTL NAV END-->
+	</div>
+	<!-- end header nav-->
+</header>
+<!-- END HEADER -->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START MAIN -->
+<div id="main">
+	<!-- START WRAPPER -->
+	<div class="wrapper">
+
+		<!-- START CONTENT -->
+		<section id="content">
+
+			<!--start container-->
+			<div class="container">
+				<!-- trello start here -->
+				<div class="section">
+					<div id="modalcreateboard" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Create a board..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<p>Title</p>
+		                    		<input type="text" placeholder="Title..">
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  	<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  </div>
+	                </div>
+	                <div id="modalcreategroup" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Create a group board..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<p>Name</p>
+		                    		<input type="text" placeholder="Name..">
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  	<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  </div>
+	                </div>
+	                <div id="modalclosedboards" class="modal">
+		                  <div class="modal-content">
+		                    <div class="col s12 m6 l12">
+		                    	<div class="row">
+		                    		<h6><b>Closed boards..</b></h6>
+		                    		<div class="divider"></div>
+		                    		<div class="col s12 m6 l12">
+		                    			<p><b>Boards</b></p>
+		                    			<div class="divider"></div>
+		                    			<p>Board Satu <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+		                    			<p>Board Dua <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+		                    		</div>
+		                    	</div>
+		                    </div>
+		                  </div>
+		                  <div class="modal-footer">
+		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+		                  </div>
+	                </div>
+				<!-- PROFILE -->
+		        <div id="profile-page" class="section">
+		            <!-- profile-page-header -->
+		            <div id="profile-page-header" class="card">
+		                <div class="card-image waves-effect waves-block waves-light">
+		                    <img class="" src="images/user-profile-bg.jpg" alt="user background">                    
+		                </div>
+		                <figure class="card-profile-image">
+		                    <img src="images/user/gerrard.png" alt="profile image" class="circle z-depth-2 responsive-img">
+		                </figure>
+		                <div class="card-content">
+		                  <div class="row">                    
+		                    <div class="col s3 offset-s2">                        
+		                        <h4 class="card-title grey-text text-darken-4">STTS 2017</h4>
+		                        <p class="medium-small grey-text">Mahasiswa</p>                        
+		                    </div>
+		                    <div class="col s2 center-align">
+		                        <h4 class="card-title grey-text text-darken-4">10+</h4>
+		                        <p class="medium-small grey-text">Boards</p>                        
+		                    </div>
+		                    <div class="col s2 center-align">
+		                        <h4 class="card-title grey-text text-darken-4">1</h4>
+		                        <p class="medium-small grey-text">Members</p>                        
+		                    </div>                   
+		                    <div class="col s2 center-align">
+		                        <h4 class="card-title grey-text text-darken-4">23 Mar 2018</h4>
+		                        <p class="medium-small grey-text">Created</p>                        
+		                    </div>
+		                  </div>
+		                </div>
+		            </div>
+		            <!--/ profile-page-header -->
+
+		            <!-- profile-page-content -->
+		            <div id="profile-page-content" class="row">
+		              <!-- profile-page-sidebar-->
+		              <div id="profile-page-sidebar" class="col s12 m4">
+		              	<!-- Invite -->
+		              	<div class="card white">
+		                  <div class="card-content black-text">
+		                    <span class="card-title"><b>Invite</b></span>
+		                        <div class="input-field">
+		                          <input id="name" type="text">
+		                          <label for="name">Email</label>
+		                        </div>
+		                  </div>                  
+		                </div>
+		                <!-- Profile About  -->
+		                <div class="card white">
+		                  <div class="card-content black-text">
+		                    <span class="card-title"><b>Edit Profile</b></span>
+		                        <div class="input-field">
+		                          <input id="name" type="text" value="STTS 2017">
+		                          <label for="name">Name</label>
+		                        </div>
+		                        <div class="input-field">
+		                          <textarea id="bio" class="materialize-textarea" length="120"></textarea>
+                          		  <label for="bio">Bio</label>
+		                        </div>
+		                    	<div class="file-field input-field">
+			                      <div class="btn">
+			                        <span>Group Photo</span>
+			                        <input type="file">
+			                      </div>
+			                      <div class="file-path-wrapper">
+			                        <input class="file-path validate" type="text">
+			                      </div>
+			                    </div>
+			                    <div class="input-field">
+		                          <button class="btn waves-effect waves-light green" type="submit" name="action">Save
+			                        <i class="mdi-content-send right"></i>
+			                      </button>
+		                        </div>
+		                  </div>                  
+		                </div>
+		                <!-- Profile About  -->
+
+		              </div>
+		              <!-- profile-page-sidebar-->
+
+		              <!-- profile-page-wall -->
+		              <div id="profile-page-wall" class="col s12 m8">
+		                <!-- profile-page-wall-share -->
+		                <div id="profile-page-wall-share" class="row">
+		                  <div class="col s12">
+		                    <ul class="tabs tab-profile z-depth-1 light-blue">
+		                      <li class="tab col s3"><a class="white-text waves-effect waves-light active" href="#Bio"><i class="mdi-editor-border-color"></i> Bio</a>
+		                      </li>
+		                      <li class="tab col s3"><a class="white-text waves-effect waves-light" href="#Members"><i class="mdi-social-group"></i> Members</a>
+		                      </li>
+		                      <li class="tab col s3"><a class="white-text waves-effect waves-light" href="#Boards"><i class="mdi-action-list"></i> Boards</a>
+		                      </li>                      
+		                    </ul>
+		                    <!-- Bio-->
+		                    <div id="Bio" class="tab-content col s12  grey lighten-4">
+		                      <div class="row">
+		                        <div class="col s2">
+		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
+		                        </div>
+		                        <div class="input-field col s10">
+		                          <h5 class="black-text"><b><u>Bio</u></b></h5>
+		                          <p class="black-text">Team bio.</p>
+		                        </div>
+		                      </div>
+		                    </div>
+		                    <!-- Members-->
+		                    <div id="Members" class="tab-content col s12  grey lighten-4">
+		                      <div class="row">
+		                        <div class="col s2">
+		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
+		                        </div>
+		                        <div class="input-field col s10">
+		                          <h5 class="black-text"><b><u>Teams</u></b></h5>
+		                          <p class="black-text">STTS 2017</p>
+		                          <p class="black-text">Team Kedua</p>
+		                          <p class="black-text">Team Ketiga</p>
+		                        </div>
+		                      </div>
+		                    </div>
+		                    <!-- Boards-->
+		                    <div id="Boards" class="tab-content col s12  grey lighten-4">
+		                      <div class="row">
+		                        <div class="col s2">
+		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
+		                        </div>
+		                        <div class="col s10">
+		                          <h5 class="black-text"><b><u>Activity</u></b></h5>
+	                          	  <p>
+		                          	Steven Gerrard added something similiar
+		                          </p>
+		                          <p class="ultra-small grey-text lighten-1">
+	                          		just now
+	                          	  </p>
+	                          	  <div class="divider"></div>
+		                          <p>
+		                          	Steven Gerrard added something
+		                          </p>
+		                          <p class="ultra-small grey-text lighten-1">
+	                          		yesterday at 8:17 PM
+	                          	  </p>
+		                        </div>
+
+		                      </div>
+		                    </div>
+		                  </div>
+		                </div>
+		                <!--/ profile-page-wall-share -->
+
+		              </div>
+		              <!--/ profile-page-wall -->
+
+		            </div>
+		        </div>
+
+				<!-- END OF PROFILE-->
+				<!-- Floating Action Button -->
+				<div class="fixed-action-btn" style="bottom: 50px; right: 19px;">
+					<a class="btn-floating btn-large">
+					  <i class="mdi-action-stars"></i>
+					</a>
+					<ul>
+					  <li><a href="css-helpers.html" class="btn-floating red"><i class="large mdi-communication-live-help"></i></a></li>
+					  <li><a href="app-widget.html" class="btn-floating yellow darken-1"><i class="large mdi-device-now-widgets"></i></a></li>
+					  <li><a href="app-calendar.html" class="btn-floating green"><i class="large mdi-editor-insert-invitation"></i></a></li>
+					  <li><a href="app-email.html" class="btn-floating blue"><i class="large mdi-communication-email"></i></a></li>
+					</ul>
+				</div>
+				<!-- Floating Action Button -->
+			</div>
+			<!--end container-->
+		</section>
+		<!-- END CONTENT -->
+
+	</div>
+	<!-- END WRAPPER -->
+</div>
+<!-- END MAIN -->
