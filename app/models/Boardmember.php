@@ -97,13 +97,14 @@ class Boardmember extends \Phalcon\Mvc\Model
 
     public function insertBoardMember($userId,$boardId,$role,$status)
     {
+        date_default_timezone_set('Asia/Jakarta');
         $boardMember = new Boardmember();
         $index = $boardMember->countMember();
         $id = "BM".str_pad($index,3,'0',STR_PAD_LEFT);
         $boardMember->memberId = $id;
         $boardMember->userId = $userId;
         $boardMember->boardId = $boardId;
-        $boardMember->memberCreated = date("Y-m-d h:i:sa");
+        $boardMember->memberCreated = date("Y-m-d H:i:sa");
         $boardMember->memberRole = $role;
         $boardMember->memberStatus = $status;
         $boardMember->save();

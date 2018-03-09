@@ -157,6 +157,7 @@
 									foreach($board as $r)
 									{
 										echo $r->boardTitle;
+										echo "<input type='hidden' id='hiddenBoardId' value='".$r->boardId."'>";
 									}
 								?>
 							</b></h1>
@@ -377,7 +378,7 @@
 									</div>
 									<div class="divider"></div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalarchive">Archive</a>
+										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalarchive" onclick="modalArchive()">Archive</a>
 									</div>
 									<div class="divider"></div>
 									<div class="col s12 m6 l12">
@@ -495,6 +496,7 @@
 					</div>
 					<!-- END OF MODAL MENU MORE-->
 					<!-- MODAL ACTION CARD-->
+					<input type="hidden" id="hiddenCardId">
 					<div id="modaleditcard" class="modal">
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
@@ -511,20 +513,47 @@
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
+					<div id="modaleditdescription" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<h6><b>Edit description card..</b></h6>
+								<div class="divider"></div>
+								<p>Description</p>
+								<textarea id="textarea2" class="materialize-textarea"></textarea>
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+					  </div>
+					</div>
+					<div id="modalcreatechecklistitem" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<h6><b>Add checklist item..</b></h6>
+								<div class="divider"></div>
+								<p>Item</p>
+								<input type="hidden" id="checklistItemId">
+								<input type="text" id="checklistItemTitle">
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="#" onclick="createChecklistItem()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+					  </div>
+					</div>
 					<div id="modalassignmembers" class="modal modal-fixed-footer white">
 					  <div class="modal-content white">
 						<div class="col s12 m6 l12">
 							<div class="row">
 								<h6><b>Assign members</b></h6>
 								<div class="divider"></div>
-								<p>
-									<input type="checkbox" id="test3" />
-									<label for="test3" class="black-text">Michael Chandra</label>
-								</p>
-								<p>
-									<input type="checkbox" id="test3" />
-									<label for="test3" class="black-text">Steven Gerrard</label>
-								</p>
+								<div id="assignMembers">
+								</div>
 							</div>
 						</div>
 					  </div>
@@ -565,7 +594,7 @@
 								<h6><b>Add a checklist..</b></h6>
 								<div class="divider"></div>
 								<p>Title</p>
-								<input type="text">
+								<input type="text" id="checklistTitle">
 								<p>Copy checklist from..</p>
 								<select>
 								  <option value="" disabled selected>Choose your option</option>
@@ -578,7 +607,7 @@
 					  </div>
 					  <div class="modal-footer teal lighten-4">
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a onclick="createChecklist()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalarchive" class="modal modal-fixed-footer white">
@@ -587,13 +616,13 @@
 							<div class="row">
 								<h6><b>Archived items..</b></h6>
 								<div class="divider"></div>
-								<div class="col s12 m6 l6">
+								<div class="col s12 m6 l6" id="archiveList">
 									<p><b>Cards</b></p>
 									<div class="divider"></div>
 									<p>Card Satu <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
 									<p>Card Dua <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
 								</div>
-								<div class="col s12 m6 l6">
+								<div class="col s12 m6 l6" id="archiveCard">
 									<p><b>Lists</b></p>
 									<div class="divider"></div>
 									<p>List Satu <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
@@ -616,34 +645,34 @@
 								<div class="divider"></div>
 								<div class="col s12 m6 l3">
 									<p>Date</p>
-									<input type="date" class="datepicker">
+									<input type="date" class="datepicker" id="startDate">
 									<p>Time</p>
-									<select>
+									<select id="startDateTime">
 									  <option value="" disabled selected>Choose your time</option>
-									  <option value="0">12:00AM</option>
-									  <option value="1">01:00AM</option>
-									  <option value="2">02:00AM</option>
-									  <option value="3">03:00AM</option>
-									  <option value="4">04:00AM</option>
-									  <option value="5">05:00AM</option>
-									  <option value="6">06:00AM</option>
-									  <option value="7">07:00AM</option>
-									  <option value="8">08:00AM</option>
-									  <option value="9">09:00AM</option>
-									  <option value="10">10:00AM</option>
-									  <option value="11">11:00AM</option>
-									  <option value="12" selected>12:00PM</option>
-									  <option value="13">01:00PM</option>
-									  <option value="14">02:00PM</option>
-									  <option value="15">03:00PM</option>
-									  <option value="16">04:00PM</option>
-									  <option value="17">05:00PM</option>
-									  <option value="18">06:00PM</option>
-									  <option value="19">07:00PM</option>
-									  <option value="20">08:00PM</option>
-									  <option value="21">09:00PM</option>
-									  <option value="22">10:00PM</option>
-									  <option value="23">11:00PM</option>
+									  <option value="0">00:00</option>
+									  <option value="1">01:00</option>
+									  <option value="2">02:00</option>
+									  <option value="3">03:00</option>
+									  <option value="4">04:00</option>
+									  <option value="5">05:00</option>
+									  <option value="6">06:00</option>
+									  <option value="7">07:00</option>
+									  <option value="8">08:00</option>
+									  <option value="9">09:00</option>
+									  <option value="10">10:00</option>
+									  <option value="11">11:00</option>
+									  <option value="12" selected>12:00</option>
+									  <option value="13">13:00</option>
+									  <option value="14">14:00</option>
+									  <option value="15">15:00</option>
+									  <option value="16">16:00</option>
+									  <option value="17">17:00</option>
+									  <option value="18">18:00</option>
+									  <option value="19">19:00</option>
+									  <option value="20">20:00</option>
+									  <option value="21">21:00</option>
+									  <option value="22">22:00</option>
+									  <option value="23">23:00</option>
 									</select>
 								</div>
 							</div>
@@ -651,7 +680,7 @@
 					  </div>
 					  <div class="modal-footer teal lighten-4">
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a onclick="modalStartDate()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalduedate" class="modal modal-fixed-footer white" style="height:80%">
@@ -662,34 +691,34 @@
 								<div class="divider"></div>
 								<div class="col s12 m6 l3">
 									<p>Date</p>
-									<input type="date" class="datepicker">
+									<input type="date" class="datepicker" id="dueDate">
 									<p>Time</p>
-									<select>
+									<select id="dueDateTime">
 									  <option value="" disabled selected>Choose your time</option>
-									  <option value="0">12:00AM</option>
-									  <option value="1">01:00AM</option>
-									  <option value="2">02:00AM</option>
-									  <option value="3">03:00AM</option>
-									  <option value="4">04:00AM</option>
-									  <option value="5">05:00AM</option>
-									  <option value="6">06:00AM</option>
-									  <option value="7">07:00AM</option>
-									  <option value="8">08:00AM</option>
-									  <option value="9">09:00AM</option>
-									  <option value="10">10:00AM</option>
-									  <option value="11">11:00AM</option>
-									  <option value="12" selected>12:00PM</option>
-									  <option value="13">01:00PM</option>
-									  <option value="14">02:00PM</option>
-									  <option value="15">03:00PM</option>
-									  <option value="16">04:00PM</option>
-									  <option value="17">05:00PM</option>
-									  <option value="18">06:00PM</option>
-									  <option value="19">07:00PM</option>
-									  <option value="20">08:00PM</option>
-									  <option value="21">09:00PM</option>
-									  <option value="22">10:00PM</option>
-									  <option value="23">11:00PM</option>
+									  <option value="0">00:00</option>
+									  <option value="1">01:00</option>
+									  <option value="2">02:00</option>
+									  <option value="3">03:00</option>
+									  <option value="4">04:00</option>
+									  <option value="5">05:00</option>
+									  <option value="6">06:00</option>
+									  <option value="7">07:00</option>
+									  <option value="8">08:00</option>
+									  <option value="9">09:00</option>
+									  <option value="10">10:00</option>
+									  <option value="11">11:00</option>
+									  <option value="12" selected>12:00</option>
+									  <option value="13">13:00</option>
+									  <option value="14">14:00</option>
+									  <option value="15">15:00</option>
+									  <option value="16">16:00</option>
+									  <option value="17">17:00</option>
+									  <option value="18">18:00</option>
+									  <option value="19">19:00</option>
+									  <option value="20">20:00</option>
+									  <option value="21">21:00</option>
+									  <option value="22">22:00</option>
+									  <option value="23">23:00</option>
 									</select>
 								</div>
 							</div>
@@ -697,7 +726,7 @@
 					  </div>
 					  <div class="modal-footer teal lighten-4">
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a onclick="modalDueDate()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalattachment" class="modal modal-fixed-footer white">
@@ -808,7 +837,8 @@
 								<div class="col s12 m6 l9">
 									<div class="row">
 										<div class="col s12 m6 l12">
-										<h5 id="modalCardTitle"><b>Card Title</b> <a href="#modaleditcard" class="ultra-small modal-trigger">Edit</a></h5>
+										<h5 id="modalCardTitle"><b>Card Title</b> </h5>
+										<a href="#modaleditcard" class="ultra-small modal-trigger">Edit Title</a>
 										</div>
 									</div>
 									<div class="row">
@@ -818,10 +848,11 @@
 									</div>
 									<div class="divider"></div>
 									<div class="row">
-										<div class="col s12 m6 l12">
+										<div class="col s12 m6 l12" id="cobacoba">
 											<h6><b>Description</b></h6>
 											<h6 id="modalCardDescription">Ini adalah deskripsi</h6>
-											<a href="#">Edit Description</a>
+											<div id="tes"></div>
+											<a href="#modaleditdescription" class="modal-trigger">Edit description</a>
 										</div>
 									</div>
 									<div class="row">
@@ -835,18 +866,13 @@
 											<div style="width:32px;height:32px;border-radius:15%;background-color:green;"></div>
 										</div>
 										<div class="col s12 m3 l3">
-											<h6><b>Start Date</b></h6>
-											<p>
-											  <input type="checkbox" id="test1" />
-											  <label for="test1">Feb 26 at 12:00PM</label>
-											</p>
+											<!--<h6><b>Start Date</b></h6>-->
+											<div id="ajaxStartDate">
+											</div>
 										</div>
 										<div class="col s12 m3 l3">
-											<h6><b>Due Date</b></h6>
-											<p>
-											  <input type="checkbox" id="test2" />
-											  <label for="test2">Feb 27 at 12:00PM</label>
-											</p>
+											<div id="ajaxDueDate">
+											</div>
 										</div>
 									</div>
 									<div class="divider"></div>
@@ -864,29 +890,9 @@
 										</div>
 									</div>
 									<div class="divider"></div>
-									<div class="row">
-										<div class="col s12 m6 l10 ">
-											<h6><b>Checklist</b></h6>
-											<div class="progress">
-												<div class="determinate" style="width: 50%"></div>
-											</div>
-											<p>
-											  <input type="checkbox" id="test3" />
-											  <label for="test3">Satu</label>
-											</p>
-											<p>
-											  <input type="checkbox" id="test4" />
-											  <label for="test4">Dua</label>
-											</p>
-											<p>
-												<a href="#">Add an item</a>
-											</p>
-										</div>
-										<div class="col s12 m6 l1 ">
-											<a href="#">Delete</a>
-										</div>
+									<div class="row" id="ajaxChecklist">
+
 									</div>
-									<div class="divider" style="margin-top:5px;"></div>
 									<div class="row">
 										<div class="col s12 m6 l12">
 										<h6><b>Add Comment</b></h6>
@@ -971,21 +977,23 @@
 									<div class="row" style="margin-top:5px;">
 										<a href="#modalcopy" class="modal-trigger btn-flat waves-effect">Copy</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
-										<a href="#" class="btn-flat waves-effect">Archive</a>
+									<div id="changeArchive" class="row" style="margin-top:5px;">
+										<a href="#" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
 									</div>
-									<div class="divider"></div>
-									<div class="row" style="margin-top:5px;">
-										<a href="#" class="btn-flat waves-effect">Send to Board</a>
-									</div>
-									<div class="row" style="margin-top:5px;">
-										<a href="#" class="btn-flat waves-effect">Delete</a>
+									<div id="changeSend" style="display:none;">
+										<div class="divider"></div>
+										<div class="row" style="margin-top:5px;">
+											<a href="#" class="btn-flat waves-effect" onclick="changeSend()">Send to Board</a>
+										</div>
+										<div class="row" style="margin-top:5px;">
+											<a href="#" class="btn-flat waves-effect">Delete</a>
+										</div>
 									</div>
 								</div>
 							</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-green btn-flat modal-action modal-close">Close</a>
+						<a href="#" class="waves-effect waves-green btn-flat  modal-close">Close</a>
 					  </div>
 					</div>
 					<!-- END OF MODAL ACTION CARD-->
@@ -1000,17 +1008,19 @@
 									echo	'<div class="card">';
 									echo		'<div class="card-content grey lighten-2 white-text">';
 						            echo            '<p class="card-title grey-text text-darken-4">'.$l->listTitle.'<span class="card-title activator"><i class="mdi-navigation-more-vert right"></i></span></p>';
+						            echo 			'<div id="list'.$l->listId.'">';
 									foreach($boardCard as $c)
 									{
-										if($c->cardListId == $l->listId)
+										if($c->cardListId == $l->listId && $c->cardArchive == 0)
 										{
-											echo			'<a href="#modal3" class="modal-trigger" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
+											echo			'<a id="card'.$c->cardId.'" href="#modal3" class="modal-trigger" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
 											echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 											echo					'<div class="left-align black-text">'.$c->cardTitle.'</div>';
 											echo				'</div>';
 											echo			'</a>';
 										}
 									}
+									echo 				'</div>';
 			                       
 			                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
 		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="#modalcreatecard" class="modal-trigger grey-text" onclick="hiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';

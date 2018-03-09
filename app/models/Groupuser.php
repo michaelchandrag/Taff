@@ -83,12 +83,13 @@ class Groupuser extends \Phalcon\Mvc\Model
 
     public function insertGroupUser($name,$status)
     {
+        date_default_timezone_set('Asia/Jakarta');
         $groupUser = new Groupuser();
         $index = Groupuser::countGroup();
         $id = "GU".str_pad($index,3,'0',STR_PAD_LEFT);
         $groupUser->groupId = $id;
         $groupUser->groupName = $name;
-        $groupUser->groupCreated = date("Y-m-d h:i:sa");
+        $groupUser->groupCreated = date("Y-m-d H:i:sa");
         $groupUser->groupStatus = $status;
         $groupUser->save();
     }

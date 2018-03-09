@@ -33,7 +33,9 @@
               echo '<link href="css/layouts/page-center.css" type="text/css" rel="stylesheet" media="screen,projection">';
             }
         ?>
-
+		
+	
+	
 
 		<!-- INCLUDED PLUGIN CSS ON THIS PAGE -->
         <link href="js/plugins/prism/prism.css" type="text/css" rel="stylesheet" media="screen,projection">
@@ -49,6 +51,7 @@
     <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
     <!--materialize js-->
     <script type="text/javascript" src="js/materialize.min.js"></script>
+	<script type="text/javascript" src="js/materialize.js"></script>
     <!--scrollbar-->
     <script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <!--prism-->
@@ -64,43 +67,22 @@
     <script type="text/javascript" src="js/custom-script.js"></script>
      <!--sweetalert -->
     <script type="text/javascript" src="js/plugins/sweetalert/sweetalert.min.js"></script> 
-    <!-- Toast Notification -->
     <!-- chartist -->
     <script type="text/javascript" src="js/plugins/jquery-validation/jquery.validate.min.js"></script>
     <script type="text/javascript" src="js/plugins/jquery-validation/additional-methods.min.js"></script>
     
+    <!-- Toast Notification -->
     <script type="text/javascript">
-    // Toast Notification
-    $(window).load(function() {
-        setTimeout(function() {
-            Materialize.toast('<span>Hiya! I am a toast.</span>', 1500);
-        }, 1500);
-        setTimeout(function() {
-            Materialize.toast('<span>You can swipe me too!</span>', 3000);
-        }, 5000);
-        setTimeout(function() {
-            Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
-        }, 15000);
-    });
-    </script>
-    <script>
-        function onSuccess(googleUser) {
-          console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-        }
-        function onFailure(error) {
-          console.log(error);
-        }
-        function renderButton() {
-          gapi.signin2.render('my-signin2', {
-            'scope': 'profile email',
-            'width': 240,
-            'height': 50,
-            'longtitle': true,
-            'theme': 'dark',
-            'onsuccess': onSuccess,
-            'onfailure': onFailure
-          });
-        }
+		/*setTimeout(function() {
+				Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
+			}, 4000);
+		setTimeout(function() {
+			Materialize.toast('<span>YJANCIOJKKK!</span>', 3000);
+		}, 4000);
+		setTimeout(function() {
+			Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
+		}, 4000);*/
+		
     </script>
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
     <!-- My JS-->

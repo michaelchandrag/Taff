@@ -59,7 +59,7 @@
 					</a>
 				</li> 
 				<li>
-					<a href="#modalcreategroup" class="cyan-text modal-trigger">
+					<a id="cokbesar" href="#modalcreategroup" class="cyan-text">
 						<i class="mdi-social-group"></i>
 						<span>Create Group Board</span>
 					</a>
@@ -213,22 +213,28 @@
                 	<?php
                 		echo '<div id="card-stats">';
                			echo '<div class="row">';
-                		foreach($listBoardUser as $r)
+                		foreach($board as $r)
                 		{	
-                			
-                			echo '<div class="col s12 m6 l3">';
-                			echo '<a href="board?id='.$r->boardId.'" >';
-                    		echo 	'<div class="card">';
-                    		echo 		'<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
-                            echo    	'<div class="card-content  green white-text">';
-                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
-                            echo   		'</div>';
-                            echo    	'<div class="card-action  green darken-2">';
-                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
-                            echo    	'</div>';
-                    		echo 	'</div>';
-                    		echo '</a>';
-                    		echo '</div>';
+                			if($r->boardOwner == $userId)
+                			{
+                				if($r->boardGroup == "0")
+                				{
+
+		                			echo '<div class="col s12 m6 l3">';
+		                			echo '<a href="board?id='.$r->boardId.'" >';
+		                    		echo 	'<div class="card">';
+		                    		echo 		'<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
+		                            echo    	'<div class="card-content  green white-text">';
+		                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
+		                            echo   		'</div>';
+		                            echo    	'<div class="card-action  green darken-2">';
+		                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
+		                            echo    	'</div>';
+		                    		echo 	'</div>';
+		                    		echo '</a>';
+		                    		echo '</div>';
+                				}
+                			}
                     		//date_format($r->boardCreated,"d/M/Y");
                 		}
                 			
@@ -262,7 +268,31 @@
 	            			echo '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="#" class="black-text"> <b>'.$groupName.'</b> </a></p>';
 	            			echo '<div id="card-stats">';
 			                     	echo   '<div class="row">';
-	            			foreach($groupBoard as $b)
+			                foreach($boardGroup as $g)
+			                {
+			                	if($g->groupId == $r->groupUserId)
+			                	{
+			                		foreach($board as $b)
+			                		{
+			                			if($b->boardId == $g->boardId)
+			                			{
+											echo    	'<div class="col s12 m6 l3">';
+					                        echo '<a href="board?id='.$b->boardId.'" >';
+					                        echo        	'<div class="card">';
+					                        echo            	'<div class="card-content red white-text">';
+					                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
+					                        echo            	'</div>';
+					                        echo            	'<div class="card-action red darken-2">';
+					                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
+					                        echo           	 	'</div>';
+					                        echo       	 	'</div>';
+					                        echo '</a>';
+					                        echo   	 	'</div>';
+			                			}
+			                		}
+			                	}
+			                }
+	            			/*foreach($boardGroup as $b)
 	            			{
 	            				if($r->groupUserId == $b->boardOwner)
 	            				{
@@ -279,7 +309,7 @@
 			                        echo '</a>';
 			                        echo   	 	'</div>';
 	            				}
-	            			}
+	            			}*/
 
 		            		
 
@@ -297,7 +327,6 @@
 	                   		echo "<div class='divider'></div>";
 	            		}
 	            	?>
-	            	
             	</div>
 
 

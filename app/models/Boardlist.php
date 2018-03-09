@@ -103,15 +103,16 @@ class Boardlist extends \Phalcon\Mvc\Model
 
     public function insertBoardList($owner,$title,$archive,$status)
     {
+        date_default_timezone_set('Asia/Jakarta');
         $list = new Boardlist();
         $index = $list->countList();
-        $id = "BL".str_pad($index,3,'0',STR_PAD_LEFT);
+        $id = "BL".str_pad($index,5,'0',STR_PAD_LEFT);
         $indexPos = $list->countListById($owner);
         $list->listId = $id;
         $list->listBoardId = $owner;
         $list->listTitle = $title;
         $list->listPosition = $indexPos+1;
-        $list->listCreated = date("Y-m-d h:i:sa");
+        $list->listCreated = date("Y-m-d H:i:sa");
         $list->listArchive = $archive;
         $list->listStatus = $status;
         $list->save();

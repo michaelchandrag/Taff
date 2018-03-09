@@ -49,6 +49,13 @@ class Board extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="boardGroup", type="string", length=1, nullable=false)
+     */
+    public $boardGroup;
+
+    /**
+     *
+     * @var string
      * @Column(column="boardStatus", type="string", length=20, nullable=false)
      */
     public $boardStatus;
@@ -67,7 +74,8 @@ class Board extends \Phalcon\Mvc\Model
     {
         $this->setSchema("taff");
         $this->setSource("board");
-        $this->belongsTo('boardOwner', '\Groupuser', 'groupId', ['alias' => 'Groupuser']);
+        $this->hasMany('boardId', 'Boardlist', 'listBoardId', ['alias' => 'Boardlist']);
+        $this->hasMany('boardId', 'Boardmember', 'boardId', ['alias' => 'Boardmember']);
         $this->belongsTo('boardOwner', '\User', 'userId', ['alias' => 'User']);
     }
 
@@ -109,16 +117,17 @@ class Board extends \Phalcon\Mvc\Model
          return count($board);
     }
 
-    public function insertBoard($owner,$title,$public,$status,$background)
+    public function insertBoard($owner,$title,$public,$group,$status,$background)
     {
         $board = new Board();
         $index = $board->countBoard();
-        $id = "BO".str_pad($index,3,'0',STR_PAD_LEFT);
+        $id = "BO".str_pad($index,5,'0',STR_PAD_LEFT);
         $board->boardId = $id;
         $board->boardOwner = $owner;
         $board->boardTitle = $title;
-        $board->boardCreated = date("Y-m-d h:i:sa");
+        $board->boardCreated = date("Y-m-d H:i:sa");
         $board->boardPublic = $public;
+        $board->boardGroup = $group;
         $board->boardClosed = '0';
         $board->boardStatus = $status;
         $board->boardBackground = $background;
@@ -134,5 +143,4 @@ class Board extends \Phalcon\Mvc\Model
         );
         return $board;
     }
-
 }

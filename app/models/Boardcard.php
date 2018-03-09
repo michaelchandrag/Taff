@@ -21,6 +21,13 @@ class Boardcard extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="cardBoardId", type="string", length=20, nullable=false)
+     */
+    public $cardBoardId;
+
+    /**
+     *
+     * @var string
      * @Column(column="cardOwner", type="string", length=20, nullable=false)
      */
     public $cardOwner;
@@ -74,8 +81,13 @@ class Boardcard extends \Phalcon\Mvc\Model
     {
         $this->setSchema("taff");
         $this->setSource("boardcard");
+        $this->hasMany('cardId', 'Boardassignmembers', 'cardId', ['alias' => 'Boardassignmembers']);
+        $this->hasMany('cardId', 'Boardchecklist', 'cardId', ['alias' => 'Boardchecklist']);
+        $this->hasMany('cardId', 'Boardchecklistitem', 'cardId', ['alias' => 'Boardchecklistitem']);
+        $this->hasMany('cardId', 'Boardduedate', 'cardId', ['alias' => 'Boardduedate']);
         $this->belongsTo('cardListId', '\Boardlist', 'listId', ['alias' => 'Boardlist']);
         $this->belongsTo('cardOwner', '\User', 'userId', ['alias' => 'User']);
+        $this->belongsTo('cardBoardId', '\Board', 'boardId', ['alias' => 'Board']);
     }
 
     /**
@@ -116,19 +128,21 @@ class Boardcard extends \Phalcon\Mvc\Model
         return count($card);
     }
 
-    public function insertBoardCard($listId,$owner,$title,$description,$archive,$status)
+    public function insertBoardCard($listId,$boardId,$owner,$title,$description,$archive,$status)
     {
+        date_default_timezone_set('Asia/Jakarta');
         $card = new Boardcard();
         $index = $card->countCard();
-        $id = "BC".str_pad($index,3,'0',STR_PAD_LEFT);
+        $id = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
         $indexPos = $card->countCardById($listId);
         $card->cardId = $id;
         $card->cardListId = $listId;
+        $card->cardBoardId = $boardId;
         $card->cardOwner = $owner;
         $card->cardTitle = $title;
         $card->cardDescription = $description;
         $card->cardPosition = $indexPos+1;
-        $card->cardCreated = date("Y-m-d h:i:sa");
+        $card->cardCreated = date("Y-m-d H:i:sa");
         $card->cardArchive = $archive;
         $card->cardStatus = $status;
         $card->save();
@@ -143,4 +157,15 @@ class Boardcard extends \Phalcon\Mvc\Model
         );
         return count($card);
     }
+
+    public function setArchive($id,$status)
+    {
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$id."'"
+            ]);
+        $card->cardArchive = $status;
+        $card->save();
+    }
+
 }

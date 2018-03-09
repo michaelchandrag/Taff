@@ -6,51 +6,69 @@ class HomeController extends ControllerBase
     public function indexAction()
     {
     	$userId = $this->session->get("userId");
-    	$board = new Board();
-    	$listBoardUser = $board->findBoardByUser($userId);
+    	$board = Board::find();
     	$groupMember = new Groupmember();
     	$groupMember = $groupMember->findGroup($userId);
     	$groupUser = Groupuser::find();
-    	$groupBoard = Groupboard::find();
-    	$this->view->listBoardUser = $listBoardUser;
+    	$boardGroup = Boardgroup::find();
+    	$this->view->board = $board;
     	$this->view->userId = $userId;
     	$this->view->groupMember = $groupMember;
     	$this->view->groupUser = $groupUser;
-    	$this->view->groupBoard = $groupBoard;
+    	$this->view->boardGroup = $boardGroup;
     }
 
     public function createBoardAction()
     {
     	$title = $_POST["title"];
     	$owner = $_POST["owner"];
-    	$public = 1;
-    	$status = 1;
+    	$public = "1";
+    	$status = '1';
     	$background = "Blue";
+        $group = "0";
     	$userId = $this->session->get("userId");
-    	/*$boardUser = new Boarduser();
-    	$boardUser->insertBoardUser($userId,$title,$public,$status);*/
-    	if(substr($owner,0,1) == 'B')
-    	{
-    		$board = new Board();
-    		$index = $board->countBoard();
-       		$id = "BO".str_pad($index,3,'0',STR_PAD_LEFT);
-    		$board->insertBoard($owner,$title,$public,$status,$background);
-
-    		$role="Creator";
-    		$boardMember = new Boardmember();
-    		$boardMember->insertBoardMember($userId,$id,$role,$status);
-    	}
-    	else if(substr($owner,0,1) == "G")
-    	{
-    		$board = new Groupboard();
-    		$index = $board->countBoard();
-       		$id = "GB".str_pad($index,3,'0',STR_PAD_LEFT);
-    		$board->insertGroupBoard($owner,$title,$public,$status,$background);
-
-    		$role="Creator";
-    		$boardMember = new Groupboardmember();
-    		$boardMember->insertGroupBoardMember($userId,$id,$role,$status);
-    	}
+        if(substr($owner,0,1) == "B")
+        {
+            $group = "0";
+        }
+        else if(substr($owner,0,1) == "G")
+        {
+            $group = "1";
+        }
+        $board = new Board();
+        $index = $board->countBoard();
+        $id = "BO".str_pad($index,5,'0',STR_PAD_LEFT);
+        $board->insertBoard($userId,$title,$public,$group,$status,$background);
+        if($group == "1")
+        {
+            $boardGroup = new Boardgroup();
+            $boardGroup->insertBoardGroup($id,$owner,$title,$status);
+            $groupMember = Groupmember::find(
+                [
+                    "groupUserId='".$owner."'"
+                ]
+            );
+            foreach($groupMember as $g)
+            {
+                $role = "Creator";
+                if($g->userId == $userId)
+                {
+                    $role = "Creator";
+                }
+                else
+                {
+                    $role = "Collaborator";
+                }
+                $boardMember = new Boardmember();
+                $boardMember->insertBoardMember($g->userId,$id,$role,$status);
+            }
+        }
+        else
+        {
+            $role="Creator";
+            $boardMember = new Boardmember();
+            $boardMember->insertBoardMember($userId,$id,$role,$status);
+        }
     	$this->view->disable();
     	echo "Berhasil";
     }
