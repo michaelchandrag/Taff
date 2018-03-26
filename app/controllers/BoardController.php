@@ -23,8 +23,18 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "listBoardId='".$boardId."'"
             ]
         );
-        $boardCard = Boardcard::find();
+        $boardCard = Boardcard::find(
+            [
+                "cardBoardId='".$boardId."'"
+            ]
+        );
+        $boardLabelCard = Boardlabelcard::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
     	$this->view->board = $board;
+        $this->view->boardLabelCard = $boardLabelCard;
     	$this->view->boardList = $boardList;
     	$this->view->boardCard = $boardCard;
     }
@@ -91,6 +101,20 @@ class BoardController extends \Phalcon\Mvc\Controller
         }
     	$this->view->disable();
 		echo $cardId;
+
+    }
+
+    public function updateCardTitleAction()
+    {
+        $id = $_POST["cardId"];
+        $title = $_POST["cardTitle"];
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$id."'"
+            ]);
+        $card->setTitle($id,$title);
+        $this->view->disable();
+        echo "Berhasil";
 
     }
 
@@ -311,9 +335,11 @@ class BoardController extends \Phalcon\Mvc\Controller
         $title = $_POST["title"];
         $status = "1";
         $checklist = new Boardchecklist();
+        $index = $checklist->countChecklist();
+        $id = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
         $checklist->insertBoardChecklist($cardId,$title,$status);
         $this->view->disable();
-        echo "Berhasil";
+        echo $id;
     }
 
     public function getChecklistAction()
@@ -339,9 +365,11 @@ class BoardController extends \Phalcon\Mvc\Controller
         $title = $_POST["title"];
         $status = "0";
         $checklist = new Boardchecklistitem();
+        $index = $checklist->countChecklistItem();
+        $id = "BCI".str_pad($index,5,'0',STR_PAD_LEFT);
         $checklist->insertBoardChecklistItem($checklistId,$cardId,$title,$status);
         $this->view->disable();
-        echo "Berhasil";
+        echo $id;
 
     }
 
@@ -385,10 +413,117 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]);
         $this->view->disable();
         echo json_encode($card);
+    }
 
+    public function createCommentAction()
+    {
+        $boardId = $_POST["boardId"];
+        $cardId = $_POST["cardId"];
+        $text = $_POST["text"];
+        $userId = $this->session->get("userId");
+        $status = "1";
+        $comment = new Boardcomment();
+        $index = $comment->countComment();
+        $id = "BUC".str_pad($index,5,'0',STR_PAD_LEFT);
+        $comment->insertBoardComment($cardId,$boardId,$userId,$text,$status);
 
+        $this->view->disable();
+        echo $id;
+    }
 
+    public function getCommentAction()
+    {
+        $cardId = $_POST["id"];
+        $comment = array();
+        $comment = Boardcomment::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($comment);
 
+    }
+
+    public function createReplyCommentAction()
+    {
+        $commentId  = $_POST["commentId"];
+        $boardId    = $_POST["boardId"];
+        $cardId     = $_POST["cardId"];
+        $text       = $_POST["text"];
+        $userId     = $this->session->get("userId");
+        $status     = "1";
+        $reply      = new Boardreplycomment();
+        $reply->insertBoardReplyComment($commentId,$cardId,$boardId,$userId,$text,$status);
+
+        $this->view->disable();
+        echo $text;
+    }
+
+    public function getReplyCommentAction()
+    {
+        $commentId = $_POST["commentId"];
+        $reply = array();
+        $reply = Boardreplycomment::find(
+            [
+                "commentId='".$commentId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($reply);
+    }
+
+    public function createChatAction()
+    {
+        $boardId = $_POST["boardId"];
+        $chatText = $_POST["chatText"];
+        $userId = $this->session->get("userId");
+        $status = "1";
+        $chat = new Boardchat();
+        $chat->insertBoardChat($boardId,$userId,$chatText,$status);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function getChatAction()
+    {
+        $boardId = $_POST["boardId"];
+        $chat = array();
+        $chat = Boardchat::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($chat);
+    }
+
+    public function createLabelCardAction()
+    {
+        $boardId    = $_POST["boardId"];
+        $cardId     = $_POST["cardId"];
+        $red        = $_POST["red"];
+        $yellow     = $_POST["yellow"];
+        $green      = $_POST["green"];
+        $blue       = $_POST["blue"];
+        $status     = "1";
+        $label = new Boardlabelcard();
+        $label->insertBoardLabelCard($boardId,$cardId,$red,$yellow,$green,$blue,$status);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function getlabelCardAction()
+    {
+        $cardId = $_POST["id"];
+        $label = array();
+        $label = Boardlabelcard::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($label);
     }
 
 

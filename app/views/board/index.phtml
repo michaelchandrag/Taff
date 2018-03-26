@@ -151,7 +151,7 @@
 				<div class="section">
 					<!-- BOARD -->
 					<div class="row">
-						<div class="col s12 m4 l12">
+						<div class="col s6 m4 l4">
 							<h1><b>
 								<?php
 									foreach($board as $r)
@@ -162,7 +162,7 @@
 								?>
 							</b></h1>
 						</div>
-						<div class="col s12 m4 l12">
+						<div class="col s6 m4 l8">
 							<p>Filter Card</p>
 							<input type="checkbox" id="filterred" />
 	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
@@ -228,7 +228,7 @@
 								<div class="divider"></div>
 								<p>Title</p>
 								<input type="text" placeholder="Title.." id="listTitle">
-								<input type="hidden" id="hiddenListId" value="<?php foreach($board as $r) {echo $r->boardId;}?>">
+								<input type="hidden" id="hiddenListId">
 							</div>
 						</div>
 					  </div>
@@ -245,7 +245,6 @@
 								<div class="divider"></div>
 								<p>Title</p>
 								<input type="text" placeholder="Title.." id="titleCard">
-								<input type="hidden" id="hiddenListId">
 							</div>
 						</div>
 					  </div>
@@ -348,7 +347,9 @@
 										<label for="testsub" class="black-text">Subscribe</label>
 										</p>
 									</div>
-									<div class="divider"></div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalsettingrole">Setting Role</a>
+									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text" href="#!">Leave Board</a>
 									</div>
@@ -380,7 +381,9 @@
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalarchive" onclick="modalArchive()">Archive</a>
 									</div>
-									<div class="divider"></div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="#!">Gantt Chart</a>
+									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text" href="#!">Close Board</a>
 									</div>
@@ -494,6 +497,196 @@
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
+					<div id="modalsettingrole" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<h6><b>Setting role for collaborator and client..</b></h6>
+								<div class="divider"></div>
+								<div class="col s6 m6 l6">
+									<p class="center-align">Role collaborator..</p>
+									<p>List</p>
+									<div class="divider"></div>
+									<div class="switch">
+					                    Create, update, move, archive	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <p>Card</p>
+									<div class="divider"></div>
+									<div class="switch">
+					                    Create, update, move, archive	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox" checked>
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Assign members	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Label card	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Checklist	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Start date	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Due Date	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Attachment	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Comment	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+								</div>
+								<div class="col s6 m6 l6">
+									<p class="center-align">Role client..</p>
+									<p>List</p>
+									<div class="divider"></div>
+									<div class="switch">
+					                    Create, update, move, archive	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <p>Card</p>
+									<div class="divider"></div>
+									<div class="switch">
+					                    Create, update, move, archive	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox" checked>
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Assign members	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Label card	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Checklist	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Start date	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Due Date	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Attachment	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+					                <div class="switch">
+					                    Comment	: 
+					                    <label>
+					                      Off
+					                      <input type="checkbox">
+					                      <span class="lever"></span> On
+					                    </label>
+					                </div>
+					                <br>
+								</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+					  </div>
+					</div>
 					<!-- END OF MODAL MENU MORE-->
 					<!-- MODAL ACTION CARD-->
 					<input type="hidden" id="hiddenCardId">
@@ -501,16 +694,16 @@
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
 							<div class="row">
-								<h6><b>Edit card..</b></h6>
+								<h6><b>Edit card title..</b></h6>
 								<div class="divider"></div>
 								<p>Title</p>
-								<input type="text" value="Card Satu">
+								<input type="text" id="txtCardTitle">
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close" onclick="updateCardTitle()">Save</a>
 					  </div>
 					</div>
 					<div id="modaleditdescription" class="modal">
@@ -520,7 +713,7 @@
 								<h6><b>Edit description card..</b></h6>
 								<div class="divider"></div>
 								<p>Description</p>
-								<textarea id="textarea2" class="materialize-textarea"></textarea>
+								<textarea id="textareaDescription" class="materialize-textarea"></textarea>
 							</div>
 						</div>
 					  </div>
@@ -569,22 +762,22 @@
 								<h6><b>Label a card..</b></h6>
 								<div class="divider"></div>
 									<p>Choose your color..</p>
-									<input type="checkbox" style="margin-top:10px;" id="filterred" />
-									<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+									<input type="checkbox" style="margin-top:10px;" id="labelred" />
+									<label for="labelred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
 									
-									<input type="checkbox" style="margin-top:5px;" id="filteryellow" />
-									<label for="filteryellow" ><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-									<input type="checkbox" style="margin-top:5px;" id="filtergreen" />
-									<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-									<input type="checkbox" style="margin-top:5px;"id="filterblue" />
-									<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+									<input type="checkbox" style="margin-top:5px;" id="labelyellow" />
+									<label for="labelyellow" ><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+									<input type="checkbox" style="margin-top:5px;" id="labelgreen" />
+									<label for="labelgreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+									<input type="checkbox" style="margin-top:5px;" id="labelblue" />
+									<label for="labelblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
 		
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
 						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="#" onclick="createLabelCard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalchecklist" class="modal modal-fixed-footer white">
@@ -862,8 +1055,12 @@
 											<img src="images/user/user2.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
 										</div>
 										<div class="col 12 m3 l2">
-											<h6><b>Label</b></h6>
-											<div style="width:32px;height:32px;border-radius:15%;background-color:green;"></div>
+											<div id="ajaxLabelCard">
+												<!--<div class="red" style="width:32px;height:32px;border-radius:15%;margin:1px;"></div>
+												<div class="yellow" style="width:32px;height:32px;border-radius:15%;margin:1px;"></div>
+												<div class="green" style="width:32px;height:32px;border-radius:15%;margin:1px;"></div>
+												<div class="blue" style="width:32px;height:32px;border-radius:15%;margin:1px;"></div>-->
+											</div>
 										</div>
 										<div class="col s12 m3 l3">
 											<!--<h6><b>Start Date</b></h6>-->
@@ -891,12 +1088,12 @@
 									</div>
 									<div class="divider"></div>
 									<div class="row" id="ajaxChecklist">
-
 									</div>
+									<div class="divider"></div>
 									<div class="row">
 										<div class="col s12 m6 l12">
 										<h6><b>Add Comment</b></h6>
-										<textarea id="textarea1" class="materialize-textarea"></textarea> <a class="waves-effect waves-light light-blue lighten-1 btn">Save</a>
+										<textarea id="textareaComment" class="materialize-textarea" ></textarea> <a class="waves-effect waves-light light-blue lighten-1 btn" onclick="createCardComment()">Save</a>
 										</div>
 									</div>
 									<div class="divider" style="margin-top:5px;"></div>
@@ -905,32 +1102,7 @@
 										<h6><b>Activities</b></h6>
 										</div>
 									</div>
-									<div class="row">
-										<div class="col s12 m4 l1">
-											<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-										</div>
-										<div class="col s12 m4 l11">
-											<p>	
-												<b>Steven Gerrard</b>
-											</p>
-											<input type="text" value="This is my first comment">
-											<p class="ultra-small grey-text lighten-1">
-												yesterday at 8:17 PM
-											</p>
-											<div class="col s12 m4 l1">
-												<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-											</div>
-											<div class="col s12 m4 l11">
-												<p>	
-													<b>Steven Gerrard</b>
-													</p>
-													<input type="text" value="This is my second comment inside my first comment">
-													<p class="ultra-small grey-text lighten-1">
-														yesterday at 8:17 PM
-												</p>
-											</div>
-
-										</div>
+									<div id='ajaxComment'>
 									</div>
 									<div class="divider"></div>
 									<div class="row">
@@ -1001,13 +1173,14 @@
 						<div class="row">
 							<!-- LIST -->
 							<?php
+								$list = -1;
+								echo '<div class="row">';
 								foreach($boardList as $l)
 								{
-
 									echo '<div class="col s12 m6 l2">';
 									echo	'<div class="card">';
 									echo		'<div class="card-content grey lighten-2 white-text">';
-						            echo            '<p class="card-title grey-text text-darken-4">'.$l->listTitle.'<span class="card-title activator"><i class="mdi-navigation-more-vert right"></i></span></p>';
+						            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="#" class="activator black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
 						            echo 			'<div id="list'.$l->listId.'">';
 									foreach($boardCard as $c)
 									{
@@ -1015,7 +1188,40 @@
 										{
 											echo			'<a id="card'.$c->cardId.'" href="#modal3" class="modal-trigger" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
 											echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-											echo					'<div class="left-align black-text">'.$c->cardTitle.'</div>';
+											echo 				"<div class='row' id='labelCard".$c->cardId."' style='margin:auto;'>";
+											foreach($boardLabelCard as $lc)
+											{
+												if($lc->cardId == $c->cardId)
+												{	
+													if($lc->labelRed == "true")
+													{
+														echo '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
+														echo 'Blank Text';
+														echo '</div>';
+													}
+													if($lc->labelYellow == "true")
+													{
+														echo '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
+														echo 'Blank Text';
+														echo '</div>';
+													}
+													if($lc->labelGreen == 'true')
+													{
+														echo '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
+														echo 'Blank Text';
+														echo '</div>';
+													}
+													if($lc->labelBlue == 'true')
+													{
+														echo '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
+														echo 'Blank Text';
+														echo '</div>';
+													}
+												}
+											}
+
+											echo 					'</div>';
+											echo					'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
 											echo				'</div>';
 											echo			'</a>';
 										}
@@ -1023,7 +1229,7 @@
 									echo 				'</div>';
 			                       
 			                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="#modalcreatecard" class="modal-trigger grey-text" onclick="hiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
+		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="#modalcreatecard" class="modal-trigger grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
 		                            echo       		'</div>';
 
 									echo		'</div>';
@@ -1039,18 +1245,26 @@
 						            echo      '</div>';
 									echo	'</div>';
 									echo '</div>';
+									$list++;
+									if($list%5 == 0 && $list>0)
+									{
+										$list = -1;
+										echo '</div>';
+										echo '<div class="row">';
+									}
 								}
-							?>
-							<div class="col s12 m6 l2">
-								<div class="card">
-									<div class="card-content grey white-text">
-	                                    <div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">
-                                       		<div id="invoice-line" class="left-align white-text"><a href="#modalcreatelist" class="modal-trigger white-text">Add a List..</a></div>
-                                   		</div>
 
-									</div>
-								</div>
-							</div>
+								echo '<div class="col s12 m6 l2" style="margin-left:0px;">';
+								echo	'<div class="card">';
+								echo		'<div class="card-content grey white-text">';
+			                    echo           '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
+			                    echo           		'<div id="invoice-line" class="left-align white-text"><a href="#modalcreatelist" class="modal-trigger white-text">Add a List..</a></div>';
+			                    echo       		'</div>';
+								echo		'</div>';
+								echo	'</div>';
+								echo '</div>';
+							?>
+							</div> <!--TUTUP ROW-->
 						</div>
 					</div>
 				
@@ -1083,20 +1297,21 @@
             <li class="li-hover">
             <a href="#" data-activates="chat-out" class="chat-close-collapse right"><i class="mdi-navigation-close"></i></a>
             <div id="right-search" class="row">
-                <form class="col s12">
+                <div class="col s12">
                     <div class="input-field">
                         <i class="mdi-communication-chat prefix"></i>
-                        <input id="icon_prefix" type="text" class="validate">
-                        <label for="icon_prefix">Chat</label>
+                        <input id="chatText" type="text" class="validate">
+                        <label for="chatText">Chat</label>
                     </div>
-                </form>
+                        <a class="btn waves-effect waves-light green" onclick="createChat()">Send</a>
+                </div>
             </div>
             </li>
             <li class="li-hover">
                 <ul class="chat-collapsible" data-collapsible="expandable">
                 <li>
                     <div class="collapsible-header red white-text active"><i class="mdi-action-stars"></i>Chat Board</div>
-                    <div class="collapsible-body favorite-associates">
+                    <div class="collapsible-body favorite-associates" id="ajaxChat">
                         <div class="favorite-associate-list chat-out-list row">
                             <div class="col s4"><img src="images/user/user2.png" alt="" class="circle responsive-img online-user valign profile-image">
                             </div>
@@ -1148,3 +1363,7 @@
 	<!-- END WRAPPER -->
 </div>
 <!-- END MAIN -->
+
+<script>
+var myVar = setInterval(function(){ myTimer() }, 1000);
+</script>

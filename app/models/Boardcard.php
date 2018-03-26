@@ -168,4 +168,14 @@ class Boardcard extends \Phalcon\Mvc\Model
         $card->save();
     }
 
+    public function setTitle($id,$title)
+    {
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$id."'"
+            ]);
+        $card->cardTitle = $title;
+        $card->save(); 
+    }
+
 }

@@ -43,6 +43,9 @@
 		<link href="js/plugins/jvectormap/jquery-jvectormap.css" type="text/css" rel="stylesheet" media="screen,projection">
 		<link href="js/plugins/chartist-js/chartist.min.css" type="text/css" rel="stylesheet" media="screen,projection">
         <link href="js/plugins/fullcalendar/css/fullcalendar.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+	
+    </head>
+    <?php echo $this->getContent(); ?>
 		<!-- ================================================
     Scripts
     ================================================ -->
@@ -51,7 +54,6 @@
     <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
     <!--materialize js-->
     <script type="text/javascript" src="js/materialize.min.js"></script>
-	<script type="text/javascript" src="js/materialize.js"></script>
     <!--scrollbar-->
     <script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <!--prism-->
@@ -82,7 +84,17 @@
 		setTimeout(function() {
 			Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
 		}, 4000);*/
-		
+		/* $(window).load(function() {
+        setTimeout(function() {
+            Materialize.toast('<span>Hiya! I am a toast.</span>', 1500);
+        }, 1500);
+        setTimeout(function() {
+            Materialize.toast('<span>You can swipe me too!</span>', 3000);
+        }, 5000);
+        setTimeout(function() {
+            Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
+        }, 15000);
+    });*/
     </script>
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
     <!-- My JS-->
@@ -90,6 +102,4 @@
     <script type="text/javascript" src="js/myjs/jsLogin.js"></script>
     <script type="text/javascript" src="js/myjs/jsHome.js"></script>
     <script type="text/javascript" src="js/myjs/jsBoard.js"></script>
-    </head>
-    <?php echo $this->getContent(); ?>
 </html>
