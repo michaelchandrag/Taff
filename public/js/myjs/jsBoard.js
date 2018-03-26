@@ -48,7 +48,7 @@ function createCard()
 			  data: {title:title,owner:owner},
 			  success: function (response) {
 				cardId = response;
-				var gabung2	= '<a id="card'+cardId+'" href="#" class="modal-baru" onclick="ajaxModalCard(\''+cardId+'\')">';
+				var gabung	= '<a id="card'+cardId+'" href="#" class="modal-baru" onclick="ajaxModalCard(\''+cardId+'\')">';
 				gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 				gabung 		+= '<div class="row" id="labelCard'+cardId+'" style="margin:auto;">';
 				gabung 		+= '</div>'
@@ -775,8 +775,11 @@ function createChecklistItem(index)
 			  url: "board/createChecklistItem",
 			  data: {id:id,checklistId:index,title:title},
 			  success: function (response) {
-				  alert(response);
+				  //alert(response);
 				  $("#checklistItem"+index).append('<p> <input type="checkbox" id="test'+response+'" /><label for="test'+response+'">'+title+'</label></p>');
+			  	  var add = '<p><a href="#" onclick="changeInput(\''+index+'\')">Add an item</a></p>';
+				  $("#item"+index).empty();
+				  $("#item"+index).append(add);
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);

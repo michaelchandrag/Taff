@@ -28,6 +28,13 @@ class Boardduedate extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="dueDateChecked", type="string", length=1, nullable=false)
+     */
+    public $dueDateChecked;
+
+    /**
+     *
+     * @var string
      * @Column(column="dueDateStatus", type="string", length=1, nullable=false)
      */
     public $dueDateStatus;
@@ -80,16 +87,18 @@ class Boardduedate extends \Phalcon\Mvc\Model
         return count($date);
     }
 
-    public function insertBoardDueDate($cardId,$dueDate,$status)
+    public function insertBoardDueDate($cardId,$dueDate,$checked,$status)
     {
         date_default_timezone_set('Asia/Jakarta');
-        $date = new Boardduedate();
-        $index = $date->countDueDate();
-        $id = "BDD".str_pad($index,3,'0',STR_PAD_LEFT);
-        $date->dueDateId = $id;
-        $date->cardId = $cardId;
-        $date->dueDate = date("Y-m-d H:i:sa",$dueDate);
-        $date->dueDateStatus = $status;
+        $date                   = new Boardduedate();
+        $index                  = $date->countDueDate();
+        $id                     = "BDD".str_pad($index,3,'0',STR_PAD_LEFT);
+        $date->dueDateId        = $id;
+        $date->cardId           = $cardId;
+        $date->dueDate          = date("Y-m-d H:i:sa",$dueDate);
+        $date->dueDateChecked   = $checked;
+        $date->dueDateStatus    = $status;
         $date->save();
     }
+
 }

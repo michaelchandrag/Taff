@@ -35,6 +35,13 @@ class Boardassignmembers extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="assignChecked", type="string", length=1, nullable=false)
+     */
+    public $assignChecked;
+
+    /**
+     *
+     * @var string
      * @Column(column="assignStatus", type="string", length=1, nullable=false)
      */
     public $assignStatus;
@@ -88,7 +95,7 @@ class Boardassignmembers extends \Phalcon\Mvc\Model
         return count($assign);
     }
 
-    public function insertBoardAssignMembers($cardId,$userId,$userName,$status)
+    public function insertBoardAssignMembers($cardId,$userId,$userName,$checked,$status)
     {
         $assign = new Boardassignmembers();
         $index = $assign->countAssign();
@@ -97,6 +104,7 @@ class Boardassignmembers extends \Phalcon\Mvc\Model
         $assign->cardId = $cardId;
         $assign->userId = $userId;
         $assign->userName = $userName;
+        $assign->assignChecked = $checked;
         $assign->assignStatus = $status;
         $assign->save();
     }

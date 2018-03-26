@@ -28,6 +28,13 @@ class Boardstartdate extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="startDateChecked", type="string", length=1, nullable=false)
+     */
+    public $startDateChecked;
+
+    /**
+     *
+     * @var string
      * @Column(column="startDateStatus", type="string", length=20, nullable=false)
      */
     public $startDateStatus;
@@ -79,16 +86,17 @@ class Boardstartdate extends \Phalcon\Mvc\Model
         return count($date);
     }
 
-    public function insertBoardStartDate($cardId,$startDate,$status)
+    public function insertBoardStartDate($cardId,$startDate,$checked,$status)
     {
         date_default_timezone_set('Asia/Jakarta');
-        $date = new Boardstartdate();
-        $index = $date->countStartDate();
-        $id = "BSD".str_pad($index,3,'0',STR_PAD_LEFT);
-        $date->startDateId = $id;
-        $date->cardId = $cardId;
-        $date->startDate = date("Y-m-d H:i:sa",$startDate);
-        $date->startDateStatus = $status;
+        $date                       = new Boardstartdate();
+        $index                      = $date->countStartDate();
+        $id                         = "BSD".str_pad($index,3,'0',STR_PAD_LEFT);
+        $date->startDateId          = $id;
+        $date->cardId               = $cardId;
+        $date->startDate            = date("Y-m-d H:i:sa",$startDate);
+        $date->startDateChecked     = $checked;
+        $date->startDateStatus      = $status;
         $date->save();
     }
 

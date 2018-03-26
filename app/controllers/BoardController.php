@@ -53,22 +53,23 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createCardAction()
     {
-    	$title = $_POST["title"];
-    	$listId = $_POST["owner"];
-        $boardId = "";
+    	$title         = $_POST["title"];
+    	$listId        = $_POST["owner"];
+        $boardId       = "";
         if(isset($_GET["id"]))
         {
-            $boardId = $_GET["id"];
+            $boardId   = $_GET["id"];
         }
     	$owner = $this->session->get("userId");
-    	$description = "null";
-    	$archive = "0";
-    	$status = "1";
+    	$description   = "null";
+    	$archive       = "0";
+    	$status        = "1";
+        $checked       = "1";
 
         //cardId
-        $card = new Boardcard();
-        $index = $card->countCard();
-        $cardId = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
+        $card           = new Boardcard();
+        $index          = $card->countCard();
+        $cardId         = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
         //listId = $listId
 
         //boardId
@@ -97,7 +98,7 @@ class BoardController extends \Phalcon\Mvc\Controller
             );
             $userName = $user->userName;
             $assign = new Boardassignmembers();
-            $assign->insertBoardAssignMembers($cardId,$userId,$userName,$status);
+            $assign->insertBoardAssignMembers($cardId,$userId,$userName,$checked,$status);
         }
     	$this->view->disable();
 		echo $cardId;
@@ -165,6 +166,7 @@ class BoardController extends \Phalcon\Mvc\Controller
     public function setStartDateAction()
     {
     	$cardId = $_POST["id"];
+        $checked = "0";
     	$status = "1";
     	$date = $_POST["date"]; // 7 March, 2018
     	$pecah = explode(" ",$date);
@@ -223,7 +225,7 @@ class BoardController extends \Phalcon\Mvc\Controller
     	$time = $_POST["time"];
     	$d=mktime($time, 00, 00, $bln, $tgl, $thn);
         $date = new Boardstartdate();
-        $date->insertBoardStartDate($cardId,$d,$status);
+        $date->insertBoardStartDate($cardId,$d,$checked,$status);
 
     	$this->view->disable();
     	echo "Berhasil";
@@ -249,6 +251,7 @@ class BoardController extends \Phalcon\Mvc\Controller
     public function setDueDateAction()
     {
         $cardId = $_POST["id"];
+        $checked = "0";
         $status = "1";
         $date = $_POST["date"]; // 7 March, 2018
         $pecah = explode(" ",$date);
@@ -307,7 +310,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $time = $_POST["time"];
         $d=mktime($time, 00, 00, $bln, $tgl, $thn);
         $date = new Boardduedate();
-        $date->insertBoardDueDate($cardId,$d,$status);
+        $date->insertBoardDueDate($cardId,$d,$checked,$status);
 
         $this->view->disable();
         echo "Berhasil";
@@ -331,12 +334,12 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createChecklistAction()
     {
-        $cardId = $_POST["id"];
-        $title = $_POST["title"];
-        $status = "1";
-        $checklist = new Boardchecklist();
-        $index = $checklist->countChecklist();
-        $id = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
+        $cardId         = $_POST["id"];
+        $title          = $_POST["title"];
+        $status         = "1";
+        $checklist      = new Boardchecklist();
+        $index          = $checklist->countChecklist();
+        $id             = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
         $checklist->insertBoardChecklist($cardId,$title,$status);
         $this->view->disable();
         echo $id;
@@ -363,11 +366,12 @@ class BoardController extends \Phalcon\Mvc\Controller
         $checklistId = $_POST["checklistId"];
         $cardId = $_POST["id"];
         $title = $_POST["title"];
+        $checked = "0";
         $status = "0";
         $checklist = new Boardchecklistitem();
         $index = $checklist->countChecklistItem();
         $id = "BCI".str_pad($index,5,'0',STR_PAD_LEFT);
-        $checklist->insertBoardChecklistItem($checklistId,$cardId,$title,$status);
+        $checklist->insertBoardChecklistItem($checklistId,$cardId,$title,$checked,$status);
         $this->view->disable();
         echo $id;
 

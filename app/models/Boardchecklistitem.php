@@ -35,6 +35,13 @@ class Boardchecklistitem extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="itemChecked", type="string", length=1, nullable=false)
+     */
+    public $itemChecked;
+
+    /**
+     *
+     * @var string
      * @Column(column="itemStatus", type="string", length=20, nullable=false)
      */
     public $itemStatus;
@@ -88,16 +95,17 @@ class Boardchecklistitem extends \Phalcon\Mvc\Model
         return count($item);
     }
 
-    public function insertBoardChecklistItem($checklistId,$cardId,$title,$status)
+    public function insertBoardChecklistItem($checklistId,$cardId,$title,$checked,$status)
     {
-        $item = new Boardchecklistitem();
-        $index = $item->countChecklistItem();
-        $id = "BCI".str_pad($index,5,'0',STR_PAD_LEFT);
-        $item->itemId = $id;
-        $item->checklistId = $checklistId;
-        $item->cardId = $cardId;
-        $item->itemTitle = $title;
-        $item->itemStatus = $status;
+        $item               = new Boardchecklistitem();
+        $index              = $item->countChecklistItem();
+        $id                 = "BCI".str_pad($index,5,'0',STR_PAD_LEFT);
+        $item->itemId       = $id;
+        $item->checklistId  = $checklistId;
+        $item->cardId       = $cardId;
+        $item->itemTitle    = $title;
+        $item->itemChecked  = $checked;
+        $item->itemStatus   = $status;
         $item->save();
     }
 
