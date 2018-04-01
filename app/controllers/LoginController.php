@@ -12,6 +12,7 @@ class LoginController extends \Phalcon\Mvc\Controller
     {
     	$email = $_POST["email"];
     	$password = $_POST["password"];
+        $password = md5($password);
     	$remember = $_POST["remember"];
     	$user = new User();
     	$id = $user->doLogin($email,$password);
@@ -42,6 +43,40 @@ class LoginController extends \Phalcon\Mvc\Controller
         // Delete the cookie
         $id->delete();
         $this->session->destroy();
+        echo "Berhasil";
+    }
+
+    public function googleLoginAction()
+    {
+        $name       = $_POST["name"];
+        $email      = $_POST["email"];
+        $password   = $_POST["password"];
+        $bio        = "";
+        $image      = $_POST["image"];
+        $password   = md5($password);
+        $remember   = $_POST["remember"];
+        $status     = "1";
+        $user       = new User();
+        $match      = $user->validateUser($email);
+        $id         = "";
+        $this->view->disable();
+        if($match)
+        {
+            $id = $user->doLogin($email,$password);
+        }
+        else
+        {
+            $user->insertUser($name,$email,$password,$user,$status);
+            $id = $user->doLogin($email,$password);
+            $profile = new Userprofile();
+            $profile->insertUserProfile($id,$name,$email,$bio,$image,$status);
+        }
+        $this->cookies->set(
+            "userId",
+            $id,
+            time() + 15 * 86400
+        );
+        $this->session->set("userId", $id);
         echo "Berhasil";
     }
 

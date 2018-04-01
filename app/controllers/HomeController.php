@@ -6,16 +6,26 @@ class HomeController extends ControllerBase
     public function indexAction()
     {
     	$userId = $this->session->get("userId");
+        if($userId == null)
+        {
+            $this->response->redirect("login");
+        }
     	$board = Board::find();
     	$groupMember = new Groupmember();
     	$groupMember = $groupMember->findGroup($userId);
     	$groupUser = Groupuser::find();
     	$boardGroup = Boardgroup::find();
-    	$this->view->board = $board;
-    	$this->view->userId = $userId;
-    	$this->view->groupMember = $groupMember;
-    	$this->view->groupUser = $groupUser;
-    	$this->view->boardGroup = $boardGroup;
+        $profile = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $this->view->userProfile       = $profile;
+    	$this->view->board             = $board;
+    	$this->view->userId            = $userId;
+    	$this->view->groupMember       = $groupMember;
+    	$this->view->groupUser         = $groupUser;
+    	$this->view->boardGroup        = $boardGroup;
     }
 
     public function createBoardAction()
@@ -24,7 +34,7 @@ class HomeController extends ControllerBase
     	$owner = $_POST["owner"];
     	$public = "1";
     	$status = '1';
-    	$background = "Blue";
+    	$background = "blue";
         $group = "0";
     	$userId = $this->session->get("userId");
         if(substr($owner,0,1) == "B")
@@ -70,17 +80,17 @@ class HomeController extends ControllerBase
             $boardMember->insertBoardMember($userId,$id,$role,$status);
         }
     	$this->view->disable();
-    	echo "Berhasil";
+    	echo $id;
     }
 
     public function createGroupAction()
     {
     	$name = $_POST["name"];
-    	$status = 1;
+    	$status = "1";
     	$userId = $this->session->get("userId");
     	$groupUser = new Groupuser();
     	$index = $groupUser->countGroup();
-        $groupId = "GU".str_pad($index,3,'0',STR_PAD_LEFT);
+        $groupId = "GU".str_pad($index,5,'0',STR_PAD_LEFT);
     	$groupUser->insertGroupUser($name,$status);
 
     	$groupMember = new Groupmember();
@@ -88,7 +98,7 @@ class HomeController extends ControllerBase
     	$groupMember->insertGroupMember($userId,$groupId,$role,$status);
     	$this->view->disable();
 
-    	echo "Berhasil";
+    	echo $groupId;
     }
 
 

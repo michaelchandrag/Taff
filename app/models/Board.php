@@ -143,4 +143,26 @@ class Board extends \Phalcon\Mvc\Model
         );
         return $board;
     }
+
+    public function setBackground($boardId,$color)
+    {
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $board->boardBackground = $color;
+        $board->save();
+    }
+
+    public function setTitle($boardId,$title)
+    {
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $board->boardTitle = $title;
+        $board->save();
+    }
 }

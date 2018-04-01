@@ -5,6 +5,11 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function indexAction()
     {
+        $userId = $this->session->get("userId");
+        if($userId == null)
+        {
+            $this->response->redirect("login");
+        }
         $boardId = "";
         if(isset($_GET["id"]))
         {
@@ -33,10 +38,17 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "boardId='".$boardId."'"
             ]
         );
-    	$this->view->board = $board;
-        $this->view->boardLabelCard = $boardLabelCard;
-    	$this->view->boardList = $boardList;
-    	$this->view->boardCard = $boardCard;
+        $profile = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $this->view->userId            = $userId;
+        $this->view->userProfile       = $profile;
+    	$this->view->board             = $board;
+        $this->view->boardLabelCard    = $boardLabelCard;
+    	$this->view->boardList         = $boardList;
+    	$this->view->boardCard         = $boardCard;
     }
 
     public function createListAction()
@@ -46,9 +58,11 @@ class BoardController extends \Phalcon\Mvc\Controller
     	$archive = "0";
     	$status = "1";
         $list = new Boardlist();
+        $index = $list->countList();
+        $id = "BL".str_pad($index,5,'0',STR_PAD_LEFT);
         $list->insertBoardList($owner,$title,$archive,$status);
     	$this->view->disable();
-    	echo "Berhasil";
+    	echo $id;
     }
 
     public function createCardAction()
@@ -61,7 +75,7 @@ class BoardController extends \Phalcon\Mvc\Controller
             $boardId   = $_GET["id"];
         }
     	$owner = $this->session->get("userId");
-    	$description   = "null";
+    	$description   = "";
     	$archive       = "0";
     	$status        = "1";
         $checked       = "1";
@@ -117,6 +131,19 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo "Berhasil";
 
+    }
+
+    public function updateCardDescriptionAction()
+    {
+        $id             = $_POST["cardId"];
+        $description    = $_POST["cardDescription"];
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$id."'"
+            ]);
+        $card->setDescription($id,$description);
+        $this->view->disable();
+        echo $description;
     }
 
     public function getBoardCardAction()
@@ -517,7 +544,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         echo "Berhasil";
     }
 
-    public function getlabelCardAction()
+    public function getLabelCardAction()
     {
         $cardId = $_POST["id"];
         $label = array();
@@ -528,6 +555,85 @@ class BoardController extends \Phalcon\Mvc\Controller
         );
         $this->view->disable();
         echo json_encode($label);
+    }
+
+    public function createAttachmentAction()
+    {
+        $this->view->disable();
+        $boardId    = $_POST["boardId"];
+        $cardId     = $_POST["cardId"];
+        $title      = $_POST["title"];
+        $extension  = $_POST["extension"];
+        $status     = "1";
+        $attachment = new Boardattachment();
+        $index      = $attachment->countAttachment();
+        $id         = "BAT".str_pad($index,5,'0',STR_PAD_LEFT);
+        $directory  = "userAttachment/".$id.".".$extension;
+        $attachment->insertBoardAttachment($boardId,$cardId,$title,$directory,$status);
+        if ( 0 < $_FILES['file1']['error'] ) 
+        {
+          echo 'Error: ' . $_FILES['file1']['error'] . '<br>';
+        }
+        else {
+          $temp = explode(".", $_FILES["file1"]["name"]);
+          move_uploaded_file($_FILES['file1']['tmp_name'], $directory);
+        }
+        echo $id;
+    }
+
+    public function getAttachmentAction()
+    {
+        $cardId = $_POST["id"];
+        $attachment = array();
+        $attachment = Boardattachment::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($attachment);
+    }
+
+    public function getBoardAction()
+    {
+        $boardId    = $_POST["id"];
+        $board      = array();
+        $board      = Board::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($board);
+    }
+
+    public function changeBackgroundAction()
+    {
+        $boardId    = $_POST["id"];
+        $color      = $_POST["color"];
+        $board      = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $board->setBackground($boardId,$color);
+        $this->view->disable();
+        echo $color;
+    }
+
+    public function changeBoardTitleAction()
+    {
+        $boardId    = $_POST["id"];
+        $title      = $_POST["title"];
+        $board      = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $board->setTitle($boardId,$title);
+        $this->view->disable();
+        echo "Berhasil";
+
     }
 
 

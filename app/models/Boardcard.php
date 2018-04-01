@@ -178,4 +178,14 @@ class Boardcard extends \Phalcon\Mvc\Model
         $card->save(); 
     }
 
+    public function setDescription($id,$description)
+    {
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$id."'"
+            ]);
+        $card->cardDescription = $description;
+        $card->save(); 
+    }
+
 }

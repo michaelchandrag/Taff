@@ -1,3 +1,11 @@
-<body id="layouts-horizontal" class="blue">
+<?php
+	$color = "";
+	foreach($board as $r)
+	{
+		$color = $r->boardBackground;
+	}
+?>
+
+<body id="layouts-horizontal" class="<?php echo $color ?>">
 	<?php echo $this->getContent(); ?>
 </body>

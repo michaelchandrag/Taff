@@ -83,9 +83,8 @@ class User extends \Phalcon\Mvc\Model
     public function insertUser($name,$email,$password,$status)
     {
         $user = new User();
-        $index = User::countUser();
-        //echo str_pad($str,20,".");
-        $id = "B".str_pad($index,3,'0',STR_PAD_LEFT);
+        $index = $user->countUser();
+        $id = "B".str_pad($index,5,'0',STR_PAD_LEFT);
         $user->userId = $id;
         $user->userName = $name;
         $user->userEmail = $email;

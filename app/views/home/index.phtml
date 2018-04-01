@@ -24,13 +24,41 @@
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
 					</li>
-					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="images/user/gerrard.png" width="32px" height="32px" style="border-radius:50%" /></a>
+					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" style="border-radius:50%" /></a>
 					</li>
 				</ul>
 				<!-- translation-button -->
 				<ul id="translation-dropdown" class="dropdown-content">
 				  <li>
-					<a href="#!"><img src="images/user/user2.png" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+					<a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
 					<a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
@@ -59,7 +87,7 @@
 					</a>
 				</li> 
 				<li>
-					<a id="cokbesar" href="#modalcreategroup" class="cyan-text">
+					<a id="cokbesar" href="#modalcreategroup" class="modal-trigger cyan-text">
 						<i class="mdi-social-group"></i>
 						<span>Create Group Board</span>
 					</a>
@@ -86,10 +114,24 @@
         <li class="user-details cyan darken-2">
             <div class="row">
                 <div class="col col s4 m4 l4">
-                    <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image">
+                    <img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="" class="circle responsive-img valign profile-image">
                 </div>
                 <div class="col col s8 m8 l8">
-                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled>Steven Gerrard<i class="mdi-navigation-arrow-drop-down right"></i></a>
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
                 </div>
             </div>
         </li>
@@ -213,6 +255,7 @@
                 	<?php
                 		echo '<div id="card-stats">';
                			echo '<div class="row">';
+               			echo '<div id="ajaxBoard'.$userId.'" style="margin-top:-25px;">';
                 		foreach($board as $r)
                 		{	
                 			if($r->boardOwner == $userId)
@@ -224,10 +267,10 @@
 		                			echo '<a href="board?id='.$r->boardId.'" >';
 		                    		echo 	'<div class="card">';
 		                    		echo 		'<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
-		                            echo    	'<div class="card-content  green white-text">';
+		                            echo    	'<div class="card-content '.$r->boardBackground.' white-text">';
 		                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
 		                            echo   		'</div>';
-		                            echo    	'<div class="card-action  green darken-2">';
+		                            echo    	'<div class="card-action '.$r->boardBackground.' darken-2">';
 		                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
 		                            echo    	'</div>';
 		                    		echo 	'</div>';
@@ -237,6 +280,7 @@
                 			}
                     		//date_format($r->boardCreated,"d/M/Y");
                 		}
+                		echo '</div>';
                 			
                         echo '<div class="col s12 m6 l3">';
                         echo     '<div class="card">';
@@ -252,7 +296,7 @@
                     	echo '</div>';
             			echo '<div class="divider"></div>';
                 	?>
-
+                		<div id="ajaxGroup">
 	            	<?php
 
 	            		foreach($groupMember as $r) //mendapatkan list group yang terdapat user
@@ -266,8 +310,9 @@
 	            				}
 	            			}
 	            			echo '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="#" class="black-text"> <b>'.$groupName.'</b> </a></p>';
-	            			echo '<div id="card-stats">';
-			                     	echo   '<div class="row">';
+            				echo '<div id="card-stats">';
+	                     	echo   '<div class="row">';
+	                     	echo '<div id="ajaxBoard'.$r->groupUserId.'" style="margin-top:-25px;">';
 			                foreach($boardGroup as $g)
 			                {
 			                	if($g->groupId == $r->groupUserId)
@@ -277,7 +322,7 @@
 			                			if($b->boardId == $g->boardId)
 			                			{
 											echo    	'<div class="col s12 m6 l3">';
-					                        echo '<a href="board?id='.$b->boardId.'" >';
+					                        echo 			'<a href="board?id='.$b->boardId.'" >';
 					                        echo        	'<div class="card">';
 					                        echo            	'<div class="card-content red white-text">';
 					                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
@@ -286,31 +331,13 @@
 					                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
 					                        echo           	 	'</div>';
 					                        echo       	 	'</div>';
-					                        echo '</a>';
+					                        echo 			'</a>';
 					                        echo   	 	'</div>';
 			                			}
 			                		}
 			                	}
 			                }
-	            			/*foreach($boardGroup as $b)
-	            			{
-	            				if($r->groupUserId == $b->boardOwner)
-	            				{
-			                        echo    	'<div class="col s12 m6 l3">';
-			                        echo '<a href="board?id='.$b->boardId.'" >';
-			                        echo        	'<div class="card">';
-			                        echo            	'<div class="card-content red white-text">';
-			                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
-			                        echo            	'</div>';
-			                        echo            	'<div class="card-action red darken-2">';
-			                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
-			                        echo           	 	'</div>';
-			                        echo       	 	'</div>';
-			                        echo '</a>';
-			                        echo   	 	'</div>';
-	            				}
-	            			}*/
-
+			                echo '</div>';
 		            		
 
 	                        echo    	'<div class="col s12 m6 l3">';
@@ -327,6 +354,7 @@
 	                   		echo "<div class='divider'></div>";
 	            		}
 	            	?>
+	            	</div>
             	</div>
 
 

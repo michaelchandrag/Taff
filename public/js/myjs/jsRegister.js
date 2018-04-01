@@ -21,7 +21,10 @@ function cekRegister()
 		  data: {name:name,email:email,password:password},
 		  success: function (response) {
 			  alert(response);
-			  
+			  if(response == "Berhasil")
+			  {
+			  	window.location.href = "login";
+			  }
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);

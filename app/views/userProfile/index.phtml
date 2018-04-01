@@ -24,16 +24,44 @@
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
 					</li>
-					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="images/user/gerrard.png" width="32px" height="32px" style="border-radius:50%" /></a>
+					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" style="border-radius:50%" /></a>
 					</li>
 				</ul>
 				<!-- translation-button -->
 				<ul id="translation-dropdown" class="dropdown-content">
 				  <li>
-					<a href="#!"><img src="images/user/user2.png" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+					<a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
-					<a href="#!"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+					<a href="login/logout"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
 				  </li>
 				  
 				</ul>
@@ -47,25 +75,7 @@
 				<li>
 					<a href="home" class="cyan-text">
 						<i class="mdi-action-dashboard"></i>
-						<span>Home</span>
-					</a>
-				</li>
-				<li>
-					<a href="#modalcreateboard" class="cyan-text modal-trigger">
-						<i class="mdi-action-note-add"></i>
-						<span>Create Board</span>
-					</a>
-				</li> 
-				<li>
-					<a href="#modalcreategroup" class="cyan-text modal-trigger">
-						<i class="mdi-social-group"></i>
-						<span>Create Group Board</span>
-					</a>
-				</li>
-				<li>
-					<a href="app-email.html" class="cyan-text">
-						<i class="mdi-navigation-close"></i>
-						<span>Closed Boards</span>
+						<span>Back To Home</span>
 					</a>
 				</li>
 			  </ul>
@@ -83,10 +93,24 @@
         <li class="user-details cyan darken-2">
             <div class="row">
                 <div class="col col s4 m4 l4">
-                    <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image">
+                    <img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="" class="circle responsive-img valign profile-image">
                 </div>
                 <div class="col col s8 m8 l8">
-                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled>Steven Gerrard<i class="mdi-navigation-arrow-drop-down right"></i></a>
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
                 </div>
             </div>
         </li>
@@ -99,9 +123,9 @@
         <li class="bold active"><a href="#modalclosedboards" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-close"></i> Closed Boards</a>
         </li>
         <div class="divider"></div>
-        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Profile</a>
+        <li class="bold active"><a href="userProfile?userId=<?php echo $userId ?>" class="waves-effect waves-cyan">Profile</a>
         </li>
-        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Log Out</a>
+        <li class="bold active"><a href="login/logout" class="waves-effect waves-cyan">Log Out</a>
         </li>
     </ul>
     <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
@@ -180,16 +204,49 @@
 		                    <img class="" src="images/user-profile-bg.jpg" alt="user background">                    
 		                </div>
 		                <figure class="card-profile-image">
-		                    <img src="images/user/gerrard.png" alt="profile image" class="circle z-depth-2 responsive-img">
+		                    <img id="userImage" src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="profile image" class="circle z-depth-2 responsive-img">
 		                </figure>
 		                <div class="card-content">
 		                  <div class="row">                    
 		                    <div class="col s3 offset-s2">                        
-		                        <h4 class="card-title grey-text text-darken-4">Steven Gerrard</h4>
-		                        <p class="medium-small grey-text">stevengerrard@gmail.com</p>                        
+		                        <h4 class="card-title grey-text text-darken-4"><b><?php echo $userProfile->userName ?></b></h4>
+		                        <p class="medium-small grey-text"><?php echo $userProfile->userEmail ?></p>                        
 		                    </div>
 		                    <div class="col s2 center-align">
-		                        <h4 class="card-title grey-text text-darken-4">10+</h4>
+		                        <h4 class="card-title grey-text text-darken-4">
+		                        	<?php
+		                        		$total = 0;
+		                        		foreach($board as $b)
+		                        		{
+		                        			if($b->boardStatus == "1" && $b->boardGroup == "0")
+		                        			{
+		                        				$total++;
+		                        			}
+		                        		}
+		                        		if($total >10)
+		                        		{
+		                        			echo "10+";
+		                        		}
+		                        		else
+		                        		{
+		                        			echo $total;
+		                        		}
+		                        	?>
+		                        </h4>
 		                        <p class="medium-small grey-text">Boards</p>                        
 		                    </div>
 		                    <div class="col s2 center-align">
@@ -197,7 +254,7 @@
 		                        <p class="medium-small grey-text">Teams</p>                        
 		                    </div>                   
 		                    <div class="col s2 center-align">
-		                        <h4 class="card-title grey-text text-darken-4">23 Mar 2018</h4>
+		                        <h4 class="card-title grey-text text-darken-4"><?php echo date_format(date_create($userProfile->userJoined),"d F Y"); ?></h4>
 		                        <p class="medium-small grey-text">Joined</p>                        
 		                    </div>
 		                  </div>
@@ -213,22 +270,32 @@
 		                <div class="card white">
 		                  <div class="card-content black-text">
 		                    <span class="card-title"><b>Edit Profile</b></span>
+		                    	<input type="hidden" id="hiddenUserId" value="<?php echo $userProfile->userId?>">
 		                        <div class="input-field">
-		                          <input id="name" type="text" value="ASD">
+		                          <input id="name" type="text" value="<?php echo $userProfile->userName; ?>">
 		                          <label for="name">Name</label>
 		                        </div>
 		                        <div class="input-field">
-		                          <textarea id="bio" class="materialize-textarea" length="120"></textarea>
-                          		  <label for="bio">Bio</label>
-		                        </div>
-		                        <div class="input-field">
-		                          <input id="email" type="tel" class="validate" value="stevengerrard@gmail.com" disabled>
+		                          <input id="email" type="tel" class="validate" value="<?php echo $userProfile->userEmail; ?>" disabled>
 		                          <label for="email">Email</label>
 		                        </div>
 		                        <div class="input-field">
-		                          <input id="oldpass" type="password" class="validate" value="janganlihat">
-		                          <label for="oldpass">Old Password</label>
+		                          <textarea id="bio" class="materialize-textarea" length="120"><?php echo $userProfile->userBio; ?></textarea>
+                          		  <label for="bio">Bio</label>
 		                        </div>
+		                    	<div class="file-field input-field">
+			                      <div class="btn">
+			                        <span>File</span>
+			                        <input type="file" id="inputImage">
+			                      </div>
+			                      <div class="file-path-wrapper">
+			                        <input class="file-path validate" type="text">
+			                      </div>
+			                    </div>
+		                        <div class="input-field right-align" style="margin-bottom:15px;">
+		                        	<a onclick="changeProfile()" class="btn waves-effect waves-light green">Change Profile<i class="mdi-content-send right"></i></a>
+		                        </div>
+		                        <div class="divider"></div>
 		                        <div class="input-field">
 		                          <input id="newpass" type="text" class="validate">
 		                          <label for="newpass">New Password</label>
@@ -237,15 +304,9 @@
 		                          <input id="confpass" type="text" class="validate">
 		                          <label for="confpass">Confirm Password</label>
 		                        </div>
-		                    	<div class="file-field input-field">
-			                      <div class="btn">
-			                        <span>File</span>
-			                        <input type="file">
-			                      </div>
-			                      <div class="file-path-wrapper">
-			                        <input class="file-path validate" type="text">
-			                      </div>
-			                    </div>
+			                      <div class="input-field right-align">
+		                        	<a onclick="changePassword()" class="btn waves-effect waves-light red">Change Password<i class="mdi-content-send right"></i>></a>
+		                          </div>
 		                  </div>                  
 		                </div>
 		                <!-- Profile About  -->
@@ -270,11 +331,25 @@
 		                    <div id="Bio" class="tab-content col s12  grey lighten-4">
 		                      <div class="row">
 		                        <div class="col s2">
-		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
+		                          <img id="visitUserImage" src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="" class="circle responsive-img valign profile-image-post">
 		                        </div>
 		                        <div class="input-field col s10">
 		                          <h5 class="black-text"><b><u>Bio</u></b></h5>
-		                          <p class="black-text">Im a gentleman</p>
+		                          <p class="black-text" id="visitUserBio"><?php echo $userProfile->userBio ?></p>
 		                        </div>
 		                      </div>
 		                    </div>

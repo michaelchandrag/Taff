@@ -24,16 +24,44 @@
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
 					</li>
-					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="images/user/gerrard.png" width="32px" height="32px" style="border-radius:50%" /></a>
+					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" style="border-radius:50%" /></a>
 					</li>
 				</ul>
 				<!-- translation-button -->
 				<ul id="translation-dropdown" class="dropdown-content">
 				  <li>
-					<a href="#!"><img src="images/user/user2.png" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+					<a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
-					<a href="#!"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+					<a href="login/logout"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
 				  </li>
 				  
 				</ul>
@@ -81,7 +109,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="#modalmore" class="cyan-text modal-trigger">
+					<a href="#modalmore" onclick="ajaxModalMore()" class="cyan-text modal-trigger">
 						<i class="mdi-navigation-more-horiz"></i>
 						<span>More</span>
 					</a>
@@ -101,10 +129,24 @@
         <li class="user-details cyan darken-2">
             <div class="row">
                 <div class="col col s4 m4 l4">
-                    <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image">
+                    <img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="" class="circle responsive-img valign profile-image">
                 </div>
                 <div class="col col s8 m8 l8">
-                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled>Steven Gerrard<i class="mdi-navigation-arrow-drop-down right"></i></a>
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
                 </div>
             </div>
         </li>
@@ -150,20 +192,20 @@
 				<!-- trello start here -->
 				<div class="section">
 					<!-- BOARD -->
-					<div class="row">
+					<div class="row" style="margin-top:-20px;">
 						<div class="col s6 m4 l4">
 							<h1><b>
 								<?php
 									foreach($board as $r)
 									{
-										echo $r->boardTitle;
+										echo "<p id='boardTitle'>".$r->boardTitle."</p>";
 										echo "<input type='hidden' id='hiddenBoardId' value='".$r->boardId."'>";
 									}
 								?>
 							</b></h1>
 						</div>
 						<div class="col s6 m4 l8">
-							<p>Filter Card</p>
+							<p><b><u>Filter Card</u></b></p>
 							<input type="checkbox" id="filterred" />
 	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
                       		<input type="checkbox" id="filteryellow" />
@@ -193,7 +235,21 @@
 									<p><b>Members</b></p>
 									<div class="row">
 										<div class="col s12 m4 l1">
-											<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+											<img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
 										</div>
 										<div class="col s12 m4 l11">
 											<p class="">	
@@ -203,7 +259,21 @@
 									</div>
 									<div class="row">
 										<div class="col s12 m4 l1">
-											<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+											<img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
 										</div>
 										<div class="col s12 m4 l11">
 											<p class="">	
@@ -249,7 +319,7 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 						<a class="waves-effect waves-red btn-flat modal-action modal-close" onclick="createCard()">Save</a>
 					  </div>
 					</div>
@@ -302,35 +372,38 @@
 								<h6><b>More Menu..</b></h6>    
 								<div class="col s12 m6 l6">
 									<div class="col s12 m6 l12">
-										<a class="btn-flat dropdown-button waves-effect black-text" href="#!" data-activates="dropdownboard">Change Background<i class="mdi-navigation-arrow-drop-down right"></i></a>
+										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownboard">Change Background<i class="mdi-navigation-arrow-drop-down right"></i></a>
 											<ul id="dropdownboard" class="dropdown-content">
-												<li>
+												<li onclick="changeBackground('red')">
 													<div class="col s12 m6 l9">
 														<div style="background-color:red;width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
 													</div>
 													<div class="col s12 m6 l2">
-														<i style="margin:5px;" class="mdi-navigation-check black-text"></i>
+														<i id="bgRed" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
 													</div>
 												</li>
-												<li>
+												<li onclick="changeBackground('yellow')">
 													<div class="col s12 m6 l9">
 														<div style="background-color:yellow;width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
 													</div>
 													<div class="col s12 m6 l2">
+														<i id="bgYellow" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
 													</div>
 												</li>
-												<li>
+												<li onclick="changeBackground('green')">
 													<div class="col s12 m6 l9">
 														<div style="background-color:green;width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
 													</div>
 													<div class="col s12 m6 l2">
+														<i id="bgGreen" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
 													</div>
 												</li>
-												<li>
+												<li onclick="changeBackground('blue')">
 													<div class="col s12 m6 l9">
 														<div style="background-color:blue;width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
 													</div>
 													<div class="col s12 m6 l2">
+														<i id="bgBlue" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
 													</div>
 												</li>
 											</ul>
@@ -351,7 +424,7 @@
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalsettingrole">Setting Role</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="#!">Leave Board</a>
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Leave Board</a>
 									</div>
 
 								</div>
@@ -363,10 +436,10 @@
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalcopyboard">Copy Board</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="#!">Print</a>
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Print</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat dropdown-button waves-effect black-text" href="#!" data-activates="dropdownexport">Export<i class="mdi-navigation-arrow-drop-down right"></i></a>
+										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownexport">Export<i class="mdi-navigation-arrow-drop-down right"></i></a>
 										
 										<ul id="dropdownexport" class="dropdown-content">
 											<li>
@@ -382,10 +455,10 @@
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalarchive" onclick="modalArchive()">Archive</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="#!">Gantt Chart</a>
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Gantt Chart</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="#!">Close Board</a>
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Close Board</a>
 									</div>
 
 								</div>
@@ -393,7 +466,7 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 					  </div>
 					</div>
 
@@ -472,13 +545,13 @@
 								<h6><b>Edit board..</b></h6>
 								<div class="divider"></div>
 								<p>Title</p>
-								<input type="text" value="Bucket List">
+								<input type="text" value="" id="txtEditBoard">
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="changeEditBoard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalcopyboard" class="modal">
@@ -702,8 +775,8 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close" onclick="updateCardTitle()">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close" onclick="updateCardTitle()">Save</a>
 					  </div>
 					</div>
 					<div id="modaleditdescription" class="modal">
@@ -718,8 +791,8 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="updateCardDescription()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalcreatechecklistitem" class="modal">
@@ -923,21 +996,45 @@
 					  </div>
 					</div>
 					<div id="modalattachment" class="modal modal-fixed-footer white">
-					  <div class="modal-content white">
+					  <!--<div class="modal-content white">
 						<div class="col s12 m6 l12">
 							<div class="row">
 								<h6><b>Add a attachment..</b></h6>
 								<div class="divider"></div>
-								<a class="btn-flat dropdown-button waves-effect blue-text" href="#!">Computer</a>
-								<a class="btn-flat dropdown-button waves-effect blue-text" href="#!">Google Drive</a>
-								<a class="btn-flat dropdown-button waves-effect blue-text" href="#!">Dropbox</a>
+								<div class="file-field input-field">
+			                      <div class="btn">
+			                        <span>Computer</span>
+			                        <input type="file" id="">
+			                      </div>
+			                      <div class="file-path-wrapper">
+			                        <input class="file-path validate" type="text">
+			                      </div>
+			                    </div>
+			                    <div class="file-field input-field">
+			                      <div class="btn">
+			                        <span>Google Drive</span>
+			                        <input type="file" id="inputGoogleDrive">
+			                      </div>
+			                      <div class="file-path-wrapper">
+			                        <input class="file-path validate" type="text">
+			                      </div>
+			                    </div>
+			                    <div class="file-field input-field">
+			                      <div class="btn">
+			                        <span>Dropbox</span>
+			                        <input type="file" id="inputDropbox">
+			                      </div>
+			                      <div class="file-path-wrapper">
+			                        <input class="file-path validate" type="text">
+			                      </div>
+			                    </div>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
-					  </div>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close" onclick="createAttachment()">Save</a>
+					  </div>-->
 					</div>
 					<div id="modalmove" class="modal modal-fixed-footer white">
 					  <div class="modal-content white">
@@ -1024,7 +1121,7 @@
 					</div>
 					<!-- END OF MODAL ACTION CARD-->
 					<!-- MODAL CARD-->
-					<div id="modal3" class="modal modal-fixed-footer grey lighten-3">
+					<div id="modal3" class="modal modal-fixed-footer grey lighten-3" style="width:70%;">
 					  <div class="modal-content grey lighten-3 black-text left-align">
 							<div class="row">
 								<div class="col s12 m6 l9">
@@ -1048,11 +1145,40 @@
 											<a href="#modaleditdescription" class="modal-trigger">Edit description</a>
 										</div>
 									</div>
+									<div class="divider"></div>
 									<div class="row">
 										<div class="col 12 m3 l4">
 											<h6><b>Members</b></h6>
-											<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-											<img src="images/user/user2.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+											<img src="<?php 
+					                    if(strpos($userProfile->userImage,"userImage") !== false)
+					                    {
+					                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+					                    }
+					                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+					                    {
+					                    	echo $userProfile->userImage;
+					                    }
+					                    else
+					                    {
+					                    	echo "userImage/user.jpg";
+					                    }
+
+					                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+														<img src="<?php 
+					                    if(strpos($userProfile->userImage,"userImage") !== false)
+					                    {
+					                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+					                    }
+					                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+					                    {
+					                    	echo $userProfile->userImage;
+					                    }
+					                    else
+					                    {
+					                    	echo "userImage/user.jpg";
+					                    }
+
+					                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
 										</div>
 										<div class="col 12 m3 l2">
 											<div id="ajaxLabelCard">
@@ -1073,17 +1199,8 @@
 										</div>
 									</div>
 									<div class="divider"></div>
-									<div class="row">
-										<div class="col s12 m6 l12">
-											<h6><b>Attachment</b></h6>
-											<div class="col s12 m6 l2">
-												<img src="images/user/blessRNG.jpg" style="width:90px;height:70px;" alt="Profile" />
-											</div>
-											<div class="col s12 m6 l7" style="margin-left:12px;">
-												<p>blessRNG.jpg</p>
-												<p class="grey-text lighten-3">Added 11 minutes ago - <a href="#">Delete</a></p>
-												<p class="grey-text lighten-3">Download</p>
-											</div>
+									<div class="row" >
+										<div class="col s12 m6 l12" id="ajaxAttachment">
 										</div>
 									</div>
 									<div class="divider"></div>
@@ -1107,7 +1224,21 @@
 									<div class="divider"></div>
 									<div class="row">
 										<div class="col s12 m4 l1">
-										<img src="images/user/gerrard.png" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+										<img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
 										</div>
 										<div class="col s12 m4 l11">
 											<p>	
@@ -1124,6 +1255,27 @@
 									<h5 class="large"><b>Add</b></h5>
 									<div class="divider"></div>
 									<div class="row" style="margin-top:5px;">
+										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownattachment">Attachment<i class="mdi-navigation-arrow-drop-down right"></i></a>
+											<ul id="dropdownattachment" class="dropdown-content">
+												<li>
+													<div class="file-field input-field">
+								                      <div class="btn-flat waves-effect">
+								                        <span>Computer</span>
+								                        <input type="file" id="inputComputer" onchange="createAttachment()">
+								                      </div>
+								                      <div class="file-path-wrapper">
+								                      </div>
+								                    </div>
+												</li>
+												<li>
+													<a href="#" class="btn-flat waves-effect">Google Drive</a>
+												</li>
+												<li>
+													<a href="#" class="btn-flat waves-effect">Dropbox</a>
+												</li>
+											</ul>
+									</div>
+									<div class="row" style="margin-top:5px;">
 										<a href="#modalassignmembers" class="modal-trigger btn-flat waves-effect" style="font-size:90%;">Assign Members</a>
 									</div>
 									<div class="row" style="margin-top:5px;">
@@ -1137,9 +1289,6 @@
 									</div>
 									<div class="row" style="margin-top:5px;">
 										<a href="#modalduedate" class="modal-trigger btn-flat waves-effect">Due Date</a>
-									</div>
-									<div class="row" style="margin-top:5px;">
-										<a href="#modalattachment" class="modal-trigger btn-flat waves-effect">Attachment</a>
 									</div>
 									<h5 class="large"><b>Menu</b></h5>
 									<div class="divider"></div>
@@ -1165,23 +1314,24 @@
 							</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-green btn-flat  modal-close">Close</a>
+						<a class="waves-effect waves-green btn-flat  modal-close">Close</a>
 					  </div>
 					</div>
 					<!-- END OF MODAL ACTION CARD-->
 					<div id="card-stats">
-						<div class="row">
+						<div id="rowList">
 							<!-- LIST -->
 							<?php
 								$list = -1;
-								echo '<div class="row">';
+								$ajaxList = 1;
+								echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">'; // BUKA ROW MINIMAL 1
 								foreach($boardList as $l)
 								{
 									echo '<div class="col s12 m6 l2">';
 									echo	'<div class="card">';
 									echo		'<div class="card-content grey lighten-2 white-text">';
 						            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="#" class="activator black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-						            echo 			'<div id="list'.$l->listId.'">';
+						            echo 			'<div id="list'.$l->listId.'" class="listUser">';
 									foreach($boardCard as $c)
 									{
 										if($c->cardListId == $l->listId && $c->cardArchive == 0)
@@ -1229,14 +1379,14 @@
 									echo 				'</div>';
 			                       
 			                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="#modalcreatecard" class="modal-trigger grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
+		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0);" class="grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
 		                            echo       		'</div>';
 
 									echo		'</div>';
 		           		            echo        '<div class="card-reveal">';
 		                            echo        	'<span class="card-title grey-text text-darken-4">List Menu <i class="mdi-navigation-close right"></i></span>';
 		                            echo        	'<div class="divider"></div>';
-						            echo            '<p><a href="#modalcreatecard" class="modal-trigger black-text">Add a card..</a></p>';
+						            echo            '<p><a href="javascript:void(0);" class="black-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a card..</a></p>';
 									echo			'<p><a href="#modalcopylist" class="modal-trigger black-text">Copy list..</a></p>';
 									echo			'<p><a href="#modalmovelist" class="modal-trigger black-text">Move list..</a></p>';
 									echo			'<p><a href="#modalmovecardlist" class="modal-trigger black-text">Move all card in this list..</a></p>';
@@ -1249,22 +1399,23 @@
 									if($list%5 == 0 && $list>0)
 									{
 										$list = -1;
+										$ajaxList++;
 										echo '</div>';
-										echo '<div class="row">';
+										echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">';
 									}
 								}
 
-								echo '<div class="col s12 m6 l2" style="margin-left:0px;">';
+								echo '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
 								echo	'<div class="card">';
 								echo		'<div class="card-content grey white-text">';
 			                    echo           '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-			                    echo           		'<div id="invoice-line" class="left-align white-text"><a href="#modalcreatelist" class="modal-trigger white-text">Add a List..</a></div>';
+			                    echo           		'<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0);" class="white-text">Add a List..</a></div>';
 			                    echo       		'</div>';
 								echo		'</div>';
 								echo	'</div>';
 								echo '</div>';
+								echo '</div>'; // TUTUP ROW
 							?>
-							</div> <!--TUTUP ROW-->
 						</div>
 					</div>
 				
@@ -1322,7 +1473,21 @@
                             </div>
                         </div>
                         <div class="favorite-associate-list chat-out-list row">
-                            <div class="col s4"><img src="images/user/gerrard.png" alt="" class="circle responsive-img online-user valign profile-image">
+                            <div class="col s4"><img src="<?php 
+		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    {
+		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                    }
+		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    {
+		                    	echo $userProfile->userImage;
+		                    }
+		                    else
+		                    {
+		                    	echo "userImage/user.jpg";
+		                    }
+
+		                    ?>" alt="" class="circle responsive-img online-user valign profile-image">
                             </div>
                             <div class="col s8">
                                 <p>Steven Gerrard</p>
