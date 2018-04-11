@@ -106,7 +106,6 @@ class Boardcomment extends \Phalcon\Mvc\Model
 
     public function insertBoardComment($cardId,$boardId,$userId,$commentText,$status)
     {
-        date_default_timezone_set('Asia/Jakarta');
         $comment = new Boardcomment();
         $index = $comment->countComment();
         $id = "BUC".str_pad($index,5,'0',STR_PAD_LEFT);
@@ -117,6 +116,28 @@ class Boardcomment extends \Phalcon\Mvc\Model
         $comment->commentText = $commentText;
         $comment->commentCreated = date("Y-m-d H:i:sa");
         $comment->commentStatus = $status;
+        $comment->save();
+    }
+
+    public function deleteComment($commentId)
+    {
+        $comment = Boardcomment::findFirst(
+            [
+                "commentId='".$commentId."'"
+            ]
+        );
+        $comment->commentStatus = "0";
+        $comment->save();
+    }
+
+    public function changeCommentText($commentId,$text)
+    {
+        $comment = Boardcomment::findFirst(
+            [
+                "commentId='".$commentId."'"
+            ]
+        );
+        $comment->commentText = $text;
         $comment->save();
     }
 

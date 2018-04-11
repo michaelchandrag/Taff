@@ -113,7 +113,6 @@ class Boardreplycomment extends \Phalcon\Mvc\Model
 
     public function insertBoardReplyComment($commentId,$cardId,$boardId,$userId,$replyText,$status)
     {
-        date_default_timezone_set('Asia/Jakarta');
         $reply = new Boardreplycomment();
         $index = $reply->countReply();
         $id = "BRC".str_pad($index,5,'0',STR_PAD_LEFT);
@@ -127,6 +126,28 @@ class Boardreplycomment extends \Phalcon\Mvc\Model
         $reply->replyStatus = $status;
         $reply->save();
 
+    }
+
+    public function deleteReply($replyId)
+    {
+        $reply = Boardreplycomment::findFirst(
+            [
+                "replyId='".$replyId."'"
+            ]
+        );
+        $reply->replyStatus = "0";
+        $reply->save();
+    }
+
+    public function changeReplyText($replyId,$text)
+    {
+        $reply = Boardreplycomment::findFirst(
+            [
+                "replyId='".$replyId."'"
+            ]
+        );
+        $reply->replyText = $text;
+        $reply->save();
     }
 
 }

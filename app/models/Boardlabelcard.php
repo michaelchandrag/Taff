@@ -126,4 +126,18 @@ class Boardlabelcard extends \Phalcon\Mvc\Model
 
     }
 
+    public function setColor($cardId,$red,$yellow,$green,$blue)
+    {
+        $label = Boardlabelcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $label->labelRed = $red;
+        $label->labelYellow = $yellow;
+        $label->labelGreen = $green;
+        $label->labelBlue = $blue;
+        $label->save();
+    }
+
 }

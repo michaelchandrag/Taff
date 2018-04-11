@@ -28,7 +28,7 @@ class Boardchecklist extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
-     * @Column(column="checklistStatus", type="string", length=20, nullable=false)
+     * @Column(column="checklistStatus", type="string", length=1, nullable=false)
      */
     public $checklistStatus;
 
@@ -90,6 +90,17 @@ class Boardchecklist extends \Phalcon\Mvc\Model
         $checklist->cardId = $cardId;
         $checklist->checklistTitle = $title;
         $checklist->checklistStatus = $status;
+        $checklist->save();
+    }
+
+    public function deleteChecklist($checklistId)
+    {
+        $checklist = Boardchecklist::findFirst(
+            [
+                "checklistId='".$checklistId."'"
+            ]
+        );
+        $checklist->checklistStatus = "0";
         $checklist->save();
     }
 

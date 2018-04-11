@@ -1,6 +1,6 @@
 <?php
 
-class UserProfileController extends \Phalcon\Mvc\Controller
+class UserprofileController extends \Phalcon\Mvc\Controller
 {
 
     public function indexAction()
@@ -20,6 +20,18 @@ class UserProfileController extends \Phalcon\Mvc\Controller
        			"boardOwner='".$userId."'"
        		]
        	);
+        $groupUser = Groupuser::find(
+          [
+            "groupStatus='1'"
+          ]
+        );
+        $groupMember = Groupmember::find(
+          [
+            "userId='".$userId."'"
+          ]
+        );
+        $this->view->groupMember = $groupMember;
+        $this->view->groupUser = $groupUser;
        	$this->view->userProfile 	= $profile;
        	$this->view->userId 		= $userId;
        	$this->view->board 			= $board;
@@ -39,6 +51,27 @@ class UserProfileController extends \Phalcon\Mvc\Controller
           move_uploaded_file($_FILES['file1']['tmp_name'], $name);
           echo $name;
         }
+    }
+
+    public function changeDataAction()
+    {
+      $userId = $_POST["userId"];
+      $userName = $_POST["userName"];
+      $userBio = $_POST["userBio"];
+      $profile = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+      $profile->changeData($userId,$userName,$userBio);
+      $user = User::findFirst(
+        [
+          "userId='".$userId."'"
+        ]
+      );
+      $user->setName($userId,$userName);
+      $this->view->disable();
+      echo "Berhasil";
     }
 
 }

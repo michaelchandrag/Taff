@@ -156,3 +156,28 @@ function hiddenGroupId(id)
 	var asd = $("#hiddenOwnerId").val();
 	//alert(asd);
 }
+
+function cekLogout()
+{
+	$.ajax({
+		  type: "POST",
+		  url: "login/logout",
+		  success: function (response) {
+			  alert(response);
+			  if(response == "Berhasil")
+			  {
+			  	/*var auth2 = gapi.auth2.getAuthInstance();
+			    auth2.signOut().then(function () {
+			      console.log('User signed out.');
+			    });*/
+			  	window.location.href = "login";
+
+			  }
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}

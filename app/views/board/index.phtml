@@ -1,9 +1,9 @@
 <!-- Start Page Loading -->
-<div id="loader-wrapper">
+<!--<div id="loader-wrapper">
 	<div id="loader"></div>        
 	<div class="loader-section section-left"></div>
 	<div class="loader-section section-right"></div>
-</div>
+</div>-->
 <!-- End Page Loading -->
 
 <!-- //////////////////////////////////////////////////////////////////////////// -->
@@ -61,7 +61,7 @@
 		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
-					<a href="login/logout"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+					<a href="javascript:void(0);" onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
 				  </li>
 				  
 				</ul>
@@ -97,13 +97,21 @@
 					</a>
 				</li>
 				<li>
-					<a href="#" class="cyan-text chat-collapse " data-activates="chat-out" data-sidenav="right" data-closeonclick="false">
+					<a href="javascript:void(0);" class="cyan-text chat-collapse " data-activates="chat-out" data-sidenav="right" data-closeonclick="false">
 						<i class="mdi-communication-chat"></i>
 						<span>Chat Board</span>
 					</a>
 				</li>
 				<li>
-					<a href="calendar" class="cyan-text">
+					<a href="<?php 
+					$boardId = "";
+					foreach($board as $r)
+					{
+						$boardId = $r->boardId;
+					}
+					echo "calendar?id=".$boardId; 
+
+					?>" class="cyan-text">
 						<i class="mdi-action-schedule"></i>
 						<span>Calender Board</span>
 					</a>
@@ -146,7 +154,7 @@
 		                    ?>" alt="" class="circle responsive-img valign profile-image">
                 </div>
                 <div class="col col s8 m8 l8">
-                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="javascript:void(0);" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
                 </div>
             </div>
         </li>
@@ -158,19 +166,19 @@
         </li>
         <li class="bold active"><a href="#modalcreatecard" class="waves-effect waves-cyan modal-trigger"><i class="mdi-content-add"></i> Create Card</a>
         </li>
-        <li class="bold active"><a href="#" class="cyan-text chat-collapse " data-activates="chat-out" data-sidenav="right" data-closeonclick="false"><i class="mdi-communication-chat"></i>Chat Board</a>
+        <li class="bold active"><a href="javascript:void(0);" class="cyan-text chat-collapse " data-activates="chat-out" data-sidenav="right" data-closeonclick="false"><i class="mdi-communication-chat"></i>Chat Board</a>
         </li>
         <li class="bold active"><a href="calender" class="waves-effect waves-cyan"><i class="mdi-action-schedule"></i> Calender Board</a>
         </li>
         <li class="bold active"><a href="#modalmore" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-more-horiz"></i> More</a>
         </li>
         <div class="divider"></div>
-        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Profile</a>
+        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Profile</a>
         </li>
-        <li class="bold active"><a href="#" class="waves-effect waves-cyan">Log Out</a>
+        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Log Out</a>
         </li>
     </ul>
-    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+    <a href="javascript:void(0);" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
 </aside>
 <!-- END LEFT SIDEBAR NAV-->
 
@@ -181,6 +189,7 @@
 
 <!-- START MAIN -->
 <div id="main">
+	<div id="result"></div>
 	<!-- START WRAPPER -->
 	<div class="wrapper">
 
@@ -200,6 +209,7 @@
 									{
 										echo "<p id='boardTitle'>".$r->boardTitle."</p>";
 										echo "<input type='hidden' id='hiddenBoardId' value='".$r->boardId."'>";
+										echo "<input type='hidden' id='hiddenUserId' value='".$userId."'>";
 									}
 								?>
 							</b></h1>
@@ -345,24 +355,8 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 						<a onclick="createCardDua()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
-					  </div>
-					</div>
-					<div id="modalcalendar" class="modal" style="height:500%;">
-					  <div class="modal-content">
-						<div class="col s12 m6 l12">
-							<div class="row">
-								<h6><b>Calendar Board</b></h6>    
-								<div class="col s12 m8 l12">
-									  <div id='calendar'></div>
-								</div>
-							</div>
-						</div>
-					  </div>
-					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalmore" class="modal">
@@ -410,13 +404,13 @@
 									</div>
 									<div class="col s12 m6 l12">
 										<p>
-										<input type="checkbox" id="testfav" />
+										<input type="checkbox" id="testfav" onchange="createFavorite()"/>
 										<label for="testfav" class="black-text">Favorite</label>
 										</p>
 									</div>
 									<div class="col s12 m6 l12">
 										<p>
-										<input type="checkbox" id="testsub" />
+										<input type="checkbox" id="testsub" onchange="createSubscribe()" />
 										<label for="testsub" class="black-text">Subscribe</label>
 										</p>
 									</div>
@@ -455,7 +449,7 @@
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalarchive" onclick="modalArchive()">Archive</a>
 									</div>
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Gantt Chart</a>
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalGanttChart()">Gantt Chart</a>
 									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Close Board</a>
@@ -470,8 +464,42 @@
 					  </div>
 					</div>
 
+
 					<!-- END OF MODAL MENU BOARD-->
 					<!-- MODAL LIST-->
+					<div id="modallistmenu" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<h6><b>List Menu..</b></h6>    
+								<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListAddCard()">Add a card..</a>
+									</div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListCopyList()">Copy list..</a>
+									</div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalMoveList()">Move list..</a>
+									</div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListMoveAllCard()">Move all card in this list..</a>
+									</div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveAllCard()">Archive all card in this list..</a>
+									</div>
+									<div class="col s12 m6 l12">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveList()">Archive this list..</a>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+					  </div>
+					</div>
 					<div id="modalcopylist" class="modal">
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
@@ -479,13 +507,13 @@
 								<h6><b>Copy list..</b></h6>
 								<div class="divider"></div>
 								<p>Title</p>
-								<input type="text" placeholder="Title..">
+								<input type="text" placeholder="Title.." id="copyListTitle">
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="createCopyList()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalmovelist" class="modal">
@@ -493,27 +521,16 @@
 						<div class="col s12 m6 l12">
 							<div class="row">
 								<h6><b>Move list..</b></h6>
-								<p>Board</p>
-								<select>
-								  <option value="" disabled selected>Choose your option</option>
-								  <option value="1" selected>Bucket List</option>
-								  <option value="2">Life Goals</option>
-								  <option value="3">Praktikum (STTS 2017)</option>
-								</select>
 								<div class="divider"></div>
 								<p>Position</p>
-								<select>
-								  <option value="" disabled selected>Choose your option</option>
-								  <option value="1" selected>1</option>
-								  <option value="2">2</option>
-								  <option value="3">3</option>
+								<select id="selectListPosition" class="browser-default">
 								</select>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="changeListPosition()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalmovecardlist" class="modal">
@@ -522,18 +539,14 @@
 							<div class="row">
 								<h6><b>Move all card in this list..</b></h6>
 								<p>List</p>
-								<select>
-								  <option value="" disabled selected>Choose your option</option>
-								  <option value="1" selected>To Do (current)</option>
-								  <option value="2">In Progress</option>
-								  <option value="3">Done</option>
+								<select id="selectAllCardList" class="browser-default">
 								</select>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="saveMoveAllCardList()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<!-- END OF MODAL LIST-->
@@ -552,6 +565,18 @@
 					  <div class="modal-footer">
 						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 						<a href="javascript:void(0);" onclick="changeEditBoard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+					  </div>
+					</div>
+					<div id="modalganttchart" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<div id="chart_div" class="col s6 m6 l12"></div>
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 					  </div>
 					</div>
 					<div id="modalcopyboard" class="modal">
@@ -824,8 +849,8 @@
 						</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a onclick="createAssignMembers()" href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modallabelcard" class="modal modal-fixed-footer white">
@@ -861,13 +886,6 @@
 								<div class="divider"></div>
 								<p>Title</p>
 								<input type="text" id="checklistTitle">
-								<p>Copy checklist from..</p>
-								<select>
-								  <option value="" disabled selected>Choose your option</option>
-								  <option value="1">Card Satu (List To Do)</option>
-								  <option value="2">Card Satu (List In Progress)</option>
-								  <option value="3">Card Tiga (List Done)</option>
-								</select>
 							</div>
 						</div>
 					  </div>
@@ -885,14 +903,10 @@
 								<div class="col s12 m6 l6" id="archiveList">
 									<p><b>Cards</b></p>
 									<div class="divider"></div>
-									<p>Card Satu <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
-									<p>Card Dua <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
 								</div>
 								<div class="col s12 m6 l6" id="archiveCard">
 									<p><b>Lists</b></p>
 									<div class="divider"></div>
-									<p>List Satu <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
-									<p>List Dua <a href="#" class="ultra-small green-text">Send to Board </a><a href="#" class="ultra-small red-text">Delete</a></p>
 								</div>
 							</div>
 						</div>
@@ -1042,38 +1056,22 @@
 							<div class="row">
 								<h6><b>Move card..</b></h6>
 								<div class="divider"></div>
-								<div class="col s12 m6 l12">
-									<p>Board</p>
-									<select>
-									  <option value="" disabled>My Boards</option>
-									  <option value="0" selected>Bucket List</option>
-									  <option value="0">Life Goals</option>
-									  <option value="" disabled>STTS 2017</option>
-									  <option value="0">Praktikum</option>
-									</select>
-								</div>
 								<div class="col s12 m6 l6">
 									<p>List</p>
-									<select>
-									  <option value="0">To Do</option>
-									  <option value="0">Doing</option>
-									  <option value="0">Done</option>
+									<select id="selectListCard" class="browser-default" onchange="changeList()">
 									</select>
 								</div>
 								<div class="col s12 m6 l6">
 									<p>Position</p>
-									<select>
-									  <option value="0">1</option>
-									  <option value="0">2</option>
-									  <option value="0">3</option>
+									<select id="selectCardPosition" class="browser-default">
 									</select>
 								</div>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="changeCardPosition()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalcopy" class="modal modal-fixed-footer white">
@@ -1083,40 +1081,19 @@
 								<h6><b>Copy card..</b></h6>
 								<div class="divider"></div>
 								<div class="col s12 m6 l12">
-									<input type="text" placeholder="Title" value="Card Satu">
+									<input type="text" placeholder="Title" value="" id="copyCardTitle">
 								</div>
 								<div class="col s12 m6 l12">
-									<p>Board</p>
-									<select>
-									  <option value="" disabled>My Boards</option>
-									  <option value="0" selected>Bucket List</option>
-									  <option value="0">Life Goals</option>
-									  <option value="" disabled>STTS 2017</option>
-									  <option value="0">Praktikum</option>
-									</select>
-								</div>
-								<div class="col s12 m6 l6">
 									<p>List</p>
-									<select>
-									  <option value="0">To Do</option>
-									  <option value="0">Doing</option>
-									  <option value="0">Done</option>
-									</select>
-								</div>
-								<div class="col s12 m6 l6">
-									<p>Position</p>
-									<select>
-									  <option value="0">1</option>
-									  <option value="0">2</option>
-									  <option value="0">3</option>
+									<select id="copyCardList" class="browser-default">
 									</select>
 								</div>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer teal lighten-4">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0)" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0)" onclick="setCopyCard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<!-- END OF MODAL ACTION CARD-->
@@ -1147,38 +1124,8 @@
 									</div>
 									<div class="divider"></div>
 									<div class="row">
-										<div class="col 12 m3 l4">
-											<h6><b>Members</b></h6>
-											<img src="<?php 
-					                    if(strpos($userProfile->userImage,"userImage") !== false)
-					                    {
-					                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-					                    }
-					                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-					                    {
-					                    	echo $userProfile->userImage;
-					                    }
-					                    else
-					                    {
-					                    	echo "userImage/user.jpg";
-					                    }
-
-					                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-														<img src="<?php 
-					                    if(strpos($userProfile->userImage,"userImage") !== false)
-					                    {
-					                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-					                    }
-					                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-					                    {
-					                    	echo $userProfile->userImage;
-					                    }
-					                    else
-					                    {
-					                    	echo "userImage/user.jpg";
-					                    }
-
-					                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
+										<div class="col 12 m3 l4" id="iconMember">
+											<h6><b>Members</b></h6>	
 										</div>
 										<div class="col 12 m3 l2">
 											<div id="ajaxLabelCard">
@@ -1216,39 +1163,10 @@
 									<div class="divider" style="margin-top:5px;"></div>
 									<div class="row">
 										<div class="col s12 m6 l12">
-										<h6><b>Activities</b></h6>
+										<h6><b>Comments</b></h6>
 										</div>
 									</div>
 									<div id='ajaxComment'>
-									</div>
-									<div class="divider"></div>
-									<div class="row">
-										<div class="col s12 m4 l1">
-										<img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
-
-		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-										</div>
-										<div class="col s12 m4 l11">
-											<p>	
-												<b>Steven Gerrard</b> added this card to To Do
-											</p>
-											<p class="ultra-small grey-text lighten-1">
-												yesterday at 8:17 PM
-											</p>
-										</div>
-											
 									</div>
 								</div>
 								<div class="col s12 m6 l3">
@@ -1260,7 +1178,7 @@
 												<li>
 													<div class="file-field input-field">
 								                      <div class="btn-flat waves-effect">
-								                        <span>Computer</span>
+								                        <span style="margin-left:-18%;">Computer</span>
 								                        <input type="file" id="inputComputer" onchange="createAttachment()">
 								                      </div>
 								                      <div class="file-path-wrapper">
@@ -1268,10 +1186,10 @@
 								                    </div>
 												</li>
 												<li>
-													<a href="#" class="btn-flat waves-effect">Google Drive</a>
+													<a href="javascript:void(0);" onclick="openGoogleDrive()" class="black-text left-align btn-flat waves-effect">Google Drive</a>
 												</li>
 												<li>
-													<a href="#" class="btn-flat waves-effect">Dropbox</a>
+													<a href="javascript:void(0);" onclick="" class="black-text left-align btn-flat waves-effect">Dropbox</a>
 												</li>
 											</ul>
 									</div>
@@ -1296,18 +1214,18 @@
 										<a href="#modalmove" class="modal-trigger btn-flat waves-effect">Move</a>
 									</div>
 									<div class="row" style="margin-top:5px;">
-										<a href="#modalcopy" class="modal-trigger btn-flat waves-effect">Copy</a>
+										<a href="#modalcopy" onclick="openModalCopy()" class="modal-trigger btn-flat waves-effect">Copy</a>
 									</div>
 									<div id="changeArchive" class="row" style="margin-top:5px;">
-										<a href="#" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
+										<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
 									</div>
 									<div id="changeSend" style="display:none;">
 										<div class="divider"></div>
 										<div class="row" style="margin-top:5px;">
-											<a href="#" class="btn-flat waves-effect" onclick="changeSend()">Send to Board</a>
+											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeSend()">Send to Board</a>
 										</div>
 										<div class="row" style="margin-top:5px;">
-											<a href="#" class="btn-flat waves-effect">Delete</a>
+											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeDelete()">Delete</a>
 										</div>
 									</div>
 								</div>
@@ -1327,82 +1245,75 @@
 								echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">'; // BUKA ROW MINIMAL 1
 								foreach($boardList as $l)
 								{
-									echo '<div class="col s12 m6 l2">';
-									echo	'<div class="card">';
-									echo		'<div class="card-content grey lighten-2 white-text">';
-						            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="#" class="activator black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-						            echo 			'<div id="list'.$l->listId.'" class="listUser">';
-									foreach($boardCard as $c)
+									if($l->listArchive == "0" && $l->listStatus == "1")
 									{
-										if($c->cardListId == $l->listId && $c->cardArchive == 0)
+										echo '<div class="col s12 m6 l2 colListUser" id="colList'.$l->listId.'">';
+										echo	'<div class="card">';
+										echo		'<div class="card-content grey lighten-2 white-text" style="height:100%;">';
+							            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="javascript:void(0);" onclick="openModalListMenu(\''.$l->listId.'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
+							            echo 			'<div id="list'.$l->listId.'" class="listUser">';
+										foreach($boardCard as $c)
 										{
-											echo			'<a id="card'.$c->cardId.'" href="#modal3" class="modal-trigger" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
-											echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-											echo 				"<div class='row' id='labelCard".$c->cardId."' style='margin:auto;'>";
-											foreach($boardLabelCard as $lc)
+											if($c->cardListId == $l->listId && $c->cardArchive == "0" && $c->cardStatus == "1")
 											{
-												if($lc->cardId == $c->cardId)
-												{	
-													if($lc->labelRed == "true")
-													{
-														echo '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
-														echo 'Blank Text';
-														echo '</div>';
-													}
-													if($lc->labelYellow == "true")
-													{
-														echo '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
-														echo 'Blank Text';
-														echo '</div>';
-													}
-													if($lc->labelGreen == 'true')
-													{
-														echo '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
-														echo 'Blank Text';
-														echo '</div>';
-													}
-													if($lc->labelBlue == 'true')
-													{
-														echo '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
-														echo 'Blank Text';
-														echo '</div>';
+												echo			'<a id="card'.$c->cardId.'" href="javascript:void(0);" class="cardUser'.$c->cardListId.'" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
+												echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
+												echo 				"<div class='row' id='labelCard".$c->cardId."' style='margin:auto;'>";
+												foreach($boardLabelCard as $lc)
+												{
+													if($lc->cardId == $c->cardId)
+													{	
+														if($lc->labelRed == "true")
+														{
+															echo '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
+															echo 'Blank Text';
+															echo '</div>';
+														}
+														if($lc->labelYellow == "true")
+														{
+															echo '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
+															echo 'Blank Text';
+															echo '</div>';
+														}
+														if($lc->labelGreen == 'true')
+														{
+															echo '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
+															echo 'Blank Text';
+															echo '</div>';
+														}
+														if($lc->labelBlue == 'true')
+														{
+															echo '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
+															echo 'Blank Text';
+															echo '</div>';
+														}
 													}
 												}
-											}
 
-											echo 					'</div>';
-											echo					'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
-											echo				'</div>';
-											echo			'</a>';
+												echo 					'</div>';
+												echo					'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
+												echo				'</div>';
+												echo			'</a>';
+											}
+										}
+										echo 				'</div>';
+				                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
+			                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0);" class="grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
+			                            echo       		'</div>';
+
+										echo		'</div>';
+										echo	'</div>';
+										echo '</div>';
+										$list++;
+										if($list%5 == 0 && $list>0)
+										{
+											$list = -1;
+											$ajaxList++;
+											echo '</div>';
+											echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">';
 										}
 									}
-									echo 				'</div>';
-			                       
-			                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-		                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0);" class="grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
-		                            echo       		'</div>';
-
-									echo		'</div>';
-		           		            echo        '<div class="card-reveal">';
-		                            echo        	'<span class="card-title grey-text text-darken-4">List Menu <i class="mdi-navigation-close right"></i></span>';
-		                            echo        	'<div class="divider"></div>';
-						            echo            '<p><a href="javascript:void(0);" class="black-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a card..</a></p>';
-									echo			'<p><a href="#modalcopylist" class="modal-trigger black-text">Copy list..</a></p>';
-									echo			'<p><a href="#modalmovelist" class="modal-trigger black-text">Move list..</a></p>';
-									echo			'<p><a href="#modalmovecardlist" class="modal-trigger black-text">Move all card in this list..</a></p>';
-									echo			'<p><a href="#" class="black-text">Archive all card in this list..</a></p>';
-									echo			'<p><a href="#" class="black-text">Archive this list..</a></p>';
-						            echo      '</div>';
-									echo	'</div>';
-									echo '</div>';
-									$list++;
-									if($list%5 == 0 && $list>0)
-									{
-										$list = -1;
-										$ajaxList++;
-										echo '</div>';
-										echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">';
-									}
+									
 								}
 
 								echo '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
@@ -1446,7 +1357,7 @@
   	<aside id="right-sidebar-nav">
         <ul id="chat-out" class="side-nav rightside-navigation">
             <li class="li-hover">
-            <a href="#" data-activates="chat-out" class="chat-close-collapse right"><i class="mdi-navigation-close"></i></a>
+            <a href="javascript:void(0);" data-activates="chat-out" class="chat-close-collapse right"><i class="mdi-navigation-close"></i></a>
             <div id="right-search" class="row">
                 <div class="col s12">
                     <div class="input-field">

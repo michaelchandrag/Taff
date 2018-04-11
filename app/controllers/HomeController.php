@@ -20,12 +20,18 @@ class HomeController extends ControllerBase
                 "userId='".$userId."'"
             ]
         );
+        $favorite = Boardfavorite::find(
+            [
+                "userId='".$userId."'"
+            ]
+        );
         $this->view->userProfile       = $profile;
     	$this->view->board             = $board;
     	$this->view->userId            = $userId;
     	$this->view->groupMember       = $groupMember;
     	$this->view->groupUser         = $groupUser;
     	$this->view->boardGroup        = $boardGroup;
+        $this->view->boardFavorite     = $favorite;
     }
 
     public function createBoardAction()

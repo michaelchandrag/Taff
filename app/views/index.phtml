@@ -34,36 +34,44 @@
               echo '<link href="css/layouts/page-center.css" type="text/css" rel="stylesheet" media="screen,projection">';
             }
         ?>
-		
-	
-	
-
 		<!-- INCLUDED PLUGIN CSS ON THIS PAGE -->
         <link href="js/plugins/prism/prism.css" type="text/css" rel="stylesheet" media="screen,projection">
 		<link href="js/plugins/perfect-scrollbar/perfect-scrollbar.css" type="text/css" rel="stylesheet" media="screen,projection">
 		<link href="js/plugins/jvectormap/jquery-jvectormap.css" type="text/css" rel="stylesheet" media="screen,projection">
 		<link href="js/plugins/chartist-js/chartist.min.css" type="text/css" rel="stylesheet" media="screen,projection">
         <link href="js/plugins/fullcalendar/css/fullcalendar.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+
+        <style>
+        .ui-draggable-helper {
+             width:13%;
+             border-radius:5px;
+             padding: 6px;
+             background: #fff;
+             font-weight:150%;
+            }
+        </style>
 	
     </head>
+    <!-- jQuery Library -->
+    <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
     <?php echo $this->getContent(); ?>
 		<!-- ================================================
     Scripts
     ================================================ -->
     
-    <!-- jQuery Library -->
-    <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
     <!--materialize js-->
     <script type="text/javascript" src="js/materialize.min.js"></script>
     <!--scrollbar-->
     <script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <!--prism-->
     <script type="text/javascript" src="js/plugins/prism/prism.js"></script>
+    
     <!-- Calendar Script -->
     <script type="text/javascript" src="js/plugins/fullcalendar/lib/jquery-ui.custom.min.js"></script>
     <script type="text/javascript" src="js/plugins/fullcalendar/lib/moment.min.js"></script>
     <script type="text/javascript" src="js/plugins/fullcalendar/js/fullcalendar.min.js"></script>
-    <script type="text/javascript" src="js/plugins/fullcalendar/fullcalendar-script.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
     <!--plugins.js - Some Specific JS codes for Plugin Settings-->
     <script type="text/javascript" src="js/plugins.min.js"></script>
     <!--custom-script.js - Add your own theme custom JS-->
@@ -75,35 +83,8 @@
     <script type="text/javascript" src="js/plugins/jquery-validation/additional-methods.min.js"></script>
     
     <!-- Toast Notification -->
-    <script type="text/javascript">
-		/*setTimeout(function() {
-				Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
-			}, 4000);
-		setTimeout(function() {
-			Materialize.toast('<span>YJANCIOJKKK!</span>', 3000);
-		}, 4000);
-		setTimeout(function() {
-			Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
-		}, 4000);*/
-		/* $(window).load(function() {
-        setTimeout(function() {
-            Materialize.toast('<span>Hiya! I am a toast.</span>', 1500);
-        }, 1500);
-        setTimeout(function() {
-            Materialize.toast('<span>You can swipe me too!</span>', 3000);
-        }, 5000);
-        setTimeout(function() {
-            Materialize.toast('<span>You have new order.</span><a class="btn-flat yellow-text" href="#">Read<a>', 3000);
-        }, 15000);
-    });*/
-    </script>
     <!-- <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script> -->
     <!-- My JS-->
-    <script type="text/javascript" src="js/myjs/jsRegister.js"></script>
-    <script type="text/javascript" src="js/myjs/jsLogin.js"></script>
-    <script type="text/javascript" src="js/myjs/jsHome.js"></script>
-    <script type="text/javascript" src="js/myjs/jsBoard.js"></script>
-    <script type="text/javascript" src="js/myjs/jsUserProfile.js"></script>
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
     <!--<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>-->
 </html>

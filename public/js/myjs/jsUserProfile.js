@@ -48,3 +48,53 @@ function changePassword()
 {
 	alert("Change Password");
 }
+
+
+function cekLogout()
+{
+	$.ajax({
+		  type: "POST",
+		  url: "login/logout",
+		  success: function (response) {
+			  alert(response);
+			  if(response == "Berhasil")
+			  {
+			  	/*var auth2 = gapi.auth2.getAuthInstance();
+			    auth2.signOut().then(function () {
+			      console.log('User signed out.');
+			    });*/
+			  	window.location.href = "login";
+
+			  }
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function changeData()
+{
+	var userId = $("#hiddenUserId").val();
+	var userName = $("#userName").val();
+	var userBio = $("#userBio").val();
+	$.ajax({
+		  type: "POST",
+		  url: "userprofile/changeData",
+		  data:{userId:userId,userName:userName,userBio:userBio},
+		  success: function (response) {
+		  	$("#visitUserBio").empty();
+			  $("#visitUserBio").append("<b><u>Bio</u></b></br>");
+			  $("#visitUserBio").append(userBio);
+			  $("#visitUserName").text(userName);
+
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}

@@ -110,4 +110,15 @@ class Boardattachment extends \Phalcon\Mvc\Model
         $attachment->save();
     }
 
+    public function deleteAttachment($id)
+    {
+        $attachment = Boardattachment::findFirst(
+            [
+                "attachmentId='".$id."'"
+            ]
+        );
+        $attachment->attachmentStatus = "0";
+        $attachment->save();
+    }
+
 }

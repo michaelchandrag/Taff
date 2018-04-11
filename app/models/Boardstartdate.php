@@ -88,7 +88,6 @@ class Boardstartdate extends \Phalcon\Mvc\Model
 
     public function insertBoardStartDate($cardId,$startDate,$checked,$status)
     {
-        date_default_timezone_set('Asia/Jakarta');
         $date                       = new Boardstartdate();
         $index                      = $date->countStartDate();
         $id                         = "BSD".str_pad($index,3,'0',STR_PAD_LEFT);
@@ -97,6 +96,41 @@ class Boardstartdate extends \Phalcon\Mvc\Model
         $date->startDate            = date("Y-m-d H:i:sa",$startDate);
         $date->startDateChecked     = $checked;
         $date->startDateStatus      = $status;
+        $date->save();
+    }
+
+    public function changeStartDate($cardId,$startDate,$checked,$status)
+    {
+        $date = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->startDate = date("Y-m-d H:i:sa",$startDate);
+        $date->startDateChecked = $checked;
+        $date->startDateStatus = $status;
+        $date->save();
+    }
+
+    public function deleteStartDate($cardId)
+    {
+        $date = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->startDateStatus = "0";
+        $date->save();
+    }
+
+    public function changeStartDateChecked($cardId,$checked)
+    {
+        $date = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->startDateChecked = $checked;
         $date->save();
     }
 

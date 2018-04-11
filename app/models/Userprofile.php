@@ -122,4 +122,16 @@ class Userprofile extends \Phalcon\Mvc\Model
         return count($profile);
     }
 
+    public function changeData($userId,$userName,$userBio)
+    {
+        $profile = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $profile->userName = $userName;
+        $profile->userBio = $userBio;
+        $profile->save();
+    }
+
 }

@@ -101,4 +101,39 @@ class Boardduedate extends \Phalcon\Mvc\Model
         $date->save();
     }
 
+    public function changeDueDate($cardId,$dueDate,$checked,$status)
+    {
+        $date = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->dueDate = date("Y-m-d H:i:sa",$dueDate);
+        $date->dueDateChecked = $checked;
+        $date->dueDateStatus = $status;
+        $date->save();
+    }
+
+    public function deleteDueDate($cardId)
+    {
+        $date = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->dueDateStatus = "0";
+        $date->save();
+    }
+
+    public function changeDueDateChecked($cardId,$checked)
+    {
+        $date = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->dueDateChecked = $checked;
+        $date->save();
+    }
+
 }

@@ -25,12 +25,14 @@ class BoardController extends \Phalcon\Mvc\Controller
         );
         $boardList = Boardlist::find(
             [
-                "listBoardId='".$boardId."'"
+                "listBoardId='".$boardId."'",
+                "order"=>"listPosition ASC"
             ]
         );
         $boardCard = Boardcard::find(
             [
-                "cardBoardId='".$boardId."'"
+                "cardBoardId='".$boardId."'",
+                "order" => "cardPosition ASC"
             ]
         );
         $boardLabelCard = Boardlabelcard::find(
@@ -119,6 +121,376 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     }
 
+    public function copyAllCardAction()
+    {
+        $boardId = $_POST["boardId"];
+        $listTujuan = $_POST["listTujuan"];
+        $listId = $_POST["listId"];
+        $owner = $this->session->get("userId");
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order"=>"cardPosition ASC"
+            ]
+        );
+        $global = "";
+        foreach($card as $c)
+        {
+            if($c->cardArchive == "0" && $c->cardStatus == "1")
+            {
+                //insert card
+                $cardId = $c->cardId;
+                $title = $c->cardTitle;
+                $archive = $c->cardArchive;
+                $status = $c->cardStatus;
+                $description = $c->cardDescription;
+                $c2 = new Boardcard();
+                $index = $c->countCard();
+                $cardIdAkhir    = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
+                $c2->insertBoardCard($listTujuan,$boardId,$owner,$title,$description,$archive,$status);
+
+                $global = $global."%20".$cardIdAkhir."%10".$title;
+                //insert assign members
+                $assign = Boardassignmembers::find(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                foreach($assign as $a)
+                {
+                    $userIdAM = $a->userId;
+                    $userNameAM = $a->userName;
+                    $checkedAM = $a->assignChecked;
+                    $statusAM = $a->assignStatus;
+                    $assign2 = new Boardassignmembers();
+                    $assign2->insertBoardAssignMembers($cardIdAkhir,$userIdAM,$userNameAM,$checkedAM,$statusAM);
+                }
+
+                //insert label card
+                $label = Boardlabelcard::findFirst(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                if($label != null)
+                {
+                    $red2 = $label->labelRed;
+                    $yellow2 = $label->labelYellow;
+                    $green2 = $label->labelGreen;
+                    $blue2 = $label->labelBlue;
+                    $status2 = $label->labelStatus;
+                    $label2 = new Boardlabelcard();
+                    $label2->insertBoardLabelCard($boardId,$cardIdAkhir,$red2,$yellow2,$green2,$blue2,$status2);
+                }
+
+                //insert attachment
+                $attachment = Boardattachment::find(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                foreach($attachment as $att)
+                {
+                    if($att->attachmentStatus == "1")
+                    {
+                        $title2 = $att->attachmentTitle;
+                        $directory2 = $att->attachmentDirectory;
+                        $status2 = $att->attachmentStatus;
+                        $attachment2 = new Boardattachment();
+                        $attachment2->insertBoardAttachment($boardId,$cardIdAkhir,$title2,$directory2,$status2);
+                    }
+                }
+
+                //insert checklist
+                $checklist = Boardchecklist::find(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                foreach($checklist as $c)
+                {
+                    if($c->checklistStatus == "1")
+                    {
+                        $idChecklist = $c->checklistId;
+                        $title2 = $c->checklistTitle;
+                        $status2 = $c->checklistStatus;
+                        $checklist2      = new Boardchecklist();
+                        $index          = $checklist2->countChecklist();
+                        $id             = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
+                        $checklist2->insertBoardChecklist($cardIdAkhir,$title2,$status2);
+
+                        //insert checklist item
+                        $item = Boardchecklistitem::find(
+                            [
+                                   "checklistId='".$idChecklist."'"  
+                            ]
+                        ); 
+                        foreach($item as $i)
+                        {
+                            if($i->itemStatus == "1")
+                            {
+                                $title3 = $i->itemTitle;
+                                $checked3 = $i->itemChecked;
+                                $status3 = $i->itemStatus;
+                                $item2 = new Boardchecklistitem(); 
+                                $item2->insertBoardChecklistItem($id,$cardIdAkhir,$title3,$checked3,$status3);
+                            }
+                        }
+                    }
+                }
+
+                //insert start date
+                $start = Boardstartdate::findFirst(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                if($start != null)
+                {
+                    $d2 = $start->startDate; //2018-04-12 12:00:00
+                    $pecah = explode(" ",$d2);
+                    $pecah2 = explode("-",$pecah[0]); //date
+                    $bln = $pecah2[1];
+                    $thn = $pecah2[0];
+                    $tgl = $pecah2[2];
+                    $pecah3 = explode(":",$pecah[1]); //time
+                    $time = $pecah3[0];
+                    $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+                    $checked2 = $start->startDateChecked;
+                    $status2 = $start->startDateStatus;
+                    $date = new Boardstartdate();
+                    $date->insertBoardStartDate($cardIdAkhir,$d3,$checked2,$status2);
+                }
+                
+
+                //insert due date
+                $due = Boardduedate::findFirst(
+                    [
+                        "cardId='".$cardId."'"
+                    ]
+                );
+                if($due != null)
+                {
+                    $d2 = $due->dueDate;
+                    $pecah = explode(" ",$d2);
+                    $pecah2 = explode("-",$pecah[0]); //date
+                    $bln = $pecah2[1];
+                    $thn = $pecah2[0];
+                    $tgl = $pecah2[2];
+                    $pecah3 = explode(":",$pecah[1]); //time
+                    $time = $pecah3[0];
+                    $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+                    $checked2 = $due->dueDateChecked;
+                    $status2 = $due->dueDateStatus;
+                    $date = new Boardduedate();
+                    $date->insertBoardDueDate($cardIdAkhir,$d3,$checked2,$status2);
+                }
+
+
+            }
+        }
+        $this->view->disable();
+        echo $global;
+    }
+
+    public function archiveListAction()
+    {
+        $boardId = $_POST["boardId"];
+        $listId = $_POST["listId"];
+        $posAwal = 0;
+        $list2 = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $posAwal = $list2->listPosition;
+        $list = Boardlist::find(
+            [
+                "listBoardId='".$boardId."'",
+                "order"=>"listPosition ASC"
+            ]
+        );
+        foreach($list as $l)
+        {
+            if($l->listArchive == "0" && $l->listStatus == "1" && $l->listPosition > 0)
+            {
+                if($l->listPosition > $posAwal)
+                {
+                    $listId2 = $l->listId;
+                    $position = $l->listPosition;
+                    $position = $position - 1;
+                    $l->setPosition($listId2,$position);
+                }
+            }
+        }
+        $posAkhir = "-1";
+        $archive = "1";
+        $list2->setPosition($listId,$posAkhir);
+        $list2->setArchive($listId,$archive);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function copyCardAction()
+    {
+        $cardId = $_POST["cardId"];
+        $title = $_POST["title"];
+        $listId = $_POST["listId"];
+        $boardId = $_POST["boardId"];
+        $owner = $this->session->get("userId");
+        $description   = "";
+        $archive       = "0";
+        $status        = "1";
+
+        //insert card
+        $card           = new Boardcard();
+        $index          = $card->countCard();
+        $cardIdAkhir    = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
+        $card->insertBoardCard($listId,$boardId,$owner,$title,$description,$archive,$status);
+
+        //insert assign members
+        $assign = Boardassignmembers::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        foreach($assign as $a)
+        {
+            $userIdAM = $a->userId;
+            $userNameAM = $a->userName;
+            $checkedAM = $a->assignChecked;
+            $statusAM = $a->assignStatus;
+            $assign2 = new Boardassignmembers();
+            $assign2->insertBoardAssignMembers($cardIdAkhir,$userIdAM,$userNameAM,$checkedAM,$statusAM);
+        }
+
+        //insert label card
+        $label = Boardlabelcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($label != null)
+        {
+            $red2 = $label->labelRed;
+            $yellow2 = $label->labelYellow;
+            $green2 = $label->labelGreen;
+            $blue2 = $label->labelBlue;
+            $status2 = $label->labelStatus;
+            $label2 = new Boardlabelcard();
+            $label2->insertBoardLabelCard($boardId,$cardIdAkhir,$red2,$yellow2,$green2,$blue2,$status2);
+        }
+        
+
+        //insert attachment
+        $attachment = Boardattachment::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        foreach($attachment as $att)
+        {
+            if($att->attachmentStatus == "1")
+            {
+                $title2 = $att->attachmentTitle;
+                $directory2 = $att->attachmentDirectory;
+                $status2 = $att->attachmentStatus;
+                $attachment2 = new Boardattachment();
+                $attachment2->insertBoardAttachment($boardId,$cardIdAkhir,$title2,$directory2,$status2);
+            }
+        }
+
+        //insert checklist
+        $checklist = Boardchecklist::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        foreach($checklist as $c)
+        {
+            if($c->checklistStatus == "1")
+            {
+                $idChecklist = $c->checklistId;
+                $title2 = $c->checklistTitle;
+                $status2 = $c->checklistStatus;
+                $checklist2      = new Boardchecklist();
+                $index          = $checklist2->countChecklist();
+                $id             = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
+                $checklist2->insertBoardChecklist($cardIdAkhir,$title2,$status2);
+
+                //insert checklist item
+                $item = Boardchecklistitem::find(
+                    [
+                           "checklistId='".$idChecklist."'"  
+                    ]
+                ); 
+                foreach($item as $i)
+                {
+                    if($i->itemStatus == "1")
+                    {
+                        $title3 = $i->itemTitle;
+                        $checked3 = $i->itemChecked;
+                        $status3 = $i->itemStatus;
+                        $item2 = new Boardchecklistitem(); 
+                        $item2->insertBoardChecklistItem($id,$cardIdAkhir,$title3,$checked3,$status3);
+                    }
+                }
+            }
+        }
+
+        //insert start date
+        $start = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($start != null)
+        {
+            $d2 = $start->startDate; //2018-04-12 12:00:00
+            $pecah = explode(" ",$d2);
+            $pecah2 = explode("-",$pecah[0]); //date
+            $bln = $pecah2[1];
+            $thn = $pecah2[0];
+            $tgl = $pecah2[2];
+            $pecah3 = explode(":",$pecah[1]); //time
+            $time = $pecah3[0];
+            $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+            $checked2 = $start->startDateChecked;
+            $status2 = $start->startDateStatus;
+            $date = new Boardstartdate();
+            $date->insertBoardStartDate($cardIdAkhir,$d3,$checked2,$status2);
+        }
+        
+
+        //insert due date
+        $due = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($due != null)
+        {
+            $d2 = $due->dueDate;
+            $pecah = explode(" ",$d2);
+            $pecah2 = explode("-",$pecah[0]); //date
+            $bln = $pecah2[1];
+            $thn = $pecah2[0];
+            $tgl = $pecah2[2];
+            $pecah3 = explode(":",$pecah[1]); //time
+            $time = $pecah3[0];
+            $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+            $checked2 = $due->dueDateChecked;
+            $status2 = $due->dueDateStatus;
+            $date = new Boardduedate();
+            $date->insertBoardDueDate($cardIdAkhir,$d3,$checked2,$status2);
+        }
+
+        
+
+        $this->view->disable();
+        echo $cardIdAkhir;
+    }
+
     public function updateCardTitleAction()
     {
         $id = $_POST["cardId"];
@@ -166,10 +538,12 @@ class BoardController extends \Phalcon\Mvc\Controller
         $cardTitle          = $card->cardTitle;
         $cardDescription    = $card->cardDescription;
         $listTitle          = $list->listTitle;
+        $cardListId         = $card->cardListId;
         $data = array(
             'cardId'            => $cardId, 
             'cardTitle'         => $cardTitle,
             'cardDescription'   => $cardDescription,
+            'cardListId'        => $cardListId,
             'listTitle'         => $listTitle
         );
     	$datas[] = $data;
@@ -177,17 +551,84 @@ class BoardController extends \Phalcon\Mvc\Controller
     	echo json_encode($datas);
     }
 
-    public function getBoardAssignMembersAction()
+    public function getBoardMemberAction()
     {
-    	$cardId = $_POST["id"];
+    	$boardId = $_POST["boardId"];
     	$assign = array();
-        $assign = Boardassignmembers::find(
-                [
-                    "cardId='".$cardId."'"
-                ]
-            );
+        $assign = Boardmember::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
     	$this->view->disable();	
     	echo json_encode($assign);
+    }
+
+    public function getBoardAssignCheckedAction()
+    {
+        $userId = $_POST["userId"];
+        $cardId = $_POST["cardId"];
+        $assign = Boardassignmembers::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $check = "false";
+        foreach($assign as $a)
+        {
+            if($a->userId == $userId)
+            {
+                if($a->assignChecked == "1")
+                {
+                    $check = "true";
+                }
+            }
+        }
+        $this->view->disable();
+        echo $check;
+    }
+
+    public function createAssignMembersAction()
+    {
+        $cardId = $_POST["cardId"];
+        $userId = $_POST["userId"];
+        $check = $_POST["check"];
+        $name = $_POST["name"];
+        $match = false;
+        $status = "1";
+        $assignId = "";
+        $assign = Boardassignmembers::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        foreach($assign as $a)
+        {
+            if($a->userId == $userId)
+            {
+                $match = true; //UPDATE checked saja
+                $assignId = $a->assignId;
+            }
+        }
+        if($match == false)
+        {
+            //baru masuk ke board, ditambahkan ke tabel boardassignmembers
+            $assign2 = new Boardassignmembers();
+            $assign2->insertBoardAssignMembers($cardId,$userId,$name,$check,$status);
+        }
+        else
+        {
+            //update check saja
+            $assign2 = Boardassignmembers::findFirst(
+                [
+                    "assignId='".$assignId."'"
+                ]
+            );
+            $assign2->changeAssignChecked($assignId,$check);
+        }
+        $this->view->disable();
+        echo "Berhasil";
+
     }
 
     public function setStartDateAction()
@@ -251,8 +692,20 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     	$time = $_POST["time"];
     	$d=mktime($time, 00, 00, $bln, $tgl, $thn);
-        $date = new Boardstartdate();
-        $date->insertBoardStartDate($cardId,$d,$checked,$status);
+        $match = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($match == null)
+        {
+            $date = new Boardstartdate();
+            $date->insertBoardStartDate($cardId,$d,$checked,$status);
+        }
+        else
+        {
+            $match->changeStartDate($cardId,$d,$checked,$status);
+        }
 
     	$this->view->disable();
     	echo "Berhasil";
@@ -336,8 +789,21 @@ class BoardController extends \Phalcon\Mvc\Controller
 
         $time = $_POST["time"];
         $d=mktime($time, 00, 00, $bln, $tgl, $thn);
-        $date = new Boardduedate();
-        $date->insertBoardDueDate($cardId,$d,$checked,$status);
+        $match = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($match == null)
+        {
+            
+            $date = new Boardduedate();
+            $date->insertBoardDueDate($cardId,$d,$checked,$status);
+        }
+        else
+        {
+            $match->changeDueDate($cardId,$d,$checked,$status);
+        }
 
         $this->view->disable();
         echo "Berhasil";
@@ -394,7 +860,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $cardId = $_POST["id"];
         $title = $_POST["title"];
         $checked = "0";
-        $status = "0";
+        $status = "1";
         $checklist = new Boardchecklistitem();
         $index = $checklist->countChecklistItem();
         $id = "BCI".str_pad($index,5,'0',STR_PAD_LEFT);
@@ -424,11 +890,118 @@ class BoardController extends \Phalcon\Mvc\Controller
     {
         $id = $_POST["id"];
         $status = $_POST["status"];
+        $listId = $_POST["listId"];
         $card = Boardcard::findFirst(
             [
                 "cardId='".$id."'"
-            ]);
+            ]
+        );
+        $posAwal = $card->cardPosition;
+        $position = -1;
         $card->setArchive($id,$status);
+
+        $card->setPosition($listId,$id,$position);
+
+        //mengatur posisi card
+        $card2 = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order" => "cardPosition ASC"
+            ]
+        );
+        foreach($card2 as $c)
+        {
+            if($c->cardPosition > $posAwal)
+            {
+                $cardId2 = $c->cardId;
+                $position2 = $c->cardPosition-1;
+                $c->setPosition($listId,$cardId2,$position2);
+            }
+        }
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function sendBackCardAction()
+    {
+        $cardId = $_POST["id"];
+        $status = $_POST["status"];
+        $listId = "";
+        $card = array();
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $title = $card->cardTitle;
+        $listId = $card->cardListId;
+        $card->setArchive($cardId,$status);
+        $posAkhir = Boardcard::maximum(
+            [
+                "column"        => "cardPosition",
+                "conditions"    => "cardListId='".$listId."'"
+            ]
+        );
+        if($posAkhir < 0)
+        {
+            $posAkhir = 0;
+        }
+        $posAkhir = $posAkhir+1;
+        $card->setPosition($listId,$cardId,$posAkhir);
+        $this->view->disable();
+        echo $listId."%20".$title;
+    }
+
+    public function sendBackListAction()
+    {
+        $listId = $_POST["listId"];
+        $status = $_POST["status"];
+        $boardId = $_POST["boardId"];
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $title = $list->listTitle;
+        $list->setArchive($listId,$status);
+        $posAkhir = Boardlist::maximum(
+            [
+                "column" => "listPosition",
+                "conditions" => "listBoardId='".$boardId."'"
+            ]
+        );
+        if($posAkhir < 0)
+        {
+            $posAkhir = 0;
+        }
+        $posAkhir = $posAkhir+1;
+        $list->setPosition($listId,$posAkhir);
+        $this->view->disable();
+        echo $title;
+    }
+
+    public function deleteCardAction()
+    {
+        $cardId = $_POST["cardId"];
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $card->deleteCard($cardId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteListAction()
+    {
+        $listId = $_POST["listId"];
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $list->deleteList($listId);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -444,6 +1017,19 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]);
         $this->view->disable();
         echo json_encode($card);
+    }
+
+    public function getListArchiveAction()
+    {
+        $status = "1";
+        $list = array();
+        $list = Boardlist::find(
+            [
+                "listArchive='".$status."'"
+
+            ]);
+        $this->view->disable();
+        echo json_encode($list);
     }
 
     public function createCommentAction()
@@ -485,10 +1071,12 @@ class BoardController extends \Phalcon\Mvc\Controller
         $userId     = $this->session->get("userId");
         $status     = "1";
         $reply      = new Boardreplycomment();
+        $index      = $reply->countReply();
+        $id         = "BRC".str_pad($index,5,'0',STR_PAD_LEFT);
         $reply->insertBoardReplyComment($commentId,$cardId,$boardId,$userId,$text,$status);
 
         $this->view->disable();
-        echo $text;
+        echo $id;
     }
 
     public function getReplyCommentAction()
@@ -538,8 +1126,20 @@ class BoardController extends \Phalcon\Mvc\Controller
         $green      = $_POST["green"];
         $blue       = $_POST["blue"];
         $status     = "1";
-        $label = new Boardlabelcard();
-        $label->insertBoardLabelCard($boardId,$cardId,$red,$yellow,$green,$blue,$status);
+        $match = Boardlabelcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        if($match == null)
+        {
+            $label = new Boardlabelcard();
+            $label->insertBoardLabelCard($boardId,$cardId,$red,$yellow,$green,$blue,$status);
+        }
+        else
+        {
+            $match->setColor($cardId,$red,$yellow,$green,$blue);
+        }
         $this->view->disable();
         echo "Berhasil";
     }
@@ -634,6 +1234,627 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo "Berhasil";
 
+    }
+
+    public function getMoveCardAction()
+    {
+        $boardId = $_POST["boardId"];
+        $list    = Boardlist::find(
+            [
+                "listBoardId='".$boardId."'",
+                "order"=> "listPosition ASC"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($list);
+    }
+
+    public function getListPositionAction()
+    {
+        $listId = $_POST["listId"];
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $position = $list->listPosition;
+        $this->view->disable();
+        echo $position;
+    }
+
+    public function changeListPositionAction()
+    {
+        $boardId = $_POST["boardId"];
+        $listId = $_POST["listId"];
+        $posAwal = $_POST["posAwal"];
+        $posTujuan = $_POST["posTujuan"];
+        $list = Boardlist::find(
+            [
+                "listBoardId='".$boardId."'",
+                "order"=>"listPosition ASC"
+            ]
+        );
+        $gerak = "";
+        $diff = 0;
+        if($posAwal < $posTujuan)
+        {
+            $diff = $posTujuan - $posAwal;
+            $gerak = "atas";
+        }
+        else
+        {
+            $diff = $posAwal - $posTujuan;
+            $gerak = "bawah";
+        }
+        $ctr = 0;
+        foreach($list as $l)
+        {
+            if($l->listArchive == "0" && $l->listStatus == "1" && $ctr < $diff)
+            {
+
+                $listId2 = $l->listId;
+                $position = $l->listPosition;
+                if($gerak == "atas" && $position>$posAwal)
+                {
+                    $position2 = $position-1;
+                    $l->setPosition($listId2,$position2);
+                    $ctr++;
+                }
+                else if($gerak == "bawah" && $position>=$posTujuan)
+                {
+                    $position2 = $position+1;
+                    $l->setPosition($listId2,$position2);
+                    $ctr++;
+                }
+            }
+        }
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $list->setPosition($listId,$posTujuan);
+        $this->view->disable();
+        echo $gerak;
+    }
+
+    public function getMoveCardPositionAction()
+    {
+        $listId = $_POST["listId"];
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order" => "cardPosition ASC"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($card);
+
+    }
+
+    public function updateCardPositionAction()
+    {
+        $cardId = $_POST["cardId"];
+        $global = "Berhasil";
+        $listSelect = $_POST["listSelect"];
+        $position = $_POST["position"];
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $listMatch = "false";
+        if($card->cardListId == $listSelect)
+        {
+            $listMatch = "true";
+        }
+        if($listMatch == "true")
+        {
+            $posAwal = $card->cardPosition;
+            if($posAwal < $position)
+            {
+                //kebawah
+                $diff = $position - $posAwal;//banyak card yang terpengaruh oleh perpindahan card dalam satu list
+                $card2 = Boardcard::find(
+                    [
+                        "cardListId='".$listSelect."'",
+                        "order" => "cardPosition ASC"
+                    ]
+                );
+                $tempdiff = 0;
+                foreach($card2 as $c2)
+                {
+                    if($c2->cardPosition > $posAwal && $tempdiff < $diff && $c2->cardArchive == "0" && $c2->cardStatus=="1") //melakukan pengecekan jika posisi awal lebih kecil dari posisi yang ditentukan dan jumlah card yang terpengaruh masih mencukupi
+                    {
+                        $tempCardId = $c2->cardId;
+                        $tempPos = ($c2->cardPosition-1);
+                        $c2->setPosition($listSelect,$tempCardId,$tempPos);
+                        $tempdiff++;
+                    }
+                }
+                $global = "bawah";
+            }
+            else if($posAwal > $position)
+            {
+                //keatas
+                $diff = $posAwal - $position;
+                $card2 = Boardcard::find(
+                    [
+                        "cardListId='".$listSelect."'",
+                        "order" => "cardPosition ASC"
+                    ]
+                );
+                $tempdiff = 0;
+                foreach($card2 as $c2)
+                {
+                    if($position <= $c2->cardPosition && $tempdiff < $diff  && $c2->cardArchive == "0" && $c2->cardStatus=="1")
+                    {
+                        $tempCardId = $c2->cardId;
+                        $tempPos = ($c2->cardPosition+1);
+                        $c2->setPosition($listSelect,$tempCardId,$tempPos);
+                        $tempdiff++;
+                    }
+                }
+                $global = "atas";
+            }
+            $card->setPosition($listSelect,$cardId,$position);
+        }
+        else
+        {
+            $listAwal = $card->cardListId;
+            $posAwal = $card->cardPosition;
+            //memperbaiki list awal
+            $card2 = Boardcard::find(
+                [
+                    "cardListId='".$listAwal."'",
+                    "order" => "cardPosition ASC"
+                ]
+            );
+            foreach($card2 as $c2)
+            {
+                if($c2->cardPosition > $posAwal  && $c2->cardArchive == "0" && $c2->cardStatus=="1")
+                {
+                    $tempCardId = $c2->cardId;
+                    $tempPos = ($c2->cardPosition-1);
+                    $c2->setPosition($listAwal,$tempCardId,$tempPos);
+                }
+            }
+            //memperbaiki list baru
+            $card3 = Boardcard::find(
+                [
+                    "cardListId='".$listSelect."'",
+                    "order" => "cardPosition ASC"
+                ] 
+            );
+            foreach($card3 as $c3)
+            {
+                if($c3->cardPosition >= $position  && $c2->cardArchive == "0" && $c2->cardStatus=="1")
+                {
+                    $tempCardId = $c3->cardId;
+                    $tempPos = ($c3->cardPosition+1);
+                    $c3->setPosition($listSelect,$tempCardId,$tempPos);
+                }
+            }
+            //memasukkan card ke list baru
+            $card->setPosition($listSelect,$cardId,$position);
+        }
+
+        $this->view->disable();
+        echo $global;
+    }
+
+    public function moveAllCardAction()
+    {
+        $listId = $_POST["listId"]; //list awal
+        $listTujuan = $_POST["listTujuan"];
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order"=>"cardPosition ASC"
+            ]
+        );
+        foreach($card as $c)
+        {
+            if($c->cardArchive == "0" && $c->cardStatus == "1")
+            {
+                $cardId = $c->cardId;
+                $position = Boardcard::maximum(
+                    [
+                        "column"=>"cardPosition",
+                        "conditions"=>"cardListId='".$listTujuan."'"
+                    ]
+                );
+                $position = $position+1;
+                $c->setPosition($listTujuan,$cardId,$position);
+            }
+        }
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function archiveAllCardAction()
+    {
+        $listId = $_POST["listId"];
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order"=>"cardPosition ASC"
+            ]
+        );
+        foreach($card as $c)
+        {
+            if($c->cardArchive == "0" && $c->cardStatus == "1")
+            {
+                $id = $c->cardId;
+                $status = "1";
+                $position = "-1";
+                $c->setArchive($id,$status);
+                $c->setPosition($listId,$id,$position);
+
+            }
+        }
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteAttachmentAction()
+    {
+        $attachmentId = $_POST["id"];
+        $attachment = Boardattachment::findFirst(
+            [
+                "attachmentId='".$attachmentId."'"
+            ]
+        );
+        $attachment->deleteAttachment($attachmentId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function downloadAttachmentAction()
+    {
+        $attachmentId = "";
+        if(isset($_GET["id"]))
+        {
+            $attachmentId = $_GET["id"];
+        }
+        $attachment = Boardattachment::findFirst(
+            [
+                "attachmentId='".$attachmentId."'"
+            ]
+        );
+        $name = $attachment->attachmentTitle;
+        $directory = $attachment->attachmentDirectory;
+
+        $file = $directory;
+
+        if (file_exists($file)) {
+            header('Pragma: public');
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="'.basename($file).'"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
+        }
+    }
+
+    public function deleteChecklistAction()
+    {
+        $checklistId = $_POST["id"];
+        $checklist = Boardchecklist::findFirst(
+            [
+                "checklistId='".$checklistId."'"
+            ]
+        );
+        $checklist->deleteChecklist($checklistId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteChecklistItemAction()
+    {
+        $itemId = $_POST["id"];
+        $item = Boardchecklistitem::findFirst(
+            [
+                "itemId='".$itemId."'"
+            ]
+        );
+        $item->deleteChecklistItem($itemId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function changeItemCheckedAction()
+    {
+        $itemId = $_POST["id"];
+        $check = $_POST["check"];
+        $item = Boardchecklistitem::findFirst(
+            [
+                "itemId='".$itemId."'"
+            ]
+        );
+        $item->changeItemChecked($itemId,$check);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteStartDateAction()
+    {
+        $cardId = $_POST["id"];
+        $date = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->deleteStartDate($cardId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function changeStartDateCheckedAction()
+    {
+        $cardId = $_POST["id"];
+        $checked = $_POST["check"];
+        $date = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->changeStartDateChecked($cardId,$checked);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteDueDateAction()
+    {
+        $cardId = $_POST["id"];
+        $date = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->deleteDueDate($cardId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function changeDueDateCheckedAction()
+    {
+        $cardId = $_POST["id"];
+        $checked = $_POST["check"];
+        $date = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $date->changeDueDateChecked($cardId,$checked);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteCommentAction()
+    {
+        $commentId = $_POST["id"];
+        $comment = Boardcomment::findFirst(
+            [
+                "commentId='".$commentId."'"
+            ]
+        );
+        $comment->deleteComment($commentId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function changeCommentTextAction()
+    {
+        $commentId = $_POST["id"];
+        $text = $_POST["text"];
+        $comment = Boardcomment::findFirst(
+            [
+                "commentId='".$commentId."'"
+            ]
+        );
+        $comment->changeCommentText($commentId,$text);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function deleteReplyAction()
+    {
+        $replyId = $_POST["id"];
+        $reply = Boardreplycomment::findFirst(
+            [
+                "replyId='".$replyId."'"
+            ]
+        );
+        $reply->deleteReply($replyId);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function changeReplyTextAction()
+    {
+        $replyId = $_POST["id"];
+        $text = $_POST["text"];
+        $reply = Boardreplycomment::findFirst(
+            [
+                "replyId='".$replyId."'"
+            ]
+        );
+        $reply->changeReplyText($replyId,$text);
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function getNameUserAction()
+    {
+        $userId = $_POST["id"];
+        $user = User::findFirst(
+            "userId='".$userId."'"
+        );
+
+        $name = $user->userName;
+        $this->view->disable();
+        return $name;
+    }
+
+    public function getDirectoryUserAction()
+    {
+        $userId = $_POST["id"];
+        $user = Userprofile::findFirst(
+            "userId='".$userId."'"
+        );
+
+        $directory = $user->userImage;
+        $this->view->disable();
+        return $directory;
+    }
+
+    public function createFavoriteAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $check = $_POST["check"];
+        $match = false;
+        $favorite = Boardfavorite::find(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $favoriteId2 = "";
+        foreach($favorite as $f)
+        {
+            if($f->boardId == $boardId)
+            {
+                $match = true;
+                $favoriteId2 = $f->favoriteId;
+            }
+        }
+        if($match == true)
+        {
+            //update
+            $favorite = Boardfavorite::findFirst(
+                [
+                    "favoriteId='".$favoriteId2."'"
+                ]
+            );
+            $favorite->setCheck($favoriteId2,$check);
+        }
+        else
+        {
+            //insert
+            $status = "1";
+            $favorite = new Boardfavorite();
+            $favorite->insertBoardFavorite($boardId,$userId,$check,$status);
+        }
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function getFavoriteAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $board = Boardfavorite::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($board);
+    }
+
+    public function getSubscribeAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $board = Boardsubscribe::find(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($board);
+    }
+
+    public function createSubscribeAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $check = $_POST["check"];
+        $match = false;
+        $subscribe = Boardsubscribe::find(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $subscribeId2 = "";
+        foreach($subscribe as $s)
+        {
+            if($s->boardId == $boardId)
+            {
+                $match = true;
+                $subscribeId2 = $s->subscribeId;
+            }
+        }
+        if($match == true)
+        {
+            //update
+            $subscribe = Boardsubscribe::findFirst(
+                [
+                    "subscribeId='".$subscribeId2."'"
+                ]
+            );
+            $subscribe->setCheck($subscribeId2,$check);
+        }
+        else
+        {
+            //insert
+            $status = "1";
+            $subscribe = new Boardsubscribe();
+            $subscribe->insertBoardSubscribe($boardId,$userId,$check,$status);
+        }
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function getCardListAction()
+    {
+        $listId = $_POST["listId"];
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'",
+                "order" => "cardPosition ASC"
+            ]
+        ); 
+        $this->view->disable();
+        echo json_encode($card);
+    }
+
+    public function getListAction()
+    {
+        $boardId = $_POST["boardId"];
+        $list = Boardlist::find(
+            [
+                "listBoardId='".$boardId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($list);
+    }
+
+    public function getCardAction()
+    {
+        $listId = $_POST["listId"];
+        $card = Boardcard::find(
+            [
+                "cardListId='".$listId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($card);
     }
 
 

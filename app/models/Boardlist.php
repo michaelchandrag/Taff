@@ -103,15 +103,20 @@ class Boardlist extends \Phalcon\Mvc\Model
 
     public function insertBoardList($owner,$title,$archive,$status)
     {
-        date_default_timezone_set('Asia/Jakarta');
         $list = new Boardlist();
         $index = $list->countList();
         $id = "BL".str_pad($index,5,'0',STR_PAD_LEFT);
         $indexPos = $list->countListById($owner);
+        $posAkhir = Boardlist::maximum(
+            [
+                "column"        => "listPosition",
+                "conditions"    => "listBoardId='".$owner."'"
+            ]
+        );
         $list->listId = $id;
         $list->listBoardId = $owner;
         $list->listTitle = $title;
-        $list->listPosition = $indexPos+1;
+        $list->listPosition = $posAkhir+1;
         $list->listCreated = date("Y-m-d H:i:sa");
         $list->listArchive = $archive;
         $list->listStatus = $status;
@@ -126,6 +131,39 @@ class Boardlist extends \Phalcon\Mvc\Model
             ]
         );
         return count($list);
+    }
+
+    public function setPosition($id,$position)
+    {
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$id."'"
+            ]
+        );
+        $list->listPosition = $position;
+        $list->save();
+    }
+
+    public function setArchive($listId,$archive)
+    {
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $list->listArchive = $archive;
+        $list->save();
+    }
+
+    public function deleteList($listId)
+    {
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $list->listStatus = "0";
+        $list->save();
     }
 
 }

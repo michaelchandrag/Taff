@@ -126,4 +126,15 @@ class User extends \Phalcon\Mvc\Model
         }
         return $id;
     }
+
+    public function setName($id,$name)
+    {
+        $user = User::findFirst(
+            [
+                "userId='".$id."'"
+            ]
+        );
+        $user->userName = $name;
+        $user->save();
+    }
 }

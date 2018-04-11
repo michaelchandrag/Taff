@@ -109,4 +109,15 @@ class Boardassignmembers extends \Phalcon\Mvc\Model
         $assign->save();
     }
 
+    public function changeAssignChecked($assignId,$checked)
+    {
+        $assign = Boardassignmembers::findFirst(
+                [
+                    "assignId='".$assignId."'"
+                ]
+            );
+        $assign->assignChecked = $checked;
+        $assign->save();
+    }
+
 }

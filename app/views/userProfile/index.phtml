@@ -75,7 +75,7 @@
 				<li>
 					<a href="home" class="cyan-text">
 						<i class="mdi-action-dashboard"></i>
-						<span>Back To Home</span>
+						<span>Home</span>
 					</a>
 				</li>
 			  </ul>
@@ -272,7 +272,7 @@
 		                    <span class="card-title"><b>Edit Profile</b></span>
 		                    	<input type="hidden" id="hiddenUserId" value="<?php echo $userProfile->userId?>">
 		                        <div class="input-field">
-		                          <input id="name" type="text" value="<?php echo $userProfile->userName; ?>">
+		                          <input type="text" value="<?php echo $userProfile->userName; ?>" id="userName">
 		                          <label for="name">Name</label>
 		                        </div>
 		                        <div class="input-field">
@@ -280,9 +280,13 @@
 		                          <label for="email">Email</label>
 		                        </div>
 		                        <div class="input-field">
-		                          <textarea id="bio" class="materialize-textarea" length="120"><?php echo $userProfile->userBio; ?></textarea>
+		                          <textarea class="materialize-textarea" length="120" id="userBio"><?php echo $userProfile->userBio; ?></textarea>
                           		  <label for="bio">Bio</label>
 		                        </div>
+		                        <div class="input-field right-align" style="margin-bottom:15px;">
+		                        	<a onclick="changeData()" class="btn waves-effect waves-light red">Change Profile<i class="mdi-content-send right"></i>></a>
+		                          </div>
+		                        <div class="divider"></div>
 		                    	<div class="file-field input-field">
 			                      <div class="btn">
 			                        <span>File</span>
@@ -293,7 +297,7 @@
 			                      </div>
 			                    </div>
 		                        <div class="input-field right-align" style="margin-bottom:15px;">
-		                        	<a onclick="changeProfile()" class="btn waves-effect waves-light green">Change Profile<i class="mdi-content-send right"></i></a>
+		                        	<a onclick="changeProfile()" href="javascript:void(0);" class="btn waves-effect waves-light green">Change Image<i class="mdi-content-send right"></i></a>
 		                        </div>
 		                        <div class="divider"></div>
 		                        <div class="input-field">
@@ -315,88 +319,65 @@
 		              <!-- profile-page-sidebar-->
 
 		              <!-- profile-page-wall -->
-		              <div id="profile-page-wall" class="col s12 m8">
-		                <!-- profile-page-wall-share -->
-		                <div id="profile-page-wall-share" class="row">
-		                  <div class="col s12">
-		                    <ul class="tabs tab-profile z-depth-1 light-blue">
-		                      <li class="tab col s3"><a class="white-text waves-effect waves-light active" href="#Bio"><i class="mdi-editor-border-color"></i> Bio</a>
-		                      </li>
-		                      <li class="tab col s3"><a class="white-text waves-effect waves-light" href="#Teams"><i class="mdi-social-group"></i> Teams</a>
-		                      </li>
-		                      <li class="tab col s3"><a class="white-text waves-effect waves-light" href="#Activity"><i class="mdi-action-list"></i> Activity</a>
-		                      </li>                      
-		                    </ul>
-		                    <!-- Bio-->
-		                    <div id="Bio" class="tab-content col s12  grey lighten-4">
-		                      <div class="row">
-		                        <div class="col s2">
-		                          <img id="visitUserImage" src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
+		              <div class="col s12 m6">
+                        <ul class="collapsible collapsible-accordion" data-collapsible="accordion">
+                          <li class="active">
+                            <div class="collapsible-header"><i class="mdi-communication-live-help"></i> Groups</div>
+                            <div class="collapsible-body" style="display: none;">
+                              <p>
+                              	<b><u>Groups</u></b></br>
+                              	<?php
+                              	foreach($groupMember as $g)
+                              	{
+                              		if($g->memberStatus == "1")
+                              		{
+                              			foreach($groupUser as $u)
+                              			{
+                              				if($g->groupUserId == $u->groupId)
+                              				{
+                              					echo " - ".$u->groupName."</br>";
+                              				}
+                              			}
+                              		}
+                              	}
 
-		                    ?>" alt="" class="circle responsive-img valign profile-image-post">
-		                        </div>
-		                        <div class="input-field col s10">
-		                          <h5 class="black-text"><b><u>Bio</u></b></h5>
-		                          <p class="black-text" id="visitUserBio"><?php echo $userProfile->userBio ?></p>
-		                        </div>
-		                      </div>
-		                    </div>
-		                    <!-- Teams-->
-		                    <div id="Teams" class="tab-content col s12  grey lighten-4">
-		                      <div class="row">
-		                        <div class="col s2">
-		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
-		                        </div>
-		                        <div class="input-field col s10">
-		                          <h5 class="black-text"><b><u>Teams</u></b></h5>
-		                          <p class="black-text">STTS 2017</p>
-		                          <p class="black-text">Team Kedua</p>
-		                          <p class="black-text">Team Ketiga</p>
-		                        </div>
-		                      </div>
-		                    </div>
-		                    <!-- Activity-->
-		                    <div id="Activity" class="tab-content col s12  grey lighten-4">
-		                      <div class="row">
-		                        <div class="col s2">
-		                          <img src="images/user/gerrard.png" alt="" class="circle responsive-img valign profile-image-post">
-		                        </div>
-		                        <div class="col s10">
-		                          <h5 class="black-text"><b><u>Activity</u></b></h5>
-	                          	  <p>
-		                          	Steven Gerrard added something similiar
-		                          </p>
-		                          <p class="ultra-small grey-text lighten-1">
-	                          		just now
-	                          	  </p>
-	                          	  <div class="divider"></div>
-		                          <p>
-		                          	Steven Gerrard added something
-		                          </p>
-		                          <p class="ultra-small grey-text lighten-1">
-	                          		yesterday at 8:17 PM
-	                          	  </p>
-		                        </div>
+                              	?>
+                              </p>
+                            </div>
+                          </li>
+                          <li >
+                            <div class="collapsible-header active"><i class="mdi-communication-email"></i> Profile</div>
+                            <div class="collapsible-body" style="">
+                              <p>
+                              	<img id="visitUserImage" src="<?php 
+				                    if(strpos($userProfile->userImage,"userImage") !== false)
+				                    {
+				                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+				                    }
+				                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+				                    {
+				                    	echo $userProfile->userImage;
+				                    }
+				                    else
+				                    {
+				                    	echo "userImage/user.jpg";
+				                    }
 
-		                      </div>
-		                    </div>
-		                  </div>
-		                </div>
-		                <!--/ profile-page-wall-share -->
-
-		              </div>
+				                    ?>" alt="profile image" class="circle z-depth-2 responsive-img" style="width:50px;height:50px;">
+				                    <div style="margin-top:-12%;margin-left:15%;">
+				                    	<b id="visitUserName"><?php echo $userProfile->userName ?></b></br>
+				                    	<u><?php echo $userProfile->userEmail ?></u>
+				                    </div>
+                              </p>
+                              <div class="divider"></div>
+                              <p id="visitUserBio" style="margin-top:-25px;"> 
+                              	<b><u>Bio</u></b></br>
+                              	<?php echo $userProfile->userBio ?>
+                              </p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
 		              <!--/ profile-page-wall -->
 
 		            </div>
@@ -425,3 +406,4 @@
 	<!-- END WRAPPER -->
 </div>
 <!-- END MAIN -->
+<script type="text/javascript" src="js/myjs/jsUserProfile.js"></script>

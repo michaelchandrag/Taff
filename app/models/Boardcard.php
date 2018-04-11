@@ -134,14 +134,20 @@ class Boardcard extends \Phalcon\Mvc\Model
         $card = new Boardcard();
         $index = $card->countCard();
         $id = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
-        $indexPos = $card->countCardById($listId);
+        $posAkhir = Boardcard::maximum(
+            [
+                "column"        => "cardPosition",
+                "conditions"    => "cardListId='".$listId."'"
+            ]
+        );
+
         $card->cardId = $id;
         $card->cardListId = $listId;
         $card->cardBoardId = $boardId;
         $card->cardOwner = $owner;
         $card->cardTitle = $title;
         $card->cardDescription = $description;
-        $card->cardPosition = $indexPos+1;
+        $card->cardPosition = $posAkhir+1;
         $card->cardCreated = date("Y-m-d H:i:sa");
         $card->cardArchive = $archive;
         $card->cardStatus = $status;
@@ -185,6 +191,27 @@ class Boardcard extends \Phalcon\Mvc\Model
                 "cardId='".$id."'"
             ]);
         $card->cardDescription = $description;
+        $card->save(); 
+    }
+
+    public function setPosition($listId,$cardId,$position)
+    {
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]);
+        $card->cardListId = $listId;
+        $card->cardPosition = $position;
+        $card->save(); 
+    }
+
+    public function deleteCard($cardId)
+    {
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]);
+        $card->cardStatus = "0";
         $card->save(); 
     }
 

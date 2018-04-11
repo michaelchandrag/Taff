@@ -235,18 +235,35 @@
 					<p class="caption"><img src="images/user/star.png" width="20px" height="20px" alt="Profile" /> <b>Favorite Boards</b></p>
                     <div id="card-stats">
                         <div class="row">
-                            <div class="col s12 m6 l3">
-                                <div class="card">
-                                    <a href="#" class="secondary-content yellow"><i class="mdi-action-grade"></i></a>
-                                    <div class="card-content  green white-text">
-                                        <h2 class="card-stats-title">Life Goals</h2>
-                                        
-                                    </div>
-                                    <div class="card-action  green darken-2">
-                                        <div id="invoice-line" class="center-align">Today</div>
-                                    </div>
-                                </div>
-                            </div>
+                        	<?php
+                        		foreach($board as $b)
+                        		{
+                        			$match = false;
+                        			foreach($boardFavorite as $f)
+                        			{
+                        				if($b->boardId == $f->boardId && $f->favoriteCheck == "1")
+                        				{
+                        					$match = true;
+                        				}
+                        			}
+                        			if($match == true)
+                        			{
+
+			                            echo '<div class="col s12 m6 l3">';
+			                            echo     '<div class="card">';
+			                            echo 		'<a href="board?id='.$b->boardId.'" >';
+			                            echo         '<div class="card-content  '.$b->boardBackground.' white-text">';
+			                            echo             '<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
+			                            echo         '</div>';
+			                            echo         '<div class="card-action  '.$b->boardBackground.' darken-2">';
+			                            echo             '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
+			                            echo         '</div>';
+			                            echo         '</a>';
+			                            echo     '</div>';
+			                            echo '</div>';
+                        			}
+                        		}
+                        	?>
                         </div>
                     </div>
                     <div class="divider"></div>
@@ -266,7 +283,7 @@
 		                			echo '<div class="col s12 m6 l3">';
 		                			echo '<a href="board?id='.$r->boardId.'" >';
 		                    		echo 	'<div class="card">';
-		                    		echo 		'<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
+		                    		echo 		'<div class="secondary-content yellow"></div>';
 		                            echo    	'<div class="card-content '.$r->boardBackground.' white-text">';
 		                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
 		                            echo   		'</div>';

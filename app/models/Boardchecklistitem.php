@@ -109,4 +109,25 @@ class Boardchecklistitem extends \Phalcon\Mvc\Model
         $item->save();
     }
 
+    public function deleteChecklistItem($itemId)
+    {
+        $item = Boardchecklistitem::findFirst(
+            [
+                "itemId='".$itemId."'"
+            ]
+        );
+        $item->itemStatus = "0";
+        $item->save();
+    }
+
+    public function changeItemChecked($itemId,$checked)
+    {
+        $item = Boardchecklistitem::findFirst(
+            [
+                "itemId='".$itemId."'"
+            ]
+        );
+        $item->itemChecked = $checked;
+        $item->save();
+    }
 }
