@@ -446,6 +446,7 @@ function createCopyList()
 	var title = $("#copyListTitle").val();
 	var rowList = $('div.ajaxList').length;
 	var jumlahList = $(".colListUser").length;
+	alert(jumlahList);
 	var posTujuan = jumlahList+1;
 	var listTujuan = "";
 	var rules = false;
@@ -844,6 +845,8 @@ function getPositionList(id)
 function openModalListMenu(id)
 {
 	$("#hiddenListId").val(id);
+
+	checkRoleListMenu();
 	$("#modallistmenu").openModal();
 }
 
@@ -911,7 +914,7 @@ function ajaxModalCard(id)
 
 	$("#changeArchive").show();
 	$("#changeSend").hide();
-
+	checkRoleCard();
 	$("#modal3").openModal();
 }
 
@@ -1338,7 +1341,7 @@ function getStartDate(id)
 			  		{
 			  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+id+"\")' />";
 			  		}
-			  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a href='javascript:void(0);' onclick='deleteStartDate(\""+id+"\")' >Remove</a>";
+			  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a class='roleActivityStartDate' style='display:none;' href='javascript:void(0);' onclick='deleteStartDate(\""+id+"\")' >Remove</a>";
 			  		gabung += "</p>";
 			  	}
 
@@ -1441,7 +1444,7 @@ function getDueDate(id)
 			  		{
 			  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' />";
 			  		}
-			  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a href='javascript:void(0);' onclick='deleteDueDate(\""+id+"\")' >Remove</a>";
+			  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a class='roleActivityDueDate' style='display:none;' href='javascript:void(0);' onclick='deleteDueDate(\""+id+"\")' >Remove</a>";
 			  		gabung += "</p>";
 			  	}
 			  	$("#ajaxDueDate").append(gabung);
@@ -1479,7 +1482,7 @@ function getChecklist(id)
 				  		var add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
 				  		var addbawah ='</div>';
 				  		var luaratas2 = '</div>';
-				  		var luarbawah1 = '<div class="col s12 m6 l1 ">';
+				  		var luarbawah1 = '<div class="col s12 m6 l1 roleActivityChecklist" style="display:none;">';
 				  		var tengah = '<a href="javascript:void(0);" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
 				  		var luarbawah2 = '</div>';
 				  		var a = "</div>";
@@ -1502,7 +1505,7 @@ function getChecklist(id)
 							  		}
 							  		else
 							  		{
-							  			$("#checklistItem"+response.checklistId).append('<p id="item'+response.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+response.itemId+'" onchange="changeItem(\''+response.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+response.itemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+response.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+							  			$("#checklistItem"+response.checklistId).append('<p id="item'+response.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+response.itemId+'" onchange="changeItem(\''+response.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+response.itemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;display:none;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+response.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
 
 							  		}
 							  		countPb(response.checklistId);
@@ -1988,6 +1991,16 @@ function changeInput(index)
 
 }
 
+function changeInputBoard()
+{
+	//mengubah button add menjadi input text
+	$("#itemBoard").empty();
+	$("#itemBoard").append('<input type="text" id="textItemBoard" placeholder="Item.." style="margin-bottom:2px;">');
+	$("#itemBoard").append('<a class="btn waves-effect waves-light green" onclick="createProgressItemBoard()"  style="margin-right:10px;margin-bottom:2px;">Add</a>');
+	$("#itemBoard").append('<a class="btn-floating waves-effect waves-light" style="margin-bottom:2px;" onclick="changeAddBoard()"><i class="mdi-content-clear"></i></a>');
+
+}
+
 function changeAdd(index)
 {
 	//mengubah input text menjadi button add
@@ -1995,6 +2008,15 @@ function changeAdd(index)
 	var add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+index+'\')">Add an item</a></p>';
 	$("#item"+index).empty();
 	$("#item"+index).append(add);
+
+}
+function changeAddBoard()
+{
+	//mengubah input text menjadi button add
+	//alert(index);
+	var add = '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+	$("#itemBoard").empty();
+	$("#itemBoard").append(add);
 
 }
 
@@ -2374,7 +2396,8 @@ function modalArchive()
 			  		if(response.cardBoardId == boardId && response.cardStatus == "1")
 			  		{
 			  			//alert(response.cardId);
-			  			$("#archiveCard").append('<p id="archiveC'+response.cardId+'" style="font-size:100%;"><b>'+response.cardTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveMenu(\''+response.cardId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteCard(\''+response.cardId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+			  			$("#archiveCard").append('<p class="roleDeleteCard" id="archiveC'+response.cardId+'" style="font-size:100%;display:none;"><b>'+response.cardTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveMenu(\''+response.cardId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteCard(\''+response.cardId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+			  			
 			  		}
 			    });
 		  },
@@ -2398,7 +2421,8 @@ function modalArchive()
 			  		if(response.listBoardId == boardId && response.listStatus == "1")
 			  		{
 			  			//alert(response.cardId);
-			  			$("#archiveList").append('<p id="archiveL'+response.listId+'" style="font-size:100%;"><b>'+response.listTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveList(\''+response.listId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteList(\''+response.listId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+			  			$("#archiveList").append('<p class="roleDeleteList" id="archiveL'+response.listId+'" style="font-size:100%;display:none;"><b>'+response.listTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveList(\''+response.listId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteList(\''+response.listId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+			  			
 			  		}
 			    });
 		  },
@@ -2408,6 +2432,7 @@ function modalArchive()
 			alert(xhr.responseText);
 		  }
 		});
+	checkRoleMore();
 }
 
 function createCardComment()
@@ -2727,7 +2752,7 @@ function getAttachment(id)
 				  		gabung += '</div>';
 				  		gabung += '<div class="col s12 m6 l9" style="margin-left:15px;margin-top:-15px;">';
 				  		gabung += '<p>'+response.attachmentTitle+'</p>';
-				  		gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download - <a href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">Delete</a>';
+				  		gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download <a class="roleActivityAttachment" style="display:none;" href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">- Delete</a>';
 				  		gabung += '</div>';
 				  		gabung += '</div>';
 				  		$("#ajaxAttachment").append(gabung);
@@ -2761,6 +2786,11 @@ function ajaxModalMore()
 
 	getBoardSubscribe(boardId);
 
+	checkRoleMore();
+
+	$("#modalmore").openModal();
+	/*$("#closeboard").show();
+	$("#openboard").hide();*/
 }
 
 function getBoard(id)
@@ -3452,7 +3482,7 @@ function openModalGanttChart()
      	}
 	    else
 	    {
-	     	$("#chart_div").append("<p>You have to create a card that has a Start Date, Due Date and a Checklist with item</p>");
+	     	$("#chart_div").append("<p>You have to create a card that has a Start Date, Due Date and a Checklist with an item</p>");
 	    }
       
     }
@@ -3460,19 +3490,1309 @@ function openModalGanttChart()
 	$("#modalganttchart").openModal();
 }
 
+function copyBoard()
+{
+	var boardId = $("#hiddenBoardId").val();
+	var title = $("#newTitle").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/copyBoard",
+		  data: {boardId:boardId,title:title},
+		  success: function (response) {
+		  	location.href="board?id="+response;
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function closeBoard()
+{
+	$("#openboard").show();
+	$("#closeboard").hide();
+	var boardId = $("#hiddenBoardId").val();
+	var status = "1";
+	$.ajax({
+		  type: "POST",
+		  url: "board/setClosedBoard",
+		  data: {boardId:boardId,status:status},
+		  success: function (response) {
+		  	//alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function openBoard()
+{
+	$("#openboard").hide();
+	$("#closeboard").show();
+	var boardId = $("#hiddenBoardId").val();
+	var status = "0";
+	$.ajax({
+		  type: "POST",
+		  url: "board/setClosedBoard",
+		  data: {boardId:boardId,status:status},
+		  success: function (response) {
+		  	//alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function openStatus()
+{
+	getProgressDate();
+	getProgressChecklist();
+	$("#modalstatus").openModal();
+}
+
+function getProgressDate()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getProgressDate",
+		  data: {boardId:boardId},
+		  success: function (response) {
+		  	//alert(response);//2018-04-20 10:00:00
+		  	if(response != "")
+		  	{
+		  		var split = response.split(" ");
+		  		var date = split[0];
+		  		var $input = $('#progressDate').pickadate();
+		  		var split2 = date.split("-");
+		  		var tahun = split2[0];
+		  		var bulan = split2[1];
+		  		var tanggal = split2[2];
+
+				// Use the picker object directly.
+				var picker = $input.pickadate('picker');
+
+				picker.set('select', new Date(tahun, (bulan-1), tanggal));
+
+		  	}
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function getProgressChecklist()
+{
+	$("#ajaxProgressChecklist").empty();
+	var boardId = $("#hiddenBoardId").val();
+	var atas = '<div id="progressChecklist">';
+	var luaratas1 = '<div class="col s12 m6 l10 ">';
+	var header = '';
+	var progressbar = '<div class="progress"><div id="pb'+"ChecklistBoard"+'" class="determinate" style="width:0%"></div></div>';
+	//var item ='<p> <input type="checkbox" id="test3" /><label for="test3">Satu</label></p>';
+	var item ='<div id="checklistItem'+"ProgressChecklist"+'"></div>';
+	var addatas ='<div id="itemBoard'+'">';
+	var add = '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+	var addbawah ='</div>';
+	var luaratas2 = '</div>';
+	var luarbawah1 = '<div class="col s12 m6 l1 ">';
+	var tengah = '';
+	var luarbawah2 = '</div>';
+	var a = "</div>";
+	var gabung = atas+luaratas1+header+progressbar+item+addatas+add+addbawah+luaratas2+luarbawah2+a;
+	$("#ajaxProgressChecklist").append(gabung);
+	$.ajax({
+		  type: "POST",
+		  url: "board/getProgressItem",
+		  data: {boardId:boardId},
+		  dataType:"json",
+		  success: function (response) {
+			  $.each(response, function(idx, response){
+			  	if(response.itemStatus == "1")
+			  	{
+
+			  		if(response.itemChecked == "1")
+			  		{
+			  			$("#checklistItemProgressChecklist").append('<p id="itemBoard'+response.progressItemId+'"> <input type="checkbox" checked="checked" class="cbBoard" id="testBoard'+response.progressItemId+'" onchange="changeProgressItem(\''+response.progressItemId+'\')" onclick="countPbProgress(\''+response.progressItemId+'\')" /><label class="black-text" for="testBoard'+response.progressItemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteProgressItem(\''+response.progressItemId+'\')" class="right-align red-text">Delete</a></span></p>');
+			  		}
+			  		else
+			  		{
+			  			$("#checklistItemProgressChecklist").append('<p id="itemBoard'+response.progressItemId+'"> <input type="checkbox" class="cbBoard" id="testBoard'+response.progressItemId+'" onchange="changeProgressItem(\''+response.progressItemId+'\')" onclick="countPbProgress(\''+response.progressItemId+'\')" /><label class="black-text" for="testBoard'+response.progressItemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteProgressItem(\''+response.progressItemId+'\')" class="right-align red-text">Delete</a></span></p>');
+
+			  		}
+			  		//countPb(response.checklistId);
+			  	}
+			  		
+			  	});
+				countPbProgress();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function deleteProgressItem(id)
+{
+	var itemId = id;
+	$.ajax({
+		  type: "POST",
+		  url: "board/deleteProgressItem",
+		  data: {itemId:itemId},
+		  success: function (response) {
+		  	$("#itemBoard"+id).remove();
+		  	countPbProgress();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function createProgressItemBoard()
+{
+	var boardId = $("#hiddenBoardId").val();
+	var text = $("#textItemBoard").val();
+	if(text != "")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/setProgressItem",
+		  data: {boardId:boardId,text:text},
+		  success: function (response) {
+		  	//alert(response);
+		  	$("#checklistItemProgressChecklist").append('<p id="itemBoard'+response+'"> <input type="checkbox" class="cbBoard" id="testBoard'+response+'" onchange="changeProgressItem(\''+response+'\')" onclick="countPbProgress(\''+response+'\')" /><label class="black-text" for="testBoard'+response+'">'+text+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteProgressItem(\''+response+'\')" class="right-align red-text">Delete</a></span></p>');
+		  	changeAddBoard();
+			countPbProgress();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+	
+}
+
+function changeProgressItem(id)
+{
+	var itemId = id;
+	var checked = $("#testBoard"+id).is(":checked");
+	var status = "";
+	if(checked == true)
+	{
+		status = "1";
+	}
+	else
+	{
+		status = "0";
+	}
+	$.ajax({
+		  type: "POST",
+		  url: "board/changeProgressItem",
+		  data: {itemId:itemId,status:status},
+		  success: function (response) {
+		  	//alert(response);
+		  	countPbProgress();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+function countPbProgress()
+{
+	//alert("COUNT");
+	var cb = $(".cbBoard").length;
+	var check = $(".cbBoard:checked").length;
+	var total = check*100/cb;
+	var total = total + "%";
+	$("#pbChecklistBoard").width(total);
+}
+
+function createStatus()
+{
+	var boardId = $("#hiddenBoardId").val();
+	var date = $("#progressDate").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/setProgressDate",
+		  data: {boardId:boardId,date:date},
+		  success: function (response) {
+		  	//alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function leaveBoard()
+{
+	var boardId = $("#hiddenBoardId").val();
+	var userId = $("#hiddenUserId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/setLeaveBoard",
+		  data: {boardId:boardId,userId:userId},
+		  success: function (response) {
+		  	//alert(response);
+		  	window.location.href = "home";
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function openRole()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRoleCollaborator",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+					if(response.listCreate == "1")
+					{
+						$("#collListCreate").prop("checked",true);
+					}
+					else
+					{
+						$("#collListCreate").prop("checked",false);
+					}
+					if(response.listEdit == "1")
+					{
+						$("#collListEdit").prop("checked",true);
+					}
+					else
+					{
+						$("#collListEdit").prop("checked",false);
+					}
+					if(response.listDelete == "1")
+					{
+						$("#collListDelete").prop("checked",true);
+					}
+					else
+					{
+						$("#collListDelete").prop("checked",false);
+					}
+					if(response.cardCreate == "1")
+					{
+						$("#collCardCreate").prop("checked",true);
+					}
+					else
+					{
+						$("#collCardCreate").prop("checked",false);
+					}
+					if(response.cardEdit == "1")
+					{
+						$("#collCardEdit").prop("checked",true);
+					}
+					else
+					{
+						$("#collCardEdit").prop("checked",false);
+					}
+					if(response.cardDelete == "1")
+					{
+						$("#collCardDelete").prop("checked",true);
+					}
+					else
+					{
+						$("#collCardDelete").prop("checked",false);
+					}
+					if(response.activityAM == "1")
+					{
+						$("#collActAM").prop("checked",true);
+					}
+					else
+					{
+						$("#collActAM").prop("checked",false);
+					}
+					if(response.activityLabel == "1")
+					{
+						$("#collActLabel").prop("checked",true);
+					}
+					else
+					{
+						$("#collActLabel").prop("checked",false);
+					}
+					if(response.activityChecklist == "1")
+					{
+						$("#collActCheck").prop("checked",true);
+					}
+					else
+					{
+						$("#collActCheck").prop("checked",false);
+					}
+					if(response.activityStartDate == "1")
+					{
+						$("#collActStart").prop("checked",true);
+					}
+					else
+					{
+						$("#collActStart").prop("checked",false);
+					}
+					if(response.activityDueDate == "1")
+					{
+						$("#collActDue").prop("checked",true);
+					}
+					else
+					{
+						$("#collActDue").prop("checked",false);
+					}
+					if(response.activityAttachment == "1")
+					{	
+						$("#collActAtt").prop("checked",true);
+					}
+					else
+					{
+						$("#collActAtt").prop("checked",false);
+					}
+			    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRoleClient",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+					if(response.listCreate == "1")
+					{
+						$("#cliListCreate").prop("checked",true);
+					}
+					else
+					{
+						$("#cliListCreate").prop("checked",false);
+					}
+					if(response.listEdit == "1")
+					{
+						$("#cliListEdit").prop("checked",true);
+					}
+					else
+					{
+						$("#cliListEdit").prop("checked",false);
+					}
+					if(response.listDelete == "1")
+					{
+						$("#cliListDelete").prop("checked",true);
+					}
+					else
+					{
+						$("#cliListDelete").prop("checked",false);
+					}
+					if(response.cardCreate == "1")
+					{
+						$("#cliCardCreate").prop("checked",true);
+					}
+					else
+					{
+						$("#cliCardCreate").prop("checked",false);
+					}
+					if(response.cardEdit == "1")
+					{
+						$("#cliCardEdit").prop("checked",true);
+					}
+					else
+					{
+						$("#cliCardEdit").prop("checked",false);
+					}
+					if(response.cardDelete == "1")
+					{
+						$("#cliCardDelete").prop("checked",true);
+					}
+					else
+					{
+						$("#cliCardDelete").prop("checked",false);
+					}
+					if(response.activityAM == "1")
+					{
+						$("#cliActAM").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActAM").prop("checked",false);
+					}
+					if(response.activityLabel == "1")
+					{
+						$("#cliActLabel").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActLabel").prop("checked",false);
+					}
+					if(response.activityChecklist == "1")
+					{
+						$("#cliActCheck").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActCheck").prop("checked",false);
+					}
+					if(response.activityStartDate == "1")
+					{
+						$("#cliActStart").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActStart").prop("checked",false);
+					}
+					if(response.activityDueDate == "1")
+					{
+						$("#cliActDue").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActDue").prop("checked",false);
+					}
+					if(response.activityAttachment == "1")
+					{	
+						$("#cliActAtt").prop("checked",true);
+					}
+					else
+					{
+						$("#cliActAtt").prop("checked",false);
+					}
+			    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	$("#modalsettingrole").openModal();
+}
+
+function createRole()
+{
+	var collListCreate = $("#collListCreate").is(":checked");
+	if(collListCreate == true)
+	{
+		collListCreate = "1";
+	}
+	else
+	{
+		collListCreate = "0";
+	}
+	var collListEdit = $("#collListEdit").is(":checked");
+	if(collListEdit == true)
+	{
+		collListEdit = "1";
+	}
+	else
+	{
+		collListEdit = "0";
+	}
+	var collListDelete = $("#collListDelete").is(":checked");
+	if(collListDelete == true)
+	{
+		collListDelete = "1";
+	}
+	else
+	{
+		collListDelete = "0";
+	}
+	var collCardCreate = $("#collCardCreate").is(":checked");
+	if(collCardCreate == true)
+	{
+		collCardCreate = "1";
+	}
+	else
+	{
+		collCardCreate = "0";
+	}
+	var collCardEdit = $("#collCardEdit").is(":checked");
+	if(collCardEdit == true)
+	{
+		collCardEdit = "1";
+	}
+	else
+	{
+		collCardEdit = "0";
+	}
+	var collCardDelete = $("#collCardDelete").is(":checked");
+	if(collCardDelete == true)
+	{
+		collCardDelete = "1";
+	}
+	else
+	{
+		collCardDelete = "0";
+	}
+	var collActAM = $("#collActAM").is(":checked");
+	if(collActAM == true)
+	{
+		collActAM = "1";
+	}
+	else
+	{
+		collActAM = "0";
+	}
+	var collActLabel = $("#collActLabel").is(":checked");
+	if(collActLabel == true)
+	{
+		collActLabel = "1";
+	}
+	else
+	{
+		collActLabel = "0";
+	}
+	var collActCheck = $("#collActCheck").is(":checked");
+	if(collActCheck == true)
+	{
+		collActCheck = "1";
+	}
+	else
+	{
+		collActCheck = "0";
+	}
+	var collActStart = $("#collActStart").is(":checked");
+	if(collActStart == true)
+	{
+		collActStart = "1";
+	}
+	else
+	{
+		collActStart = "0";
+	}
+	var collActDue = $("#collActDue").is(":checked");
+	if(collActDue == true)
+	{
+		collActDue = "1";
+	}
+	else
+	{
+		collActDue = "0";
+	}
+	var collActAtt = $("#collActAtt").is(":checked");
+	if(collActAtt == true)
+	{
+		collActAtt = "1";
+	}
+	else
+	{
+		collActAtt = "0";
+	}
+	var cliListCreate = $("#cliListCreate").is(":checked");
+	if(cliListCreate == true)
+	{
+		cliListCreate = "1";
+	}
+	else
+	{
+		cliListCreate = "0";
+	}
+	var cliListEdit = $("#cliListEdit").is(":checked");
+	if(cliListEdit == true)
+	{
+		cliListEdit = "1";
+	}
+	else
+	{
+		cliListEdit = "0";
+	}
+	var cliListDelete = $("#cliListDelete").is(":checked");
+	if(cliListDelete == true)
+	{
+		cliListDelete = "1";
+	}
+	else
+	{
+		cliListDelete = "0";
+	}
+	var cliCardCreate = $("#cliCardCreate").is(":checked");
+	if(cliCardCreate == true)
+	{
+		cliCardCreate = "1";
+	}
+	else
+	{
+		cliCardCreate = "0";
+	}
+	var cliCardEdit = $("#cliCardEdit").is(":checked");
+	if(cliCardEdit == true)
+	{
+		cliCardEdit = "1";
+	}
+	else
+	{
+		cliCardEdit = "0";
+	}
+	var cliCardDelete = $("#cliCardDelete").is(":checked");
+	if(cliCardDelete == true)
+	{
+		cliCardDelete = "1";
+	}
+	else
+	{
+		cliCardDelete = "0";
+	}
+	var cliActAM = $("#cliActAM").is(":checked");
+	if(cliActAM == true)
+	{
+		cliActAM = "1";
+	}
+	else
+	{
+		cliActAM = "0";
+	}
+	var cliActLabel = $("#cliActLabel").is(":checked");
+	if(cliActLabel == true)
+	{
+		cliActLabel = "1";
+	}
+	else
+	{
+		cliActLabel = "0";
+	}
+	var cliActCheck = $("#cliActCheck").is(":checked");
+	if(cliActCheck == true)
+	{
+		cliActCheck = "1";
+	}
+	else
+	{
+		cliActCheck = "0";
+	}
+	var cliActStart = $("#cliActStart").is(":checked");
+	if(cliActStart == true)
+	{
+		cliActStart = "1";
+	}
+	else
+	{
+		cliActStart = "0";
+	}
+	var cliActDue = $("#cliActDue").is(":checked");
+	if(cliActDue == true)
+	{
+		cliActDue = "1";
+	}
+	else
+	{
+		cliActDue = "0";
+	}
+	var cliActAtt = $("#cliActAtt").is(":checked");
+	if(cliActAtt == true)
+	{
+		cliActAtt = "1";
+	}
+	else
+	{
+		cliActAtt = "0";
+	}
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/setRoleCollaborator",
+		  data: {boardId:boardId,collListCreate:collListCreate,collListEdit:collListEdit,collListDelete:collListDelete,collCardCreate:collCardCreate,collCardEdit:collCardEdit,collCardDelete:collCardDelete,collActAM:collActAM,collActLabel:collActLabel,collActCheck:collActCheck,collActStart:collActStart,collActDue:collActDue,collActAtt:collActAtt},
+		  success: function (response) {
+		  	//alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	$.ajax({
+		  type: "POST",
+		  url: "board/setRoleClient",
+		  data: {boardId:boardId,cliListCreate:cliListCreate,cliListEdit:cliListEdit,cliListDelete:cliListDelete,cliCardCreate:cliCardCreate,cliCardEdit:cliCardEdit,cliCardDelete:cliCardDelete,cliActAM:cliActAM,cliActLabel:cliActLabel,cliActCheck:cliActCheck,cliActStart:cliActStart,cliActDue:cliActDue,cliActAtt:cliActAtt},
+		  success: function (response) {
+		  	//alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	/*
+	cliListCreate:cliListCreate,cliListEdit:cliListEdit,cliListDelete:cliListDelete,cliCardCreate:cliCardCreate,cliCardEdit:cliCardEdit,cliCardDelete:cliCardDelete,cliActAM:cliActAM,cliActLabel:cliActLabel,cliActCheck:cliActCheck,cliActStart:cliActStart,cliActDue:cliActDue,cliActAtt:cliActAtt
+	*/
+}
+
+function findBoards()
+{
+	var text = $("#txtFindBoards").val();
+	if(text != "")
+	{
+		window.location.href="home?find="+text;
+	}
+}
 
 
-$(document).keypress(function(e) {
-    if(e.which == 13) {
-        createChat();
-    }
-});
+function checkRole()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRole",
+		  data: {boardId:boardId},
+		  success: function (response) {
+		  	setRole(response,boardId);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+function checkRoleCard()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRole",
+		  data: {boardId:boardId},
+		  success: function (response) {
+		  	setRoleCard(response,boardId);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+function checkRoleMore()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRole",
+		  data: {boardId:boardId},
+		  success: function (response) {
+		  	setRoleMore(response,boardId);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+function checkRoleListMenu()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getRole",
+		  data: {boardId:boardId},
+		  success: function (response) {
+		  	setRoleListMenu(response,boardId);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+function setRole(role,boardId)
+{
+	var boardId = boardId;
+	//disembunyikan semua dahulu
+	$(".roleCreateList").hide();
+	$(".roleCreateCard").hide();
+	$(".roleCreator").hide();
+	$(".roleCollaboratorClient").hide();
+	if(role == "Creator")
+	{
+		$(".roleCreateList").show();
+		$(".roleCreateCard").show();
+		$(".roleCreator").show();
+		$(".roleCollaboratorClient").hide();
+	}
+	else if(role == "Collaborator")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleCollaborator",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.listCreate == "1")
+				{
+					$(".roleCreateList").show();
+				}
+				if(response.cardCreate == "1")
+				{
+					$(".roleCreateCard").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+	else if(role == "Client")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleClient",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.listCreate == "1")
+				{
+					$(".roleCreateList").show();
+				}
+				if(response.cardCreate == "1")
+				{
+					$(".roleCreateCard").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+}
+
+function setRoleListMenu(role,boardId)
+{
+	var boardId = boardId;
+	//disembunyikan semua dahulu
+	$(".roleCreateCardMenu").hide();
+	$(".roleEditCardMenu").hide();
+	$(".roleDeleteCardMenu").hide();
+	$(".roleCreateListMenu").hide();
+	$(".roleEditListMenu").hide();
+	$(".roleDeleteListMenu").hide();
+	if(role == "Creator")
+	{
+		$(".roleCreateCardMenu").show();
+		$(".roleEditCardMenu").show();
+		$(".roleDeleteCardMenu").show();
+		$(".roleCreateListMenu").show();
+		$(".roleEditListMenu").show();
+		$(".roleDeleteListMenu").show();
+	}
+	else if(role == "Collaborator")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleCollaborator",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.cardCreate == "1")
+				{
+					$(".roleCreateCardMenu").show();
+				}
+				if(response.cardEdit == "1")
+				{
+					$(".roleEditCardMenu").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCardMenu").show();
+				}
+				if(response.listCreate == "1")
+				{
+					$(".roleCreateListMenu").show();
+				}
+				if(response.listEdit == "1")
+				{
+					$(".roleEditListMenu").show();
+				}
+				if(response.listDelete == "1")
+				{
+					$(".roleDeleteListMenu").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+	else if(role == "Client")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleClient",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.cardCreate == "1")
+				{
+					$(".roleCreateCardMenu").show();
+				}
+				if(response.cardEdit == "1")
+				{
+					$(".roleEditCardMenu").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCardMenu").show();
+				}
+				if(response.listEdit == "1")
+				{
+					$(".roleEditListMenu").show();
+				}
+				if(response.listDelete == "1")
+				{
+					$(".roleDeleteListMenu").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+}
+
+function setRoleCard(role,boardId)
+{
+	var boardId = boardId;
+	//disembunyikan semua dahulu
+	$(".roleEditCard").hide();
+	$(".roleDeleteCard").hide();
+	$(".roleActivityAM").hide();
+	$(".roleActivityLabel").hide();
+	$(".roleActivityChecklist").hide();
+	$(".roleActivityAttachment").hide();
+	$(".roleActivityStartDate").hide();
+	$(".roleActivityDueDate").hide();
+	if(role == "Creator")
+	{
+		$(".roleEditCard").show();
+		$(".roleDeleteCard").show();
+		$(".roleActivityAM").show();
+		$(".roleActivityLabel").show();
+		$(".roleActivityChecklist").show();
+		$(".roleActivityAttachment").show();
+		$(".roleActivityStartDate").show();
+		$(".roleActivityDueDate").show();
+	}
+	else if(role == "Collaborator")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleCollaborator",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.cardEdit == "1")
+				{
+					$(".roleEditCard").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCard").show();
+				}
+				if(response.activityAM == "1")
+				{
+					$(".roleActivityAM").show();
+				}
+				if(response.activityLabel == "1")
+				{
+					$(".roleActivityLabel").show();
+				}
+				if(response.activityChecklist == "1")
+				{
+					$(".roleActivityChecklist").show();
+				}
+				if(response.activityAttachment == "1")
+				{
+					$(".roleActivityAttachment").show();
+				}
+				if(response.activityStartDate == "1")
+				{
+					$(".roleActivityStartDate").show();
+				}
+				if(response.activityDueDate == "1")
+				{
+					$(".roleActivityDueDate").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+	else if(role == "Client")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleClient",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.cardEdit == "1")
+				{
+					$(".roleEditCard").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCard").show();
+				}
+				if(response.activityAM == "1")
+				{
+					$(".roleActivityAM").show();
+				}
+				if(response.activityLabel == "1")
+				{
+					$(".roleActivityLabel").show();
+				}
+				if(response.activityChecklist == "1")
+				{
+					$(".roleActivityChecklist").show();
+				}
+				if(response.activityAttachment == "1")
+				{
+					$(".roleActivityAttachment").show();
+				}
+				if(response.activityStartDate == "1")
+				{
+					$(".roleActivityStartDate").show();
+				}
+				if(response.activityDueDate == "1")
+				{
+					$(".roleActivityDueDate").show();
+				}
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+}
+
+function setRoleMore(role,boardId)
+{
+	var boardId = boardId;
+	//disembunyikan semua dahulu
+	$(".roleDeleteList").hide();
+	$(".roleDeleteCard").hide();
+	$(".roleCreator").hide();
+	$(".roleCollaboratorClient").hide();
+	if(role == "Creator")
+	{
+		$(".roleDeleteList").show();
+		$(".roleDeleteCard").show();
+		$(".roleCreator").show();
+	}
+	else if(role == "Collaborator")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleCollaborator",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.listDelete == "1")
+				{
+					$(".roleDeleteList").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCard").show();
+				}
+				$(".roleCollaboratorClient").show();
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+	else if(role == "Client")
+	{
+		$.ajax({
+		  type: "POST",
+		  url: "board/getRoleClient",
+		  data: {boardId:boardId},
+		  dataType :"json",
+		  success: function (response) {
+			$.each(response, function(idx, response){
+				if(response.listDelete == "1")
+				{
+					$(".roleDeleteList").show();
+				}
+				if(response.cardDelete == "1")
+				{
+					$(".roleDeleteCard").show();
+				}
+				$(".roleCollaboratorClient").show();
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	}
+}
+
+function createPDF()
+{
+	window.location.href="board/createPDF";
+}
+
+function setFilter()
+{
+	//cardUserLabel aCardUserLabel
+	var filterRed = $("#filterred").is(":checked");
+	var filterYellow = $("#filteryellow").is(":checked");
+	var filterGreen = $("#filtergreen").is(":checked");
+	var filterBlue = $("#filterblue").is(":checked");
+
+	if(filterRed == false && filterYellow == false && filterGreen == false && filterBlue == false)
+	{
+		var jumlahCard = $(".cardUserLabel").length;
+		for(var i=0;i<jumlahCard;i++)
+		{
+			$(".aCardUserLabel:eq("+i+")").show();
+			
+		}
+	}
+	else
+	{
+		setDisplayCard(filterRed,filterYellow,filterGreen,filterBlue);
+	}
+	
+}
+
+function setDisplayCard(red,yellow,green,blue)
+{
+	var jumlahCard = $(".cardUserLabel").length;
+	for(var i=0;i<jumlahCard;i++)
+	{
+		var child = $(".cardUserLabel:eq("+i+")").children();
+		var match = false;
+		for(var j =0;j<child.length;j++)
+		{
+			if($(child[j]).hasClass("red") && red == true || $(child[j]).hasClass("yellow") && yellow == true || $(child[j]).hasClass("green") && green == true || $(child[j]).hasClass("blue") && blue == true)
+			{
+				match=true;
+			}
+		}
+		if(match == true)
+		{
+			$(".aCardUserLabel:eq("+i+")").show();
+		}
+		else if(match == false)
+		{
+			$(".aCardUserLabel:eq("+i+")").hide();
+		}
+		
+	}
+}
+
+function openModalInvite()
+{
+
+	$("#modalinvite").openModal();
+}
+
+function createInvite()
+{
+	$.ajax({
+		  type: "POST",
+		  url: "board/createInvite",
+		  data: {},
+		  success: function (response) {
+			alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+			alert("Chat");
+		  }
+		});
+}
 
 $(document).ready(function() {
-    //
+    checkRole();
+    $(document).keypress(function(e) {
+	    if(e.which == 13) {
+	    	if($("#txtFindBoards").is(":focus"))
+	        {
+	        	findBoards();
+	        }
+	        if($("#chatText").is(":focus"))
+	        {
+	        	createChat();
+	        }
+	    }
+	});
 });
 
-//var myVar = setInterval(function(){ myTimer() }, 1000);
 
 function myTimer() {
 	var boardId = $("#hiddenBoardId").val();
@@ -3486,11 +4806,13 @@ function myTimer() {
 			$("#ajaxChat").empty();
 			$.each(response, function(idx, response){
 			  		var gabung = "";
+			  		var name = getNameUser(response.userId);
+			  		var directory = getDirectoryUser(response.userId);
 			  		gabung += '<div class="favorite-associate-list chat-out-list row">';
-                    gabung +=     '<div class="col s4"><img src="images/user/user2.png" alt="" class="circle responsive-img online-user valign profile-image">';
+                    gabung +=     '<div class="col s4"><img src="'+directory+'" alt="" class="circle responsive-img online-user valign profile-image">';
                     gabung +=     '</div>';
                     gabung +=     '<div class="col s8">';
-                    gabung +=         '<p>'+response.userId+'</p>';
+                    gabung +=         '<p>'+name+'</p>';
                     gabung +=        '<p class="place black-text">'+response.chatText+'</p>';
                     gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
                     gabung +=     '</div>';

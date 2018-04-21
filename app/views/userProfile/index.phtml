@@ -19,7 +19,7 @@
 				</ul>
 				<div class="header-search-wrapper hide-on-med-and-down">
 					<i class="mdi-action-search"></i>
-					<input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+					<input type="text" id="txtFindBoards" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
 				</div>
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
@@ -61,7 +61,7 @@
 		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
 				  </li>
 				  <li>
-					<a href="login/logout"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+					<a href="javascript:void(0);" onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
 				  </li>
 				  
 				</ul>
@@ -250,7 +250,25 @@
 		                        <p class="medium-small grey-text">Boards</p>                        
 		                    </div>
 		                    <div class="col s2 center-align">
-		                        <h4 class="card-title grey-text text-darken-4">1</h4>
+		                        <h4 class="card-title grey-text text-darken-4">
+		                        <?php
+		                        	$total = 0;
+		                        	foreach($groupMember as $g)
+	                              	{
+	                              		if($g->memberStatus == "1")
+	                              		{
+	                              			foreach($groupUser as $u)
+	                              			{
+	                              				if($g->groupUserId == $u->groupId)
+	                              				{
+	                              					$total++;
+	                              				}
+	                              			}
+	                              		}
+	                              	}
+	                              	echo $total;
+		                        ?>
+		                    	</h4>
 		                        <p class="medium-small grey-text">Teams</p>                        
 		                    </div>                   
 		                    <div class="col s2 center-align">

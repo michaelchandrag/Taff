@@ -1,12 +1,3 @@
-<!-- Start Page Loading -->
-<div id="loader-wrapper">
-	<div id="loader"></div>        
-	<div class="loader-section section-left"></div>
-	<div class="loader-section section-right"></div>
-</div>
-<!-- End Page Loading -->
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
 
 <!-- START HEADER -->
 <header id="header" class="page-topbar">
@@ -19,7 +10,7 @@
 				</ul>
 				<div class="header-search-wrapper hide-on-med-and-down">
 					<i class="mdi-action-search"></i>
-					<input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+					<input type="text" id="txtFindBoards" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
 				</div>
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
@@ -93,7 +84,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="#modalclosedboards" class="cyan-text modal-trigger">
+					<a href="javascript:void(0);" onclick="openClosedBoard()" class="cyan-text">
 						<i class="mdi-navigation-close"></i>
 						<span>Closed Boards</span>
 					</a>
@@ -141,7 +132,7 @@
         </li>
         <li class="bold active"><a href="#modalcreategroup" class="waves-effect waves-cyan modal-trigger"><i class="mdi-social-group"></i> Create Group Board</a>
         </li>
-        <li class="bold active"><a href="#modalclosedboards" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-close"></i> Closed Boards</a>
+        <li class="bold active"><a href="javascript:void(0);" onclick="openClosedBoard()" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-close"></i> Closed Boards</a>
         </li>
         <div class="divider"></div>
         <li class="bold active"><a href="#" class="waves-effect waves-cyan">Profile</a>
@@ -210,8 +201,9 @@
 		                    		<div class="col s12 m6 l12">
 		                    			<p><b>Boards</b></p>
 		                    			<div class="divider"></div>
-		                    			<p>Board Satu <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
-		                    			<p>Board Dua <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+		                    			<div id="closedboard">
+		                    			</div>
+		                    			
 		                    		</div>
 		                    	</div>
 		                    </div>
@@ -222,13 +214,13 @@
 	                </div>
 	                <div class="col s12 m4 l8">
 							<p><b>Filter Board</b></p>
-							<input type="checkbox" id="filterred" />
+							<input type="checkbox" id="filterred" onchange="setFilter()" />
 	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filteryellow" />
+                      		<input type="checkbox" id="filteryellow" onchange="setFilter()"/>
 	                      	<label for="filteryellow"><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filtergreen" />
+                      		<input type="checkbox" id="filtergreen" onchange="setFilter()"/>
 	                      	<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filterblue" />
+                      		<input type="checkbox" id="filterblue" onchange="setFilter()"/>
 	                      	<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
 					</div>
 					<div class="divider"></div>
@@ -241,7 +233,7 @@
                         			$match = false;
                         			foreach($boardFavorite as $f)
                         			{
-                        				if($b->boardId == $f->boardId && $f->favoriteCheck == "1")
+                        				if($b->boardId == $f->boardId && $f->favoriteCheck == "1" && $b->boardClosed == "0" && $b->boardStatus == "1")
                         				{
                         					$match = true;
                         				}
@@ -273,11 +265,36 @@
                 		echo '<div id="card-stats">';
                			echo '<div class="row">';
                			echo '<div id="ajaxBoard'.$userId.'" style="margin-top:-25px;">';
-                		foreach($board as $r)
+               			foreach($boardMember as $bm)
+               			{
+               				if($bm->userId == $userId && $bm->memberStatus == "1")
+               				{
+               					foreach($board as $r)
+               					{
+               						if($r->boardGroup == "0" && $r->boardClosed == "0" && $r->boardStatus == "1" && $r->boardId == $bm->boardId)
+               						{
+               							echo '<div class="col s12 m6 l3 colBoardUser">';
+			                			echo '<a href="board?id='.$r->boardId.'" >';
+			                    		echo 	'<div class="card">';
+			                    		echo 		'<div class="secondary-content yellow"></div>';
+			                            echo    	'<div class="card-content '.$r->boardBackground.' white-text boardUser">';
+			                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
+			                            echo   		'</div>';
+			                            echo    	'<div class="card-action '.$r->boardBackground.' darken-2">';
+			                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
+			                            echo    	'</div>';
+			                    		echo 	'</div>';
+			                    		echo '</a>';
+			                    		echo '</div>';
+               						}
+               					}
+               				}
+               			}
+                		/*foreach($board as $r)
                 		{	
                 			if($r->boardOwner == $userId)
                 			{
-                				if($r->boardGroup == "0")
+                				if($r->boardGroup == "0" && $r->boardClosed == "0" && $r->boardStatus == "1")
                 				{
 
 		                			echo '<div class="col s12 m6 l3">';
@@ -296,7 +313,7 @@
                 				}
                 			}
                     		//date_format($r->boardCreated,"d/M/Y");
-                		}
+                		}*/
                 		echo '</div>';
                 			
                         echo '<div class="col s12 m6 l3">';
@@ -336,15 +353,15 @@
 			                	{
 			                		foreach($board as $b)
 			                		{
-			                			if($b->boardId == $g->boardId)
+			                			if($b->boardId == $g->boardId && $b->boardClosed == "0" && $b->boardStatus == "1")
 			                			{
-											echo    	'<div class="col s12 m6 l3">';
+											echo    	'<div class="col s12 m6 l3 colBoardUser">';
 					                        echo 			'<a href="board?id='.$b->boardId.'" >';
 					                        echo        	'<div class="card">';
-					                        echo            	'<div class="card-content red white-text">';
+					                        echo            	'<div class="card-content '.$b->boardBackground.' white-text boardUser">';
 					                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
 					                        echo            	'</div>';
-					                        echo            	'<div class="card-action red darken-2">';
+					                        echo            	'<div class="card-action '.$b->boardBackground.' darken-2">';
 					                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
 					                        echo           	 	'</div>';
 					                        echo       	 	'</div>';

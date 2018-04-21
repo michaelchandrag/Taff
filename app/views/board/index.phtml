@@ -19,7 +19,7 @@
 				</ul>
 				<div class="header-search-wrapper hide-on-med-and-down">
 					<i class="mdi-action-search"></i>
-					<input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+					<input type="text" id="txtFindBoards" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
 				</div>
 				<ul class="right hide-on-med-and-down">
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
@@ -79,19 +79,25 @@
 					</a>
 				</li>
 				<li>
-					<a href="#modalinvite" class="cyan-text modal-trigger">
+					<a href="javascript:void(0);" onclick="openModalInvite()" class="cyan-text">
 						<i class="mdi-social-person-add"></i>
 						<span>Invite</span>
 					</a>
 				</li>
 				<li>
-					<a href="#modalcreatelist" class="cyan-text modal-trigger">
+					<a href="javascript:void(0);" onclick="openStatus()" class="cyan-text">
+						<i class="mdi-action-assignment"></i>
+						<span>Status</span>
+					</a>
+				</li>
+				<li>
+					<a href="#modalcreatelist" class="cyan-text modal-trigger roleCreateList" style="display:none;">
 						<i class="mdi-action-list"></i>
 						<span>Create List</span>
 					</a>
 				</li> 
 				<li>
-					<a href="#modalcreatecarddua" class="cyan-text modal-trigger">
+					<a href="#modalcreatecarddua" class="cyan-text modal-trigger roleCreateCard" style="display:none;">
 						<i class="mdi-content-add"></i>
 						<span>Create Card</span>
 					</a>
@@ -117,7 +123,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="#modalmore" onclick="ajaxModalMore()" class="cyan-text modal-trigger">
+					<a href="javascript:void(0);" onclick="ajaxModalMore()" class="cyan-text">
 						<i class="mdi-navigation-more-horiz"></i>
 						<span>More</span>
 					</a>
@@ -160,7 +166,7 @@
         </li>
         <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
         </li>
-        <li class="bold active"><a href="#modalinvite" class="waves-effect waves-cyan modal-trigger"><i class="mdi-social-person-add"></i>Invite</a>
+        <li class="bold active"><a href="javascript:void(0);" onclick="openModalInvite()" class="waves-effect waves-cyan"><i class="mdi-social-person-add"></i>Invite</a>
         </li>
         <li class="bold active"><a href="#modalcreatelist" class="waves-effect waves-cyan modal-trigger"><i class="mdi-action-list"></i> Create List</a>
         </li>
@@ -216,13 +222,13 @@
 						</div>
 						<div class="col s6 m4 l8">
 							<p><b><u>Filter Card</u></b></p>
-							<input type="checkbox" id="filterred" />
+							<input type="checkbox" id="filterred" onchange="setFilter()" />
 	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filteryellow" />
+                      		<input type="checkbox" id="filteryellow" onchange="setFilter()"/>
 	                      	<label for="filteryellow"><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filtergreen" />
+                      		<input type="checkbox" id="filtergreen" onchange="setFilter()" />
 	                      	<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
-                      		<input type="checkbox" id="filterblue" />
+                      		<input type="checkbox" id="filterblue" onchange="setFilter()"/>
 	                      	<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
 						</div>
 					</div>
@@ -296,8 +302,8 @@
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javacsript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="createInvite()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalcreatelist" class="modal">
@@ -315,6 +321,24 @@
 					  <div class="modal-footer">
 						<a class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 						<a class="waves-effect waves-red btn-flat modal-action modal-close" onclick="createList()">Save</a>
+					  </div>
+					</div>
+					<div id="modalstatus" class="modal">
+					  <div class="modal-content">
+						<div class="col s12 m6 l12">
+							<div class="row">
+								<h6><b>Board status..</b></h6>
+								<p>Board deadline..</p>
+									<input type="date" class="datepicker" id="progressDate">
+								<p>Progress</p>
+									<div id="ajaxProgressChecklist">
+									</div>
+							</div>
+						</div>
+					  </div>
+					  <div class="modal-footer">
+						<a class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a class="waves-effect waves-red btn-flat modal-action modal-close" onclick="createStatus()">Save</a>
 					  </div>
 					</div>
 					<div id="modalcreatecard" class="modal">
@@ -365,7 +389,7 @@
 							<div class="row">
 								<h6><b>More Menu..</b></h6>    
 								<div class="col s12 m6 l6">
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleCreator" style="display:none;">
 										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownboard">Change Background<i class="mdi-navigation-arrow-drop-down right"></i></a>
 											<ul id="dropdownboard" class="dropdown-content">
 												<li onclick="changeBackground('red')">
@@ -414,17 +438,17 @@
 										<label for="testsub" class="black-text">Subscribe</label>
 										</p>
 									</div>
-									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalsettingrole">Setting Role</a>
+									<div class="col s12 m6 l12 roleCreator" style="display:none;">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openRole()">Setting Role</a>
 									</div>
-									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Leave Board</a>
+									<div class="col s12 m6 l12 roleCollaboratorClient" style="display:none;">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="leaveBoard()">Leave Board</a>
 									</div>
 
 								</div>
 								<div class="col s12 m6 l6">
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text modal-trigger" href="#modaleditboard">Edit Board</a>
+										<a class="btn-flat waves-effect black-text modal-trigger roleCreator" style="display:none;" href="#modaleditboard">Edit Board</a>
 									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalcopyboard">Copy Board</a>
@@ -437,7 +461,7 @@
 										
 										<ul id="dropdownexport" class="dropdown-content">
 											<li>
-												<a href="#">PDF</a>
+												<a href="#" onclick="createPDF()">PDF</a>
 											</li>
 											<li>
 												<a href="#">Excel</a>
@@ -451,8 +475,11 @@
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalGanttChart()">Gantt Chart</a>
 									</div>
-									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Close Board</a>
+									<div class="col s12 m6 l12 roleCreator" style="display:none;" id="closeboard">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="closeBoard()">Close Board</a>
+									</div>
+									<div class="col s12 m6 l12" id="openboard" style="display:none;">
+										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openBoard()">Open Board</a>
 									</div>
 
 								</div>
@@ -474,21 +501,21 @@
 								<h6><b>List Menu..</b></h6>    
 								<div class="col s12 m6 l12">
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListAddCard()">Add a card..</a>
+										<a class="btn-flat waves-effect black-text roleCreateCardMenu" href="javascript:void(0);" onclick="openModalListAddCard()" style="display:none;">Add a card..</a>
 									</div>
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleCreateListMenu" style="display:none;">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListCopyList()">Copy list..</a>
 									</div>
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleEditListMenu" style="display:none;">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalMoveList()">Move list..</a>
 									</div>
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleEditCardMenu" style="display:none;">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListMoveAllCard()">Move all card in this list..</a>
 									</div>
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleDeleteCardMenu" style="display:none;">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveAllCard()">Archive all card in this list..</a>
 									</div>
-									<div class="col s12 m6 l12">
+									<div class="col s12 m6 l12 roleDeleteListMenu" style="display:none;">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveList()">Archive this list..</a>
 									</div>
 
@@ -586,13 +613,13 @@
 								<h6><b>Copy board..</b></h6>
 								<div class="divider"></div>
 								<p>Title</p>
-								<input type="text" value="Bucket List">
+								<input type="text" value="" id="newTitle">
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="copyBoard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalsettingrole" class="modal">
@@ -603,186 +630,146 @@
 								<div class="divider"></div>
 								<div class="col s6 m6 l6">
 									<p class="center-align">Role collaborator..</p>
-									<p>List</p>
-									<div class="divider"></div>
-									<div class="switch">
-					                    Create, update, move, archive	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+									<p><b><u>List</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="collListCreate"/>
+											<label for="collListCreate" class="black-text">Create</label>
 					                </div>
 					                <br>
-					                <p>Card</p>
-									<div class="divider"></div>
-									<div class="switch">
-					                    Create, update, move, archive	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox" checked>
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collListEdit"/>
+											<label for="collListEdit" class="black-text">Edit</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Assign members	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collListDelete"/>
+											<label for="collListDelete" class="black-text">Archive & delete</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Label card	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <p><b><u>Card</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="collCardCreate"/>
+											<label for="collCardCreate" class="black-text">Create</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Checklist	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collCardEdit"/>
+											<label for="collCardEdit" class="black-text">Edit</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Start date	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collCardDelete"/>
+											<label for="collCardDelete" class="black-text">Archive & delete</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Due Date	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <p><b><u>Activity</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="collActAM"/>
+											<label for="collActAM" class="black-text">Assign members</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Attachment	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collActLabel"/>
+											<label for="collActLabel" class="black-text">Label card</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Comment	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="collActCheck"/>
+											<label for="collActCheck" class="black-text">Checklist</label>
 					                </div>
 					                <br>
+					                <div class="">
+											<input type="checkbox" id="collActStart"/>
+											<label for="collActStart" class="black-text">Start date</label>
+					                </div>
+					                <br>
+					                <div class="">
+											<input type="checkbox" id="collActDue"/>
+											<label for="collActDue" class="black-text">Due date</label>
+					                </div>
+					                <br>
+					                <div class="">
+											<input type="checkbox" id="collActAtt"/>
+											<label for="collActAtt" class="black-text">Attachment</label>
+					                </div>
 								</div>
 								<div class="col s6 m6 l6">
 									<p class="center-align">Role client..</p>
-									<p>List</p>
-									<div class="divider"></div>
-									<div class="switch">
-					                    Create, update, move, archive	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+									<p><b><u>List</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="cliListCreate"/>
+											<label for="cliListCreate" class="black-text">Create</label>
 					                </div>
 					                <br>
-					                <p>Card</p>
-									<div class="divider"></div>
-									<div class="switch">
-					                    Create, update, move, archive	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox" checked>
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliListEdit"/>
+											<label for="cliListEdit" class="black-text">Edit</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Assign members	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliListDelete"/>
+											<label for="cliListDelete" class="black-text">Archive & delete</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Label card	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <p><b><u>Card</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="cliCardCreate"/>
+											<label for="cliCardCreate" class="black-text">Create</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Checklist	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliCardEdit"/>
+											<label for="cliCardEdit" class="black-text">Edit</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Start date	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliCardDelete"/>
+											<label for="cliCardDelete" class="black-text">Archive & delete</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Due Date	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <p><b><u>Activity</u></b></p>
+									<div class="divider" style="margin-top:-2%;margin-bottom:2%;"></div>
+									<div class="">
+											<input type="checkbox" id="cliActAM"/>
+											<label for="cliActAM" class="black-text">Assign members</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Attachment	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliActLabel"/>
+											<label for="cliActLabel" class="black-text">Label card</label>
 					                </div>
 					                <br>
-					                <div class="switch">
-					                    Comment	: 
-					                    <label>
-					                      Off
-					                      <input type="checkbox">
-					                      <span class="lever"></span> On
-					                    </label>
+					                <div class="">
+											<input type="checkbox" id="cliActCheck"/>
+											<label for="cliActCheck" class="black-text">Checklist</label>
 					                </div>
 					                <br>
+					                <div class="">
+											<input type="checkbox" id="cliActStart"/>
+											<label for="cliActStart" class="black-text">Start date</label>
+					                </div>
+					                <br>
+					                <div class="">
+											<input type="checkbox" id="cliActDue"/>
+											<label for="cliActDue" class="black-text">Due date</label>
+					                </div>
+					                <br>
+					                <div class="">
+											<input type="checkbox" id="cliActAtt"/>
+											<label for="cliActAtt" class="black-text">Attachment</label>
+					                </div>
 								</div>
 							</div>
 						</div>
 					  </div>
 					  <div class="modal-footer">
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
+						<a href="javascript:void(0);" onclick="createRole()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<!-- END OF MODAL MENU MORE-->
@@ -1105,7 +1092,7 @@
 									<div class="row">
 										<div class="col s12 m6 l12">
 										<h5 id="modalCardTitle"><b>Card Title</b> </h5>
-										<a href="#modaleditcard" class="ultra-small modal-trigger">Edit Title</a>
+										<a href="#modaleditcard" class="ultra-small modal-trigger roleEditCard" style="display:none;">Edit Title</a>
 										</div>
 									</div>
 									<div class="row">
@@ -1119,7 +1106,7 @@
 											<h6><b>Description</b></h6>
 											<h6 id="modalCardDescription">Ini adalah deskripsi</h6>
 											<div id="tes"></div>
-											<a href="#modaleditdescription" class="modal-trigger">Edit description</a>
+											<a href="#modaleditdescription" class="modal-trigger roleEditCard" style="display:none;">Edit description</a>
 										</div>
 									</div>
 									<div class="divider"></div>
@@ -1172,7 +1159,7 @@
 								<div class="col s12 m6 l3">
 									<h5 class="large"><b>Add</b></h5>
 									<div class="divider"></div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityAttachment" style="margin-top:5px;display:none;">
 										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownattachment">Attachment<i class="mdi-navigation-arrow-drop-down right"></i></a>
 											<ul id="dropdownattachment" class="dropdown-content">
 												<li>
@@ -1193,38 +1180,38 @@
 												</li>
 											</ul>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityAM" style="margin-top:5px;display:none;">
 										<a href="#modalassignmembers" class="modal-trigger btn-flat waves-effect" style="font-size:90%;">Assign Members</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityLabel" style="margin-top:5px;display:none;">
 										<a href="#modallabelcard" class="modal-trigger btn-flat waves-effect">Label Card</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityChecklist" style="margin-top:5px;display:none;">
 										<a href="#modalchecklist" class="modal-trigger btn-flat waves-effect">Checklist</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityStartDate" style="margin-top:5px;display:none;">
 										<a href="#modalstartdate" class="modal-trigger btn-flat waves-effect">Start Date</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleActivityDueDate" style="margin-top:5px;display:none;">
 										<a href="#modalduedate" class="modal-trigger btn-flat waves-effect">Due Date</a>
 									</div>
 									<h5 class="large"><b>Menu</b></h5>
 									<div class="divider"></div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleEditCard" style="margin-top:5px;display:none;">
 										<a href="#modalmove" class="modal-trigger btn-flat waves-effect">Move</a>
 									</div>
-									<div class="row" style="margin-top:5px;">
+									<div class="row roleCreateCard" style="margin-top:5px;display:none;">
 										<a href="#modalcopy" onclick="openModalCopy()" class="modal-trigger btn-flat waves-effect">Copy</a>
 									</div>
-									<div id="changeArchive" class="row" style="margin-top:5px;">
+									<div id="changeArchive" class="row roleDeleteCard" style="margin-top:5px;display:none;">
 										<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
 									</div>
 									<div id="changeSend" style="display:none;">
 										<div class="divider"></div>
-										<div class="row" style="margin-top:5px;">
+										<div class="row roleDeleteCard" style="margin-top:5px;display:none;">
 											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeSend()">Send to Board</a>
 										</div>
-										<div class="row" style="margin-top:5px;">
+										<div class="row roleDeleteCard" style="margin-top:5px;display:none;">
 											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeDelete()">Delete</a>
 										</div>
 									</div>
@@ -1256,9 +1243,9 @@
 										{
 											if($c->cardListId == $l->listId && $c->cardArchive == "0" && $c->cardStatus == "1")
 											{
-												echo			'<a id="card'.$c->cardId.'" href="javascript:void(0);" class="cardUser'.$c->cardListId.'" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
+												echo			'<a id="card'.$c->cardId.'" href="javascript:void(0);" class="cardUser'.$c->cardListId.' aCardUserLabel" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
 												echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-												echo 				"<div class='row' id='labelCard".$c->cardId."' style='margin:auto;'>";
+												echo 				"<div class='row cardUserLabel' id='labelCard".$c->cardId."' style='margin:auto;'>";
 												foreach($boardLabelCard as $lc)
 												{
 													if($lc->cardId == $c->cardId)
@@ -1297,7 +1284,7 @@
 											}
 										}
 										echo 				'</div>';
-				                        echo            '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
+				                        echo            '<div class="card-compare grey lighten-2 roleCreateCard" style="margin-top:8px;border-radius:5px;display:none;">';
 			                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0);" class="grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
 			                            echo       		'</div>';
 
@@ -1316,7 +1303,7 @@
 									
 								}
 
-								echo '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
+								echo '<div class="col s12 m6 l2 roleCreateList" style="margin-left:0px;display:none;" id="listCreateList">';
 								echo	'<div class="card">';
 								echo		'<div class="card-content grey white-text">';
 			                    echo           '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
@@ -1374,61 +1361,9 @@
                 <li>
                     <div class="collapsible-header red white-text active"><i class="mdi-action-stars"></i>Chat Board</div>
                     <div class="collapsible-body favorite-associates" id="ajaxChat">
-                        <div class="favorite-associate-list chat-out-list row">
-                            <div class="col s4"><img src="images/user/user2.png" alt="" class="circle responsive-img online-user valign profile-image">
-                            </div>
-                            <div class="col s8">
-                                <p>Michael</p>
-                                <p class="place black-text">No?</p>
-                                <p class="ultra-small grey-text lighten-3">just now</p>
-                            </div>
-                        </div>
-                        <div class="favorite-associate-list chat-out-list row">
-                            <div class="col s4"><img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
-
-		                    ?>" alt="" class="circle responsive-img online-user valign profile-image">
-                            </div>
-                            <div class="col s8">
-                                <p>Steven Gerrard</p>
-                                <p class="place black-text">How are you?</p>
-                                <p class="ultra-small grey-text lighten-3">5 minutes ago</p>
-                            </div>
-                        </div>
+                        
                     </div>
                     
-                </li>
-                <li>
-            	<div class="collapsible-header teal white-text"><i class="mdi-social-whatshot"></i>Recent Activites</div>
-                    <div class="collapsible-body recent-activity">
-                        <div class="recent-activity-list chat-out-list row">
-                            <div class="col s3 recent-activity-list-icon"><i class="mdi-action-add-shopping-cart"></i>
-                            </div>
-                            <div class="col s9 recent-activity-list-text">
-                                <a href="#">just now</a>
-                                <p>Jim Doe Purchased new equipments for zonal office.</p>
-                            </div>
-                        </div>
-                        <div class="recent-activity-list chat-out-list row">
-                            <div class="col s3 recent-activity-list-icon"><i class="mdi-device-airplanemode-on"></i>
-                            </div>
-                            <div class="col s9 recent-activity-list-text">
-                                <a href="#">Yesterday</a>
-                                <p>Your Next flight for USA will be on 15th August 2015.</p>
-                            </div>
-                        </div>
-                    </div>
                 </li>
                 </ul>
             </li>

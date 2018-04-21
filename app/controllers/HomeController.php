@@ -6,11 +6,24 @@ class HomeController extends ControllerBase
     public function indexAction()
     {
     	$userId = $this->session->get("userId");
+        $find  = null;
+        if(isset($_GET["find"]))
+        {
+            $find = $_GET["find"];
+        }
         if($userId == null)
         {
             $this->response->redirect("login");
         }
     	$board = Board::find();
+        if($find != null)
+        {
+            $board = Board::find(
+                [
+                    "conditions" => "boardTitle like '%".$find."%'"
+                ]
+            );
+        }
     	$groupMember = new Groupmember();
     	$groupMember = $groupMember->findGroup($userId);
     	$groupUser = Groupuser::find();
@@ -25,6 +38,12 @@ class HomeController extends ControllerBase
                 "userId='".$userId."'"
             ]
         );
+        $boardMember = Boardmember::find(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $this->view->boardMember       = $boardMember;
         $this->view->userProfile       = $profile;
     	$this->view->board             = $board;
     	$this->view->userId            = $userId;
@@ -84,6 +103,25 @@ class HomeController extends ControllerBase
             $role="Creator";
             $boardMember = new Boardmember();
             $boardMember->insertBoardMember($userId,$id,$role,$status);
+            //role collaborator
+            $listCreate = "1";
+            $listEdit = "1";
+            $listDelete = "1";
+            $cardCreate = "1";
+            $cardEdit = "1";
+            $cardDelete = "1";
+            $activityAM = "1";
+            $activityLabel = "1";
+            $activityChecklist = "1";
+            $activityStartDate = "1";
+            $activityDueDate = "1";
+            $activityAttachment = "1";
+            $roleStatus = "1";
+            $coll = new Boardrolecollaborator();
+            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
+
+            $client = new Boardroleclient();
+            $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         }
     	$this->view->disable();
     	echo $id;
@@ -105,6 +143,50 @@ class HomeController extends ControllerBase
     	$this->view->disable();
 
     	echo $groupId;
+    }
+
+    public function getClosedBoardAction()
+    {
+        $userId = $this->session->get("userId");
+        $board = Board::find(
+            [
+                "boardOwner='".$userId."'"
+            ]
+        );
+        $this->view->disable();
+        echo json_encode($board);
+    }
+
+    public function setClosedBoardAction()
+    {
+        $boardId = $_POST["boardId"];
+        $status = $_POST["status"];
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $title = $board->boardTitle;
+        $board->boardClosed = $status;
+        $board->save();
+        $this->view->disable();
+        echo $title;
+    }
+
+    public function setStatusBoardAction()
+    {
+        $boardId = $_POST["boardId"];
+        $status = $_POST["status"];
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $title = $board->boardTitle;
+        $board->boardStatus = $status;
+        $board->save();
+        $this->view->disable();
+        echo "Berhasil";
     }
 
 

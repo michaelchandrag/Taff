@@ -74,10 +74,10 @@ function createBoard()
 				  gabung += '<a href="board?id='+response+'" >';
 				  gabung += '<div class="card">';
 				  gabung += '<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
-				  gabung += '<div class="card-content green white-text">';
+				  gabung += '<div class="card-content blue white-text">';
 				  gabung += '<h2 class="card-stats-title">'+title+'</h2>';
 				  gabung += '</div>';
-				  gabung += '<div class="card-action  green darken-2">';
+				  gabung += '<div class="card-action  blue darken-2">';
 				  gabung += '<div id="invoice-line" class="center-align black-text">'+date2+'</div>';
 				  gabung += '</div>';
 				  gabung += '</div>';
@@ -181,3 +181,167 @@ function cekLogout()
 		  }
 		});
 }
+
+function openClosedBoard()
+{
+	$("#modalclosedboards").openModal();
+	$("#closedboard").empty();
+	$.ajax({
+		async:false,
+		  type: "POST",
+		  url: "home/getClosedBoard",
+		  data: {},
+		  dataType:"json",
+		  success: function (response) {
+			  	$.each(response, function(idx, response){
+			  		if(response.boardClosed == "1" && response.boardStatus == "1")
+			  		{
+			  			$("#closedboard").append('<p id="p'+response.boardId+'">'+response.boardTitle+' <a href="javascript:void(0)" onclick="openBoard(\''+response.boardId+'\')" class="ultra-small green-text">Re-open </a><a href="javascript:void(0)" onclick="deleteBoard(\''+response.boardId+'\')" class="ultra-small red-text">Delete</a></p>');
+			  		}
+			    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+	/*
+	<p>Board Satu <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+	<p>Board Dua <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
+	*/
+}
+
+function openBoard(id)
+{
+	var boardId = id;
+	var status = "0";
+	$.ajax({
+		  type: "POST",
+		  url: "home/setClosedBoard",
+		  data: {boardId:boardId,status:status},
+		  success: function (response) {
+		  	//alert(response);
+		  	$("#p"+id).remove();
+		  	location.reload();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function deleteBoard(id)
+{
+	var boardId = id;
+	var status = "0";
+	$.ajax({
+		  type: "POST",
+		  url: "home/setStatusBoard",
+		  data: {boardId:boardId,status:status},
+		  success: function (response) {
+		  	//alert(response);
+		  	$("#p"+id).remove();
+		  	alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function setFilter()
+{
+	if($("#filterred").is(":checked") == false && $("#filteryellow").is(":checked") == false && $("#filtergreen").is(":checked") == false && $("#filterblue").is(":checked") == false)
+	{
+		var jumlahBoard = $(".boardUser").length;
+		for(var i=0;i<jumlahBoard;i++)
+		{	
+			$(".colBoardUser:eq("+i+")").show();
+		}
+	}
+	else
+	{
+		if($("#filterred").is(":checked"))
+		{
+			setDisplayBoard("red","show");
+		}
+		else
+		{
+			setDisplayBoard("red","hide");
+		}
+		if($("#filteryellow").is(":checked"))
+		{
+			setDisplayBoard("yellow","show");
+			
+		}
+		else
+		{
+			setDisplayBoard("yellow","hide");
+		}
+		if($("#filtergreen").is(":checked"))
+		{
+			setDisplayBoard("green","show");
+			
+		}
+		else
+		{
+			setDisplayBoard("green","hide");
+		}
+		if($("#filterblue").is(":checked"))
+		{
+			setDisplayBoard("blue","show");
+			
+		}
+		else
+		{
+			setDisplayBoard("blue","hide");
+		}
+	}
+	
+}
+
+function setDisplayBoard(color,status)
+{
+	var jumlahBoard = $(".boardUser").length;
+	for(var i=0;i<jumlahBoard;i++)
+	{	
+		if($(".boardUser:eq("+i+")").hasClass(color))
+		{
+			if(status == "show")
+			{
+				$(".colBoardUser:eq("+i+")").show();
+			}
+			else if(status == "hide")
+			{
+				$(".colBoardUser:eq("+i+")").hide();
+			}
+		}
+	}
+}
+
+function findBoards()
+{
+	var text = $("#txtFindBoards").val();
+	if(text != "")
+	{
+		window.location.href="home?find="+text;
+	}
+}
+
+$(document).ready(function() {
+    $(document).keypress(function(e) {
+	    if(e.which == 13) {
+	        if($("#txtFindBoards").is(":focus"))
+	        {
+	        	findBoards();
+	        }
+	    }
+	});
+});
+

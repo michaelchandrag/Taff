@@ -56,7 +56,7 @@ function cekLogout()
 		  type: "POST",
 		  url: "login/logout",
 		  success: function (response) {
-			  alert(response);
+			  //alert(response);
 			  if(response == "Berhasil")
 			  {
 			  	/*var auth2 = gapi.auth2.getAuthInstance();
@@ -98,3 +98,23 @@ function changeData()
 		  }
 		});
 }
+
+function findBoards()
+{
+	var text = $("#txtFindBoards").val();
+	if(text != "")
+	{
+		window.location.href="home?find="+text;
+	}
+}
+
+$(document).ready(function() {
+    $(document).keypress(function(e) {
+	    if(e.which == 13) {
+	        if($("#txtFindBoards").is(":focus"))
+	        {
+	        	findBoards();
+	        }
+	    }
+	});
+});
