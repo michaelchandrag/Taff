@@ -1,0 +1,13 @@
+{
+	"repositories":[
+		{
+			"type":"vcs",
+			"url":"git@github.com:ScorpWebs/fpdf-phalcon.git" 
+		}
+	],
+	"require": {
+				"scorpwebs/fpdf-phalcon": "dev-master",
+		"setasign/fpdf": "1.8.1",
+		"mpdf/mpdf": "^7.0"
+	}
+}

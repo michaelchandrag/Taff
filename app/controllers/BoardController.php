@@ -1,7 +1,6 @@
 <?php
 
-use Phalcon\Loader;
-use Phalcon\Mvc\Url;
+require_once __DIR__ . '/../../vendor/autoload.php';
 class BoardController extends \Phalcon\Mvc\Controller
 {
 
@@ -2374,22 +2373,12 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createPDFAction()
     {
-        $loader = new Loader();
-        $loader->registerClasses(
-            [
-                "FPDF"         => APP_PATH . '/library/FPDF/fpdf.php',
-            ]
-        );
-
-        // Register autoloader
-        $loader->register();
-
-        $pdf = new \FPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial','B',16);
-        $pdf->Cell(40,10,'Hello World!');
+        set_time_limit(0);
         $this->view->disable();
-        $pdf->Output('anjing2.pdf','D');
+        $mpdf = new \Mpdf\Mpdf();
+        $mpdf->WriteHTML('<h1>Hello world!</h1>');
+        $mpdf->Output('filename.pdf', \Mpdf\Output\Destination::DOWNLOAD);
+        exit();
     }
 
     public function createInviteAction()
@@ -2403,10 +2392,47 @@ class BoardController extends \Phalcon\Mvc\Controller
         $loader->register();*/
         $filepath = APP_PATH . '/library/PHPMailer/src/PHPMailer.php';
         if (file_exists($filepath)) {
-            require $filepath;
         }
+        $filepath2 = APP_PATH . '/library/PHPMailer/src/Exception.php';
+        $filepath3 = APP_PATH . '/library/PHPMailer/src/SMTP.php';
+        require_once $filepath;
+        require_once $filepath2;
+        require_once $filepath3;
+        $this->view->disable();
+        $mail = new PHPMailer\PHPMailer\PHPMailer; //Server settings
+            
+        try {
+            $mail->isSMTP();    
+            $mail->SMTPDebug = 2;                                       // Set mailer to use SMTP
+            $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+                                  // Enable verbose debug output
+            $mail->SMTPAuth = true;                            // Enable SMTP authentication
+            $mail->Username = 'canzinzzide@gmail.com';                 // SMTP username
+            $mail->Password = 'cancan110796';                           // SMTP password
+            $mail->SMTPSecure = 'smtp';                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = 465;                                    // TCP port to connect to
+            
+            //Recipients
+            $mail->setFrom('canzinzzide@gmail.com', 'Taff');
+            $mail->addAddress('web-ra4tr@mail-tester.com', '');
 
-        //$mail = new PHPMailer;
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = 'Here is the subject';
+            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+            //$mail->send();
+            if (!$mail->send()) {
+            echo "Mailer Error: " . $mail->ErrorInfo;
+            }
+            else
+            {
+                echo 'Message has been sent';  
+            }
+        } catch (Exception $e) {
+            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+        }
     }
 
 }
