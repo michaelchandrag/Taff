@@ -15,7 +15,58 @@ class HomeController extends ControllerBase
         {
             $this->response->redirect("login");
         }
-    	$board = Board::find();
+        $inviteBoardId = $this->session->get("inviteBoardId");
+        if($inviteBoardId != null || $inviteBoardId != "")
+        {
+            $match = Boardmember::findFirst(
+                [
+                    "conditions" => "boardId='".$inviteBoardId."' AND userId='".$userId."'"
+                ]
+            );
+            if($match == null)
+            {
+                $bm = new Boardmember();
+                $role = $this->session->get("inviteRoleMember");
+                $status = "1";
+                $bm->insertBoardMember($userId,$inviteBoardId,$role,$status);
+            }
+            else
+            {
+                $match->memberStatus = '1';
+                $match->save();
+            }
+            $this->session->remove("inviteBoardId");
+            $this->session->remove("inviteRoleMember");
+        }
+        $inviteGroupId = $this->session->get("inviteGroupId");
+        if($inviteGroupId != null || $inviteGroupId != "")
+        {
+            $match = Groupmember::findFirst(
+                [
+                    "conditions" => "groupUserId='".$groupId."' AND userId='".$userId."'"
+                ]
+            );
+            if($match == null)
+            {
+                $gm = new Groupmember();
+                $role = "Member";
+                $status = "1";
+                $gm->insertGroupMember($userId,$groupId,$role,$status);
+                $this->response->redirect("home");
+            }
+            else
+            {
+                $match->memberStatus = '1';
+                $match->save();
+                $this->response->redirect("home");
+            }
+            $this->session->remove("inviteGroupId");
+        }
+    	$board = Board::find(
+            [
+                "conditions" => "boardClosed='0' AND boardStatus ='1'"
+            ]
+        );
         if($find != null)
         {
             $board = Board::find(
@@ -26,7 +77,11 @@ class HomeController extends ControllerBase
         }
     	$groupMember = new Groupmember();
     	$groupMember = $groupMember->findGroup($userId);
-    	$groupUser = Groupuser::find();
+    	$groupUser = Groupuser::find(
+            [
+                "groupStatus='1'"
+            ]
+        );
     	$boardGroup = Boardgroup::find();
         $profile = Userprofile::findFirst(
             [
@@ -80,30 +135,49 @@ class HomeController extends ControllerBase
             $boardGroup->insertBoardGroup($id,$owner,$title,$status);
             $groupMember = Groupmember::find(
                 [
-                    "groupUserId='".$owner."'"
+                    "groupUserId='".$owner."' AND memberStatus='1'"
                 ]
             );
             foreach($groupMember as $g)
             {
                 $role = "Creator";
-                if($g->userId == $userId)
+                /*if($g->userId == $userId)
                 {
                     $role = "Creator";
                 }
                 else
                 {
                     $role = "Collaborator";
-                }
+                }*/
                 $boardMember = new Boardmember();
                 $boardMember->insertBoardMember($g->userId,$id,$role,$status);
             }
+            //role collaborator dan client
+            $listCreate = "1";
+            $listEdit = "1";
+            $listDelete = "1";
+            $cardCreate = "1";
+            $cardEdit = "1";
+            $cardDelete = "1";
+            $activityAM = "1";
+            $activityLabel = "1";
+            $activityChecklist = "1";
+            $activityStartDate = "1";
+            $activityDueDate = "1";
+            $activityAttachment = "1";
+            $roleStatus = "1";
+            $coll = new Boardrolecollaborator();
+            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
+
+            $client = new Boardroleclient();
+            $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         }
         else
         {
             $role="Creator";
             $boardMember = new Boardmember();
             $boardMember->insertBoardMember($userId,$id,$role,$status);
-            //role collaborator
+            //role collaborator dan client
             $listCreate = "1";
             $listEdit = "1";
             $listDelete = "1";

@@ -21,6 +21,34 @@ class Groupuser extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="groupDescription", type="string", length=200, nullable=true)
+     */
+    public $groupDescription;
+
+    /**
+     *
+     * @var string
+     * @Column(column="groupWebsite", type="string", length=200, nullable=true)
+     */
+    public $groupWebsite;
+
+    /**
+     *
+     * @var string
+     * @Column(column="groupLocation", type="string", length=200, nullable=true)
+     */
+    public $groupLocation;
+
+    /**
+     *
+     * @var string
+     * @Column(column="groupImage", type="string", length=200, nullable=true)
+     */
+    public $groupImage;
+
+    /**
+     *
+     * @var string
      * @Column(column="groupCreated", type="string", nullable=false)
      */
     public $groupCreated;
@@ -39,7 +67,7 @@ class Groupuser extends \Phalcon\Mvc\Model
     {
         $this->setSchema("taff");
         $this->setSource("groupuser");
-        $this->hasMany('groupId', 'Board', 'boardOwner', ['alias' => 'Board']);
+        $this->hasMany('groupId', 'Boardgroup', 'groupId', ['alias' => 'Boardgroup']);
         $this->hasMany('groupId', 'Groupmember', 'groupUserId', ['alias' => 'Groupmember']);
     }
 
@@ -89,6 +117,10 @@ class Groupuser extends \Phalcon\Mvc\Model
         $id = "GU".str_pad($index,5,'0',STR_PAD_LEFT);
         $groupUser->groupId = $id;
         $groupUser->groupName = $name;
+        $groupUser->groupDescription = "";
+        $groupUser->groupWebsite = "";
+        $groupUser->groupLocation = "";
+        $groupUser->groupImage = "groupImage/group.png";
         $groupUser->groupCreated = date("Y-m-d H:i:sa");
         $groupUser->groupStatus = $status;
         $groupUser->save();
@@ -100,9 +132,33 @@ class Groupuser extends \Phalcon\Mvc\Model
             [
                 "groupId='".$id."'" 
             ]
-
         );
         return $groupUser;
+    }
+
+    public function changeData($groupId,$groupName,$groupDescription,$groupWebsite,$groupLocation)
+    {
+        $group = Groupuser::findFirst(
+            [
+                "groupId='".$groupId."'" 
+            ]
+        );
+        $group->groupName = $groupName;
+        $group->groupDescription = $groupDescription;
+        $group->groupWebsite = $groupWebsite;
+        $group->groupLocation = $groupLocation;
+        $group->save();
+    }
+
+    public function deleteGroup($groupId)
+    {
+        $group = Groupuser::findFirst(
+            [
+                "groupId='".$groupId."'" 
+            ]
+        );
+        $group->groupStatus = '0';
+        $group->save();
     }
 
 }

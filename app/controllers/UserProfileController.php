@@ -10,6 +10,16 @@ class UserprofileController extends \Phalcon\Mvc\Controller
         {
             $userId = $_GET["userId"];
         }
+        $sess_userId = $this->session->get("userId");
+        if($sess_userId == null || $userId == "")
+        {
+          $this->response->redirect("home");
+        }
+        $owner = "true";
+        if($sess_userId == $userId)
+          $owner = "true";
+        else
+          $owner = "false";
        	$profile = Userprofile::findFirst(
        		[
        			"userId='".$userId."'"
@@ -30,11 +40,18 @@ class UserprofileController extends \Phalcon\Mvc\Controller
             "userId='".$userId."'"
           ]
         );
+        $user = Userprofile::findFirst(
+          [
+            "userId='".$sess_userId."'"
+          ]
+        );
+        $this->view->user = $user;
         $this->view->groupMember = $groupMember;
         $this->view->groupUser = $groupUser;
        	$this->view->userProfile 	= $profile;
        	$this->view->userId 		= $userId;
        	$this->view->board 			= $board;
+        $this->view->owner = $owner;
     }
 
     public function submitImageAction()
@@ -58,18 +75,35 @@ class UserprofileController extends \Phalcon\Mvc\Controller
       $userId = $_POST["userId"];
       $userName = $_POST["userName"];
       $userBio = $_POST["userBio"];
+      $userLocation = $_POST["userLocation"];
+      $userGender = $_POST["userGender"];
       $profile = Userprofile::findFirst(
             [
                 "userId='".$userId."'"
             ]
         );
-      $profile->changeData($userId,$userName,$userBio);
+      $profile->changeData($userId,$userName,$userBio,$userLocation,$userGender);
       $user = User::findFirst(
         [
           "userId='".$userId."'"
         ]
       );
       $user->setName($userId,$userName);
+      $this->view->disable();
+      echo "Berhasil";
+    }
+
+    public function changePasswordAction()
+    {
+      $userId = $_POST["userId"];
+      $userPassword = $_POST["userPassword"];
+      $userPassword = md5($userPassword);
+      $user = User::findFirst(
+        [
+          "userId='".$userId."'"
+        ]
+      );
+      $user->setPassword($userId,$userPassword);
       $this->view->disable();
       echo "Berhasil";
     }

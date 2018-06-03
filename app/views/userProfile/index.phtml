@@ -1,12 +1,3 @@
-<!-- Start Page Loading -->
-<div id="loader-wrapper">
-	<div id="loader"></div>        
-	<div class="loader-section section-left"></div>
-	<div class="loader-section section-right"></div>
-</div>
-<!-- End Page Loading -->
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
 
 <!-- START HEADER -->
 <header id="header" class="page-topbar">
@@ -25,13 +16,13 @@
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
 					</li>
 					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
+		                    if(strpos($user->userImage,"userImage") !== false)
 		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                   		echo $user->userImage."?".filemtime($user->userImage); 
 		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    else if(strpos($user->userImage,"googleusercontent.com") !== false)
 		                    {
-		                    	echo $userProfile->userImage;
+		                    	echo $user->userImage;
 		                    }
 		                    else
 		                    {
@@ -44,14 +35,14 @@
 				<!-- translation-button -->
 				<ul id="translation-dropdown" class="dropdown-content">
 				  <li>
-					<a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
+					<a href="userProfile?userId=<?php echo $user->userId ?>"><img src="<?php 
+		                    if(strpos($user->userImage,"userImage") !== false)
 		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+		                   		echo $user->userImage."?".filemtime($user->userImage); 
 		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+		                    else if(strpos($user->userImage,"googleusercontent.com") !== false)
 		                    {
-		                    	echo $userProfile->userImage;
+		                    	echo $user->userImage;
 		                    }
 		                    else
 		                    {
@@ -145,57 +136,6 @@
 			<div class="container">
 				<!-- trello start here -->
 				<div class="section">
-					<div id="modalcreateboard" class="modal">
-		                  <div class="modal-content">
-		                    <div class="col s12 m6 l12">
-		                    	<div class="row">
-		                    		<h6><b>Create a board..</b></h6>
-		                    		<div class="divider"></div>
-		                    		<p>Title</p>
-		                    		<input type="text" placeholder="Title..">
-		                    	</div>
-		                    </div>
-		                  </div>
-		                  <div class="modal-footer">
-		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-		                  	<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
-		                  </div>
-	                </div>
-	                <div id="modalcreategroup" class="modal">
-		                  <div class="modal-content">
-		                    <div class="col s12 m6 l12">
-		                    	<div class="row">
-		                    		<h6><b>Create a group board..</b></h6>
-		                    		<div class="divider"></div>
-		                    		<p>Name</p>
-		                    		<input type="text" placeholder="Name..">
-		                    	</div>
-		                    </div>
-		                  </div>
-		                  <div class="modal-footer">
-		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-		                  	<a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
-		                  </div>
-	                </div>
-	                <div id="modalclosedboards" class="modal">
-		                  <div class="modal-content">
-		                    <div class="col s12 m6 l12">
-		                    	<div class="row">
-		                    		<h6><b>Closed boards..</b></h6>
-		                    		<div class="divider"></div>
-		                    		<div class="col s12 m6 l12">
-		                    			<p><b>Boards</b></p>
-		                    			<div class="divider"></div>
-		                    			<p>Board Satu <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
-		                    			<p>Board Dua <a href="#" class="ultra-small green-text">Re-open </a><a href="#" class="ultra-small red-text">Delete</a></p>
-		                    		</div>
-		                    	</div>
-		                    </div>
-		                  </div>
-		                  <div class="modal-footer">
-		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-		                  </div>
-	                </div>
 				<!-- PROFILE -->
 		        <div id="profile-page" class="section">
 		            <!-- profile-page-header -->
@@ -283,7 +223,18 @@
 		            <!-- profile-page-content -->
 		            <div id="profile-page-content" class="row">
 		              <!-- profile-page-sidebar-->
-		              <div id="profile-page-sidebar" class="col s12 m4">
+		              <div id="profile-page-sidebar" class="col s12 m6"
+		              <?php
+		              	if($owner == "true")
+		              	{
+		              		echo "style='display:block;'";
+		              	}
+		              	else
+		              	{
+		              		echo "style='display:none;'";
+		              	}
+		              ?>
+		              >
 		                <!-- Profile About  -->
 		                <div class="card white">
 		                  <div class="card-content black-text">
@@ -292,17 +243,30 @@
 		                        <div class="input-field">
 		                          <input type="text" value="<?php echo $userProfile->userName; ?>" id="userName">
 		                          <label for="name">Name</label>
+
 		                        </div>
+		                        <label class="red-text" style="display:none;" id="errorName">Name at least 3 characters.</label>
 		                        <div class="input-field">
-		                          <input id="email" type="tel" class="validate" value="<?php echo $userProfile->userEmail; ?>" disabled>
+		                          <input id="email" type="email" class="validate" value="<?php echo $userProfile->userEmail; ?>" disabled>
 		                          <label for="email">Email</label>
 		                        </div>
 		                        <div class="input-field">
 		                          <textarea class="materialize-textarea" length="120" id="userBio"><?php echo $userProfile->userBio; ?></textarea>
                           		  <label for="bio">Bio</label>
 		                        </div>
+		                        <div class="input-field">
+		                          <input type="text" value="<?php echo $userProfile->userLocation ?>" id="userLocation">
+		                          <label for="name">Location</label>
+		                        </div>
+		                        <div class="input-field">
+                          		  	<label for="bio">Gender</label><br>
+		                          	<input name="rgender" type="radio" id="rmale" <?php if($userProfile->userGender == "Male") echo "checked='checked'"?> />
+                      				<label for="rmale">Male</label>
+                      				<input name="rgender" type="radio" id="rfemale" <?php if($userProfile->userGender == "Female") echo "checked='checked'"?>/>
+                      				<label for="rfemale">Female</label>
+		                        </div>
 		                        <div class="input-field right-align" style="margin-bottom:15px;">
-		                        	<a onclick="changeData()" class="btn waves-effect waves-light red">Change Profile<i class="mdi-content-send right"></i>></a>
+		                        	<a onclick="changeData()" class="btn waves-effect waves-light red">Change Profile<i class="mdi-content-send right"></i></a>
 		                          </div>
 		                        <div class="divider"></div>
 		                    	<div class="file-field input-field">
@@ -314,20 +278,24 @@
 			                        <input class="file-path validate" type="text">
 			                      </div>
 			                    </div>
+			                    <label class="red-text" style="display:none;" id="errorImage">File is not supported.</label>
 		                        <div class="input-field right-align" style="margin-bottom:15px;">
 		                        	<a onclick="changeProfile()" href="javascript:void(0);" class="btn waves-effect waves-light green">Change Image<i class="mdi-content-send right"></i></a>
 		                        </div>
 		                        <div class="divider"></div>
 		                        <div class="input-field">
-		                          <input id="newpass" type="text" class="validate">
+		                          <input id="newpass" type="password" class="validate">
 		                          <label for="newpass">New Password</label>
 		                        </div>
 		                        <div class="input-field">
-		                          <input id="confpass" type="text" class="validate">
+		                          <input id="confpass" type="password" class="validate">
 		                          <label for="confpass">Confirm Password</label>
 		                        </div>
+		                        <div class="input-field" id="errorChangePassword" style="display:none;">
+		                        	<label class="red-text">Password must be at least 1 character and have to match with confirm password.</label><br><br>
+		                        </div>
 			                      <div class="input-field right-align">
-		                        	<a onclick="changePassword()" class="btn waves-effect waves-light red">Change Password<i class="mdi-content-send right"></i>></a>
+		                        	<a onclick="changePassword()" class="btn waves-effect waves-light red">Change Password<i class="mdi-content-send right"></i></a>
 		                          </div>
 		                  </div>                  
 		                </div>
@@ -351,9 +319,9 @@
                               		{
                               			foreach($groupUser as $u)
                               			{
-                              				if($g->groupUserId == $u->groupId)
+                              				if($g->groupUserId == $u->groupId && $u->groupStatus == "1")
                               				{
-                              					echo " - ".$u->groupName."</br>";
+                              					echo " - <a href='groupprofile?id=".$u->groupId."'>".$u->groupName."</a></br>";
                               				}
                               			}
                               		}
@@ -390,7 +358,11 @@
                               <div class="divider"></div>
                               <p id="visitUserBio" style="margin-top:-25px;"> 
                               	<b><u>Bio</u></b></br>
-                              	<?php echo $userProfile->userBio ?>
+                              	<?php echo $userProfile->userBio ?></br></br>
+                              	<b><u>Location</u></b></br>
+                              	<?php echo $userProfile->userLocation ?></br></br>
+                              	<b><u>Gender</u></b></br>
+                              	<?php echo $userProfile->userGender ?></br></br>
                               </p>
                             </div>
                           </li>

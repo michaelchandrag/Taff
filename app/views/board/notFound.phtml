@@ -1,0 +1,162 @@
+
+<!-- START HEADER -->
+<header id="header" class="page-topbar">
+    <!-- start header nav-->
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">                      
+                  <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
+                </ul>
+                <div class="header-search-wrapper hide-on-med-and-down">
+                    <i class="mdi-action-search"></i>
+                    <input type="text" id="txtFindBoards" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
+
+                            ?>" width="32px" height="32px" style="border-radius:50%" /></a>
+                    </li>
+                </ul>
+                <!-- translation-button -->
+                <ul id="translation-dropdown" class="dropdown-content">
+                  <li>
+                    <a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
+
+                            ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0);" onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+                  </li>
+                  
+                </ul>
+            </div>
+        </nav>
+
+        <!-- HORIZONTL NAV START-->
+         <nav id="horizontal-nav" class="white hide-on-med-and-down">
+            <div class="nav-wrapper">                  
+              <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+                <li>
+                    <a href="home" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        <!-- HORIZONTL NAV END-->
+    </div>
+    <!-- end header nav-->
+</header>
+<!-- END HEADER -->
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="user-details cyan darken-2">
+            <div class="row">
+                <div class="col col s4 m4 l4">
+                    <img src="<?php 
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
+
+                            ?>" alt="" class="circle responsive-img valign profile-image">
+                </div>
+                <div class="col col s8 m8 l8">
+                    <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="javascript:void(0);" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
+                </div>
+            </div>
+        </li>
+        <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Profile</a>
+        </li>
+        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="javascript:void(0);" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+<!-- START MAIN -->
+<div id="main">
+    <div id="result"></div>
+    <!-- START WRAPPER -->
+    <div class="wrapper">
+
+        <!-- START CONTENT -->
+        <section id="content">
+
+            <!--start container-->
+            <div class="container">
+                <!-- trello start here -->
+                <div class="section">
+                    <!-- BOARD -->
+                    <div class="row" style="margin-top:-20px;">
+                        <div class="col s6 m4 l4">
+                            <p>
+                                <h1>Board not found.</h1><br>
+
+                            </p>
+                        </div>
+                        <div class="col s6 m4 l8">
+                        </div>
+                    </div>
+                    </div>
+                    <!-- END OF MODAL ACTION CARD-->
+                    <div id="card-stats">
+                    </div>
+                
+                </div>
+
+            </div>
+            <!--end container-->
+        </section>
+        <!-- END CONTENT -->
+
+    </div>
+    <!-- END WRAPPER -->
+</div>
+<!-- END MAIN -->
+
+<script>
+</script>

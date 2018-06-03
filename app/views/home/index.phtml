@@ -142,11 +142,6 @@
     </ul>
     <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
 </aside>
-<!-- END LEFT SIDEBAR NAV-->
-
-
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
 
 <!-- START MAIN -->
 <div id="main">
@@ -168,12 +163,13 @@
 		                    		<p>Title</p>
 		                    		<input type="text" placeholder="Title.." id="boardTitle">
 		                    		<input type="hidden" id="hiddenOwnerId">
+                                    <p class="red-text" id="errorBoardTitle" style="display:none;">Board title is required.</p>
 		                    	</div>
 		                    </div>
 		                  </div>
 		                  <div class="modal-footer">
 		                    <a class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-		                  	<a onclick="createBoard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  	<a onclick="createBoard()" class="waves-effect waves-red btn-flat modal-action">Create</a>
 		                  </div>
 	                </div>
 	                <div id="modalcreategroup" class="modal">
@@ -184,12 +180,13 @@
 		                    		<div class="divider"></div>
 		                    		<p>Name</p>
 		                    		<input type="text" placeholder="Name.." id="groupName">
+                                    <p class="red-text" id="errorGroupTitle" style="display:none;">Group title is required.</p>
 		                    	</div>
 		                    </div>
 		                  </div>
 		                  <div class="modal-footer">
 		                    <a href="#" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-		                  	<a onclick="createGroup()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
+		                  	<a onclick="createGroup()" class="waves-effect waves-red btn-flat modal-action">Create</a>
 		                  </div>
 	                </div>
 	                <div id="modalclosedboards" class="modal">
@@ -233,10 +230,13 @@
                         			$match = false;
                         			foreach($boardFavorite as $f)
                         			{
-                        				if($b->boardId == $f->boardId && $f->favoriteCheck == "1" && $b->boardClosed == "0" && $b->boardStatus == "1")
-                        				{
-                        					$match = true;
-                        				}
+                                        foreach($boardMember as $bm)
+                                        {
+                                            if($b->boardId == $f->boardId && $f->favoriteCheck == "1" && $b->boardClosed == "0" && $b->boardStatus == "1" && $bm->boardId == $f->boardId && $bm->memberStatus == "1")
+                                            {
+                                                $match = true;
+                                            }
+                                        }
                         			}
                         			if($match == true)
                         			{
@@ -244,7 +244,7 @@
 			                            echo '<div class="col s12 m6 l3">';
 			                            echo     '<div class="card">';
 			                            echo 		'<a href="board?id='.$b->boardId.'" >';
-			                            echo         '<div class="card-content  '.$b->boardBackground.' white-text">';
+			                            echo         '<div class="card-content  '.$b->boardBackground.' black-text">';
 			                            echo             '<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
 			                            echo         '</div>';
 			                            echo         '<div class="card-action  '.$b->boardBackground.' darken-2">';
@@ -277,7 +277,7 @@
 			                			echo '<a href="board?id='.$r->boardId.'" >';
 			                    		echo 	'<div class="card">';
 			                    		echo 		'<div class="secondary-content yellow"></div>';
-			                            echo    	'<div class="card-content '.$r->boardBackground.' white-text boardUser">';
+			                            echo    	'<div class="card-content '.$r->boardBackground.' black-text boardUser">';
 			                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
 			                            echo   		'</div>';
 			                            echo    	'<div class="card-action '.$r->boardBackground.' darken-2">';
@@ -290,30 +290,6 @@
                					}
                				}
                			}
-                		/*foreach($board as $r)
-                		{	
-                			if($r->boardOwner == $userId)
-                			{
-                				if($r->boardGroup == "0" && $r->boardClosed == "0" && $r->boardStatus == "1")
-                				{
-
-		                			echo '<div class="col s12 m6 l3">';
-		                			echo '<a href="board?id='.$r->boardId.'" >';
-		                    		echo 	'<div class="card">';
-		                    		echo 		'<div class="secondary-content yellow"></div>';
-		                            echo    	'<div class="card-content '.$r->boardBackground.' white-text">';
-		                            echo       		'<h2 class="card-stats-title">'.$r->boardTitle.'</h2>';      
-		                            echo   		'</div>';
-		                            echo    	'<div class="card-action '.$r->boardBackground.' darken-2">';
-		                            echo        	'<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($r->boardCreated),"d M Y").'</div>';
-		                            echo    	'</div>';
-		                    		echo 	'</div>';
-		                    		echo '</a>';
-		                    		echo '</div>';
-                				}
-                			}
-                    		//date_format($r->boardCreated,"d/M/Y");
-                		}*/
                 		echo '</div>';
                 			
                         echo '<div class="col s12 m6 l3">';
@@ -332,61 +308,161 @@
                 	?>
                 		<div id="ajaxGroup">
 	            	<?php
+                        foreach($groupUser as $g)
+                        {
+                            $active = false;
+                            foreach($groupMember as $gm)
+                            {
+                                if($g->groupId == $gm->groupUserId)
+                                {
+                                    $active = true;
+                                }
+                            }
+                            foreach($boardGroup as $bg)
+                            {
+                                if($g->groupId == $bg->groupId)
+                                {
+                                    foreach($boardMember as $bm)
+                                    {
+                                        if($bm->boardId == $bg->boardId)
+                                        {
+                                            foreach($board as $b)
+                                            {
+                                                if($bg->boardId == $b->boardId && $b->boardClosed == '0' && $b->boardStatus='1')
+                                                {
+                                                    $active = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if($active == true)
+                            {
+                                $groupName = $g->groupName;
+                                $groupId = $g->groupId;
+                                echo '<p class="caption"><img src="'.$g->groupImage.'" width="20px" height="20px" alt="Profile" /><a href="groupprofile?id='.$groupId.'" class="black-text"> <b>'.$groupName.'</b> </a></p>';
+                                echo '<div id="card-stats">';
+                                echo   '<div class="row">';
+                                echo '<div id="ajaxBoard'.$groupId.'" style="margin-top:-25px;">';
+                                foreach($board as $b)
+                                {
+                                    foreach($boardGroup as $bg)
+                                    {
 
-	            		foreach($groupMember as $r) //mendapatkan list group yang terdapat user
+                                        if($b->boardClosed == "0" && $b->boardStatus == "1" && $bg->boardId == $b->boardId && $bg->groupId == $groupId)
+                                        {
+                                            echo        '<div class="col s12 m6 l3 colBoardUser">';
+                                            echo            '<a href="board?id='.$b->boardId.'" >';
+                                            echo            '<div class="card">';
+                                            echo                '<div class="card-content '.$b->boardBackground.' black-text boardUser">';
+                                            echo                    '<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
+                                            echo                '</div>';
+                                            echo                '<div class="card-action '.$b->boardBackground.' darken-2">';
+                                            echo                  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
+                                            echo                '</div>';
+                                            echo            '</div>';
+                                            echo            '</a>';
+                                            echo        '</div>';
+                                        }
+                                    }
+                                }
+                                echo '</div>';
+                                
+                                foreach($groupMember as $gm)
+                                {
+                                    if($g->groupId == $gm->groupUserId && ($gm->memberRole == "Admin" || $gm->memberRole == "Member"))
+                                    {
+                                        echo        '<div class="col s12 m6 l3">';
+                                        echo            '<div class="card">';
+                                        echo                '<div class="card-content grey white-text">';
+                                        echo                        '<a href="#modalcreateboard" class="modal-trigger" onclick="hiddenGroupId(\''.$groupId.'\')">';
+                                        echo                        '<h2 class="card-stats-title white-text">Create a new Board..</h2>';
+                                        echo                    '</a>';
+                                        echo                '</div>';
+                                        echo            '</div>';
+                                        echo        '</div>';
+                                    }
+                                }
+                                
+                                echo    '</div>';
+                                echo '</div>';
+                                echo "<div class='divider'></div>";
+                            }
+
+                        }
+
+	            		/*foreach($groupMember as $r) //mendapatkan list group yang terdapat user
 	            		{
 	            			$groupName = "";
+                            $groupId = "";
+                            $active = "false";
 	            			foreach($groupUser as $g) //mendapatkan nama group
 	            			{
-	            				if($r->groupUserId == $g->groupId)
+	            				if($r->groupUserId == $g->groupId && $g->groupStatus == "1")
 	            				{
 	            					$groupName = $g->groupName;
+                                    $groupId = $g->groupId;
+                                    $active = "true";
 	            				}
 	            			}
-	            			echo '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="#" class="black-text"> <b>'.$groupName.'</b> </a></p>';
-            				echo '<div id="card-stats">';
-	                     	echo   '<div class="row">';
-	                     	echo '<div id="ajaxBoard'.$r->groupUserId.'" style="margin-top:-25px;">';
-			                foreach($boardGroup as $g)
-			                {
-			                	if($g->groupId == $r->groupUserId)
-			                	{
-			                		foreach($board as $b)
-			                		{
-			                			if($b->boardId == $g->boardId && $b->boardClosed == "0" && $b->boardStatus == "1")
-			                			{
-											echo    	'<div class="col s12 m6 l3 colBoardUser">';
-					                        echo 			'<a href="board?id='.$b->boardId.'" >';
-					                        echo        	'<div class="card">';
-					                        echo            	'<div class="card-content '.$b->boardBackground.' white-text boardUser">';
-					                        echo                	'<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
-					                        echo            	'</div>';
-					                        echo            	'<div class="card-action '.$b->boardBackground.' darken-2">';
-					                        echo              	  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
-					                        echo           	 	'</div>';
-					                        echo       	 	'</div>';
-					                        echo 			'</a>';
-					                        echo   	 	'</div>';
-			                			}
-			                		}
-			                	}
-			                }
-			                echo '</div>';
-		            		
 
-	                        echo    	'<div class="col s12 m6 l3">';
-	                        echo        	'<div class="card">';
-	                        echo            	'<div class="card-content grey white-text">';
-	                        echo 						'<a href="#modalcreateboard" class="modal-trigger" onclick="hiddenGroupId(\''.$r->groupUserId.'\')">';
-	                        echo                		'<h2 class="card-stats-title white-text">Create a new Board..</h2>';
-	                        echo                	'</a>';
-	                        echo            	'</div>';
-	                        echo        	'</div>';
-	                        echo    	'</div>';
-	                        echo 	'</div>';
-	                   		echo '</div>';
-	                   		echo "<div class='divider'></div>";
-	            		}
+                            if($active == "true")
+                            {
+                                echo '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="groupprofile?id='.$groupId.'" class="black-text"> <b>'.$groupName.'</b> </a></p>';
+                                echo '<div id="card-stats">';
+                                echo   '<div class="row">';
+                                echo '<div id="ajaxBoard'.$r->groupUserId.'" style="margin-top:-25px;">';
+                                foreach($boardGroup as $g)
+                                {
+                                    if($g->groupId == $r->groupUserId)
+                                    {
+                                        foreach($board as $b)
+                                        {
+                                            $member = false;
+                                            foreach($boardMember as $bm)
+                                            {
+                                                if($bm->boardId == $b->boardId && $bm->userId == $userId && $bm->memberStatus == "1")
+                                                {
+                                                   $member = true;
+                                                }
+                                            }
+                                            if($b->boardId == $g->boardId && $b->boardClosed == "0" && $b->boardStatus == "1" && $member == true)
+                                            {
+                                                echo        '<div class="col s12 m6 l3 colBoardUser">';
+                                                echo            '<a href="board?id='.$b->boardId.'" >';
+                                                echo            '<div class="card">';
+                                                echo                '<div class="card-content '.$b->boardBackground.' white-text boardUser">';
+                                                echo                    '<h2 class="card-stats-title">'.$b->boardTitle.'</h2>';
+                                                echo                '</div>';
+                                                echo                '<div class="card-action '.$b->boardBackground.' darken-2">';
+                                                echo                  '<div id="invoice-line" class="center-align black-text">'.date_format(new DateTime($b->boardCreated),"d M Y").'</div>';
+                                                echo                '</div>';
+                                                echo            '</div>';
+                                                echo            '</a>';
+                                                echo        '</div>';
+                                            }
+                                        }
+                                    }
+                                }
+                                echo '</div>';
+                                
+
+                                echo        '<div class="col s12 m6 l3">';
+                                echo            '<div class="card">';
+                                echo                '<div class="card-content grey white-text">';
+                                echo                        '<a href="#modalcreateboard" class="modal-trigger" onclick="hiddenGroupId(\''.$r->groupUserId.'\')">';
+                                echo                        '<h2 class="card-stats-title white-text">Create a new Board..</h2>';
+                                echo                    '</a>';
+                                echo                '</div>';
+                                echo            '</div>';
+                                echo        '</div>';
+                                echo    '</div>';
+                                echo '</div>';
+                                echo "<div class='divider'></div>";
+                            }
+	            			
+	            		}*/
 	            	?>
 	            	</div>
             	</div>

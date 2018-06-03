@@ -6,6 +6,7 @@ class Userprofile extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Primary
      * @Column(column="userProfileId", type="string", length=50, nullable=false)
      */
     public $userProfileId;
@@ -41,6 +42,20 @@ class Userprofile extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="userLocation", type="string", length=200, nullable=true)
+     */
+    public $userLocation;
+
+    /**
+     *
+     * @var string
+     * @Column(column="userGender", type="string", length=6, nullable=true)
+     */
+    public $userGender;
+
+    /**
+     *
+     * @var string
      * @Column(column="userJoined", type="string", nullable=false)
      */
     public $userJoined;
@@ -48,7 +63,7 @@ class Userprofile extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
-     * @Column(column="userImage", type="string", length=50, nullable=false)
+     * @Column(column="userImage", type="string", length=256, nullable=false)
      */
     public $userImage;
 
@@ -111,6 +126,8 @@ class Userprofile extends \Phalcon\Mvc\Model
         $profile->userEmail     = $email;
         $profile->userBio       = $bio;
         $profile->userJoined    = date("Y-m-d");
+        $profile->userLocation  = "";
+        $profile->userGender    = "";
         $profile->userImage     = $image;
         $profile->userStatus    = $status;
         $profile->save();
@@ -122,7 +139,7 @@ class Userprofile extends \Phalcon\Mvc\Model
         return count($profile);
     }
 
-    public function changeData($userId,$userName,$userBio)
+    public function changeData($userId,$userName,$userBio,$userLocation,$userGender)
     {
         $profile = Userprofile::findFirst(
             [
@@ -131,6 +148,8 @@ class Userprofile extends \Phalcon\Mvc\Model
         );
         $profile->userName = $userName;
         $profile->userBio = $userBio;
+        $profile->userLocation = $userLocation;
+        $profile->userGender = $userGender;
         $profile->save();
     }
 

@@ -1,12 +1,3 @@
-  <!-- Start Page Loading -->
-  <div id="loader-wrapper">
-      <div id="loader"></div>        
-      <div class="loader-section section-left"></div>
-      <div class="loader-section section-right"></div>
-  </div>
-  <!-- End Page Loading -->
-
-
 
 <div id="login-page" class="row">
   <div class="col s12 z-depth-4 card-panel">
@@ -23,12 +14,18 @@
           <input id="email" type="email">
           <label for="email" class="center-align">Email</label>
         </div>
+        <div class="col s12" style="margin-left:15%;margin-top:-5%;display:none;" id="errorEmail">
+            <label class="center-align red-text">Email required.</label>
+        </div>
       </div>
       <div class="row margin">
         <div class="input-field col s12">
           <i class="mdi-action-lock-outline prefix"></i>
           <input id="password" type="password">
           <label for="password">Password</label>
+        </div>
+        <div class="col s12" style="margin-left:15%;margin-top:-5%;display:none;" id="errorPass">
+            <label class="center-align red-text">Password required.</label>
         </div>
       </div>
       <div class="row">          
@@ -38,18 +35,23 @@
         </div>
       </div>
       <div class="row">
+
+        <div class="col s12" style="display:none;" id="errorLogin">
+            <label class="center-align red-text">Incorrect email and password.</label>
+        </div>
         <div class="input-field col s12">
           <a class="btn waves-effect waves-light col s12" onclick="cekLogin()">Login</a>
         </div>
       </div>
+      <div class="divider"></div>
       <div class="row">
         <div class="input-field col s12">
           <div id="my-signin2" onclick="googleLogin()"></div>
         </div>
       </div>
       <div class="row">
-        <div class="input-field col s6 m6 l6">
-          <p class="margin medium-small"><a href="register">Register Now!</a></p>
+        <div class="input-field col s6 m6 l12">
+          <p class="margin medium-small">Don't have an account yet? <a href="register">Register now!</a></p>
         </div>        
       </div>
 

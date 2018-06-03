@@ -1,0 +1,13 @@
+
+#card-stats {
+	white-space: nowrap;
+	min-width:100%;
+	width:1000%;
+}
+.colListUser {
+	float:left;
+	display: inline-block;
+	width:1.5%;
+	margin:5px;
+	overflow:auto;
+}

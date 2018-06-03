@@ -114,12 +114,22 @@ class Groupmember extends \Phalcon\Mvc\Model
     {
         $groupMember = Groupmember::find(
             [
-                "userId = '".$id."'"
+                "conditions" => "userId = '".$id."' and memberStatus='1'"
             ]
-
         );
         return $groupMember;
 
+    }
+
+    public function leaveGroup($groupId,$userId)
+    {
+        $groupMember = Groupmember::findFirst(
+            [
+                "conditions" => "groupUserId='".$groupId."' and userId='".$userId."'"
+            ]
+        );
+        $groupMember->memberStatus = "0";
+        $groupMember->save();
     }
 
 }

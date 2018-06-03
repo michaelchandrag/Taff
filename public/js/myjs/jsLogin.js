@@ -3,6 +3,9 @@ function cekLogin()
 	var email = $("#email").val();
 	var password = $("#password").val();
 	var remember = "false";
+    $("#errorEmail").hide();
+    $("#errorPass").hide();
+    $("#errorLogin").hide();
 	if ($('#remember').is(":checked"))
 	{
 		remember = "true";
@@ -20,12 +23,16 @@ function cekLogin()
 			  url: "login/login",
 			  data: {email:email,password:password,remember:remember},
 			  success: function (response) {
-				  alert(response);
+				  //alert(response);
 				  if(response == "Berhasil")
 				  {
 				 	window.location.href = "home";
 
 				  }
+                  else
+                  {
+                    $("#errorLogin").show();
+                  }
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -36,7 +43,10 @@ function cekLogin()
 	}
 	else
 	{
-		alert("Error");
+        if(email.length < 1)
+            $("#errorEmail").show();
+        if(password.length < 1)
+            $("#errorPass").show();
 	}
 }
 
@@ -78,7 +88,7 @@ function onSuccess(googleUser) {
 	  url: "login/googleLogin",
 	  data: {name:name,email:email,password:password,image:image,remember:remember},
 	  success: function (response) {
-		  alert(response);
+		  //alert(response);
 		  if(response == "Berhasil")
 		  {
 

@@ -1,20 +1,27 @@
 <?php
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Helper\Sample;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 class BoardController extends \Phalcon\Mvc\Controller
 {
 
     public function indexAction()
     {
         $userId = $this->session->get("userId");
-        if($userId == null)
-        {
-            $this->response->redirect("login");
-        }
+        
         $boardId = "";
         if(isset($_GET["id"]))
         {
             $boardId = $_GET["id"];
+        }
+        if($userId == null)
+        {
+            $this->response->redirect("home");
         }
     	$board = "";
     	$boardList = "";
@@ -24,6 +31,40 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "boardId='".$boardId."'"
             ]
         );
+        $board2 = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        if($board2 == null || $board2 == "")
+        {
+            $this->view->pick("board/notFound");
+        }
+        if(empty($boardId))
+        {
+            $this->view->pick("board/notFound");
+        }
+
+        foreach($board as $b)
+        {
+            if($b->boardClosed == "1" && $b->boardStatus == "1")
+            {
+                $this->view->pick("board/closed");
+            }
+            else if($b->boardStatus == "0")
+            {
+                $this->view->pick("board/notFound");
+            }
+            $bm = Boardmember::findFirst(
+                [
+                    "conditions" => "boardId='".$b->boardId."' AND userId='".$userId."'"
+                ]
+            );
+            if($bm->memberStatus != "1" || $bm == null)
+            {
+                $this->view->pick("board/nonMember");
+            }
+        }
         $boardList = Boardlist::find(
             [
                 "listBoardId='".$boardId."'",
@@ -46,12 +87,31 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "userId='".$userId."'"
             ]
         );
+        $role = Boardmember::findFirst(
+            [
+                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
+            ]
+        );
+        $roleColl = Boardrolecollaborator::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $roleCli = Boardroleclient::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+        $this->assets->addCss("css/cssku.css");
         $this->view->userId            = $userId;
         $this->view->userProfile       = $profile;
     	$this->view->board             = $board;
         $this->view->boardLabelCard    = $boardLabelCard;
     	$this->view->boardList         = $boardList;
     	$this->view->boardCard         = $boardCard;
+        $this->view->role              = $role->memberRole; //Creator - Collaborator - Client
+        $this->view->roleCollaborator  = $roleColl;
+        $this->view->roleClient        = $roleClient;
     }
 
     public function createListAction()
@@ -120,6 +180,169 @@ class BoardController extends \Phalcon\Mvc\Controller
     	$this->view->disable();
 		echo $cardId;
 
+    }
+
+    public function copyListAction()
+    {
+        $title = $_POST["title"];
+        $owner = $_POST["owner"];
+        $listId = $_POST["listId"];
+        $boardId = $owner;
+        $archive = "0";
+        $status = "1";
+        $list = new Boardlist();
+        $index = $list->countList();
+        $id = "BL".str_pad($index,5,'0',STR_PAD_LEFT);
+        $listTujuan = $id;
+        $list->insertBoardList($owner,$title,$archive,$status);
+
+        $card = Boardcard::find(
+            [
+                "conditions"=>"cardListId='".$listId."' AND cardArchive='0' AND cardStatus='1'",
+                "order"=>"cardPosition ASC"
+            ]
+        );
+        $arrCard = [];
+        foreach($card as $c)
+        {
+            $cardId = $c->cardId;
+            $title = $c->cardTitle;
+            $archive = $c->cardArchive;
+            $status = $c->cardStatus;
+            $description = $c->cardDescription;
+            $c2 = new Boardcard();
+            $index = $c->countCard();
+            $cardIdAkhir    = "BC".str_pad($index,5,'0',STR_PAD_LEFT);
+            $userId = $this->session->get("userId");
+            $c2->insertBoardCard($listTujuan,$boardId,$userId,$title,$description,$archive,$status);
+            $assign = Boardassignmembers::find(
+                [
+                    "conditions"=>"cardId='".$cardId."' AND assignStatus='1'"
+                ]
+            );
+            foreach($assign as $a)
+            {
+                $userIdAM = $a->userId;
+                $userNameAM = $a->userName;
+                $checkedAM = $a->assignChecked;
+                $statusAM = $a->assignStatus;
+                $assign2 = new Boardassignmembers();
+                $assign2->insertBoardAssignMembers($cardIdAkhir,$userIdAM,$userNameAM,$checkedAM,$statusAM);
+            }
+            $label = Boardlabelcard::findFirst(
+                [
+                    "conditions"=>"cardId='".$cardId."'"
+                ]
+            );
+            if($label != false || $label != null)
+            {
+                $red2 = $label->labelRed;
+                $yellow2 = $label->labelYellow;
+                $green2 = $label->labelGreen;
+                $blue2 = $label->labelBlue;
+                $status2 = $label->labelStatus;
+                $label2 = new Boardlabelcard();
+                $label2->insertBoardLabelCard($boardId,$cardIdAkhir,$red2,$yellow2,$green2,$blue2,$status2);
+            }
+            $attachment = Boardattachment::find(
+                [
+                    "conditions"=>"cardId='".$cardId."' and attachmentStatus='1'"
+                ]
+            );
+            foreach($attachment as $att)
+            {
+                $title2 = $att->attachmentTitle;
+                $directory2 = $att->attachmentDirectory;
+                $status2 = $att->attachmentStatus;
+                $attachment2 = new Boardattachment();
+                $attachment2->insertBoardAttachment($boardId,$cardIdAkhir,$title2,$directory2,$status2);
+            }
+            $checklist = Boardchecklist::find(
+                [
+                    "conditions"=>"cardId='".$cardId."' AND checklistStatus='1'"
+                ]
+            );
+            foreach($checklist as $check)
+            {
+                $idChecklist = $c->checklistId;
+                $title2 = $c->checklistTitle;
+                $status2 = $c->checklistStatus;
+                $checklist2      = new Boardchecklist();
+                $index          = $checklist2->countChecklist();
+                $id             = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
+                $checklist2->insertBoardChecklist($cardIdAkhir,$title2,$status2);
+
+                //insert checklist item
+                $item = Boardchecklistitem::find(
+                    [
+                           "conditions"=>"checklistId='".$idChecklist."' and itemStatus='1'"  
+                    ]
+                ); 
+                foreach($item as $i)
+                {
+                    $title3 = $i->itemTitle;
+                    $checked3 = $i->itemChecked;
+                    $status3 = $i->itemStatus;
+                    $item2 = new Boardchecklistitem(); 
+                    $item2->insertBoardChecklistItem($id,$cardIdAkhir,$title3,$checked3,$status3);
+                }
+            }
+            //item
+            $start = Boardstartdate::findFirst(
+                [
+                    "conditions"=>"cardId='".$cardId."' AND startDateStatus='1'"
+                ]
+            );
+            if($start != null || $start != false)
+            {
+                $d2 = $start->startDate; //2018-04-12 12:00:00
+                $pecah = explode(" ",$d2);
+                $pecah2 = explode("-",$pecah[0]); //date
+                $bln = $pecah2[1];
+                $thn = $pecah2[0];
+                $tgl = $pecah2[2];
+                $pecah3 = explode(":",$pecah[1]); //time
+                $time = $pecah3[0];
+                $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+                $checked2 = $start->startDateChecked;
+                $status2 = $start->startDateStatus;
+                $date = new Boardstartdate();
+                $date->insertBoardStartDate($cardIdAkhir,$d3,$checked2,$status2);
+            }
+            $due = Boardduedate::findFirst(
+                [
+                    "conditions"=>"cardId='".$cardId."' AND dueDateStatus='1'"
+                ]
+            );
+            if($due != null || $due != false)
+            {
+                $d2 = $due->dueDate;
+                $pecah = explode(" ",$d2);
+                $pecah2 = explode("-",$pecah[0]); //date
+                $bln = $pecah2[1];
+                $thn = $pecah2[0];
+                $tgl = $pecah2[2];
+                $pecah3 = explode(":",$pecah[1]); //time
+                $time = $pecah3[0];
+                $d3=mktime($time, 00, 00, $bln, $tgl, $thn);
+                $checked2 = $due->dueDateChecked;
+                $status2 = $due->dueDateStatus;
+                $date = new Boardduedate();
+                $date->insertBoardDueDate($cardIdAkhir,$d3,$checked2,$status2);
+            }
+            $arr = array(
+                'cardId'=> $cardIdAkhir,
+                'cardTitle'=>$title,
+                'label'=>$label
+            );
+            array_push($arrCard,$arr);
+        }
+        $datas = array(
+            'listId'=>$listTujuan,
+            'card'=>$arrCard
+        );
+        $this->view->disable();
+        echo json_encode($datas);
     }
 
     public function copyAllCardAction()
@@ -519,6 +742,210 @@ class BoardController extends \Phalcon\Mvc\Controller
         echo $description;
     }
 
+    public function getCardDetailsAction()
+    {
+        $cardId = $_POST["id"];
+        $boardId = $_POST["boardId"];
+        $cardTitle = "";
+        $cardDescription = "";
+        $listTitle = "";
+        $data = array();
+        function getProfile($userId)
+        {
+            $profile = Userprofile::findFirst(
+                [
+                    "userId='".$userId."'"
+                ]
+            );
+            return $profile;
+        }
+        $card = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$card->cardListId."'"
+            ]
+        );
+        $cardTitle          = $card->cardTitle;
+        $cardDescription    = $card->cardDescription;
+        $listTitle          = $list->listTitle;
+        $cardListId         = $card->cardListId;
+        //header
+        $data = array(
+            'cardId'            => $cardId, 
+            'cardTitle'         => $cardTitle,
+            'cardDescription'   => $cardDescription,
+            'cardListId'        => $cardListId,
+            'listTitle'         => $listTitle
+        );
+        $datas[] = $data;
+        //assign member
+        $dataAssign = [];
+        $member = Boardmember::find(
+            [
+                "conditions" => "boardId='".$boardId."' AND memberStatus='1'"
+            ]
+        );
+        foreach($member as $member)
+        {
+            $profile = Userprofile::findFirst(
+                [
+                    "userId='".$member->userId."'"
+                ]  
+            );
+            $assign = Boardassignmembers::findFirst(
+                [
+                    "cardId='".$cardId."' and userId='".$member->userId."'"
+                ]
+            );
+            $check = "false";
+            if($assign != null && $assign->assignChecked == "1")
+            {
+                $check = "true";
+            }
+            $arr = array(
+                'userId' => $profile->userId,
+                'userImage' => $profile->userImage,
+                'userName' => $profile->userName,
+                'checked' => $check,
+                'memberStatus' => $member->memberStatus
+            );
+            array_push($dataAssign,$arr);
+        }
+        
+
+        //label card
+        $label = Boardlabelcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        //start date
+        $startDate = Boardstartdate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        //due date
+        $dueDate = Boardduedate::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        //checklist
+        $assChecklist = [];
+        $checklist = Boardchecklist::find(
+            [
+                "conditions"=>"cardId='".$cardId."' AND checklistStatus='1'"
+            ]
+        );
+        foreach($checklist as $checklist)
+        {
+            $checklistId = $checklist->checklistId;
+            $checklistTitle = $checklist->checklistTitle;
+            $checklistStatus = $checklist->checklistStatus;
+            $arrItem = array();
+            $item = Boardchecklistitem::find(
+                [
+                    "conditions"=>"checklistId='".$checklistId."' AND itemStatus='1'"
+                ]
+            );
+            foreach($item as $item)
+            {
+                $itemId = $item->itemId;
+                $itemTitle = $item->itemTitle;
+                $itemChecked = $item->itemChecked;
+                $itemStatus = $item->itemStatus;
+                $arrItem2 = array(
+                    'itemId'=>$itemId,
+                    'itemTitle'=>$itemTitle,
+                    'itemChecked'=>$itemChecked,
+                    'itemStatus'=>$itemStatus
+                );
+                array_push($arrItem,$arrItem2);
+            }
+            $arr = array(
+                'checklistId'=>$checklistId,
+                'checklistTitle'=>$checklistTitle,
+                'checklistStatus'=>$checklistStatus,
+                'item'=>$arrItem
+            );
+            array_push($assChecklist,$arr);
+        }
+        //comment
+        $assComment = [];
+        $comment = Boardcomment::find(
+            [
+                "conditions"=>"cardId='".$cardId."' AND commentStatus='1'"
+            ]
+        );
+        foreach($comment as $comment)
+        {
+            $commentId = $comment->commentId;
+            $commentUserId = $comment->userId;
+            $commentText = $comment->commentText;
+            $commentStatus = $comment->commentStatus;
+            $userProfile = getProfile($comment->userId);
+            $commentName = $userProfile->userName;
+            $commentDirectory = $userProfile->userImage;
+            $arrReply = array();
+            $reply = Boardreplycomment::find(
+                [
+                    "conditions"=>"commentId='".$commentId."' and replyStatus='1'"
+                ]
+            );
+            foreach($reply as $reply)
+            {
+                $replyId = $reply->replyId;
+                $replyUserId = $reply->userId;
+                $replyText = $reply->replyText;
+                $replyStatus = $reply->replyStatus;
+                $replyUserProfile = getProfile($reply->userId);
+                $replyName = $replyUserProfile->userName;
+                $replyDirectory = $replyUserProfile->userImage;
+                $arr = array(
+                    "replyId"=>$replyId,
+                    "replyUserId"=>$replyUserId,
+                    "replyText"=>$replyText,
+                    "replyStatus"=>$replyStatus,
+                    "replyName"=>$replyName,
+                    "replyDirectory"=>$replyDirectory
+                ); 
+                array_push($arrReply,$arr);
+            }
+            $arrComment = array(
+                "commentId"=>$commentId,
+                "commentUserId"=>$commentUserId,
+                "commentText"=>$commentText,
+                "commentStatus"=>$commentStatus,
+                "commentName"=>$commentName,
+                "commentDirectory"=>$commentDirectory,
+                "commentReply"=>$arrReply
+            );
+            array_push($assComment,$arrComment);
+        }
+        //attachment
+        $attachment = Boardattachment::find(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        //move card
+        $list   = Boardlist::find(
+            [
+                "listBoardId='".$boardId."'",
+                "order"=> "listPosition ASC"
+            ]
+        );
+        $myarray = array("header"=>$datas,"member"=>$dataAssign,"label"=>$label,"startDate"=>$startDate,"dueDate"=>$dueDate,"checklist"=>$assChecklist,"comment"=>$assComment,"attachment"=>$attachment,"move"=>$list);
+
+        $this->view->disable();
+        echo json_encode($myarray);
+    }
+
     public function getBoardCardAction()
     {
     	$cardId = $_POST["id"];
@@ -558,7 +985,7 @@ class BoardController extends \Phalcon\Mvc\Controller
     	$assign = array();
         $assign = Boardmember::find(
             [
-                "boardId='".$boardId."'"
+                "conditions" => "boardId='".$boardId."' AND memberStatus='1'"
             ]
         );
     	$this->view->disable();	
@@ -977,8 +1404,32 @@ class BoardController extends \Phalcon\Mvc\Controller
         }
         $posAkhir = $posAkhir+1;
         $list->setPosition($listId,$posAkhir);
+        $card = Boardcard::find(
+            [
+                "conditions"=>"cardListId='".$listId."' AND cardArchive='0' AND cardStatus='1' AND cardPosition>0",
+                "order" => "cardPosition ASC"
+            ]
+        );
+        $arrCard = [];
+        foreach($card as $card)
+        {
+            $label = Boardlabelcard::findFirst(
+                [
+                    "cardId='".$card->cardId."'"
+                ]
+            );
+            $arr = array(
+                'card'=>$card,
+                'label'=>$label,
+            );
+            array_push($arrCard,$arr);
+        }
+        $datas = array(
+            'listTitle'=>$title,
+            'cardList'=>$arrCard
+        );
         $this->view->disable();
-        echo $title;
+        echo json_encode($datas);
     }
 
     public function deleteCardAction()
@@ -1006,31 +1457,27 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo "Berhasil";
     }
-
-    public function getCardArchiveAction()
+    public function getArchiveAction()
     {
-        $status = "1";
-        $card = array();
+        $boardId = $_POST["boardId"];
+        $archive = "1";
+        $status = "1";        
         $card = Boardcard::find(
             [
-                "cardArchive='".$status."'"
-
-            ]);
-        $this->view->disable();
-        echo json_encode($card);
-    }
-
-    public function getListArchiveAction()
-    {
-        $status = "1";
-        $list = array();
+                "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='".$archive."' AND cardStatus='".$status."'"
+            ]
+        );
         $list = Boardlist::find(
             [
-                "listArchive='".$status."'"
-
-            ]);
+                "conditions"=>"listBoardId='".$boardId."' AND listArchive='".$archive."' AND listStatus='".$status."'"
+            ]
+        );
         $this->view->disable();
-        echo json_encode($list);
+        $datas = array(
+            "card"=>$card,
+            "list"=>$list
+        );
+        echo json_encode($datas);
     }
 
     public function createCommentAction()
@@ -1100,9 +1547,14 @@ class BoardController extends \Phalcon\Mvc\Controller
         $userId = $this->session->get("userId");
         $status = "1";
         $chat = new Boardchat();
+        $user = Userprofile::findfirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
         $chat->insertBoardChat($boardId,$userId,$chatText,$status);
         $this->view->disable();
-        echo "Berhasil";
+        echo json_encode($user);
     }
 
     public function getChatAction()
@@ -1182,6 +1634,27 @@ class BoardController extends \Phalcon\Mvc\Controller
         echo $id;
     }
 
+    public function dropboxAction()
+    {
+        set_time_limit(0);
+        $link = $_POST["link"];
+        $name = $_POST["name"];
+        $boardId = $_POST["boardId"];
+        $cardId = $_POST["cardId"];
+        $extension = $_POST["extension"];
+        $url = file_get_contents( $link );
+        $attachment = new Boardattachment();
+        $index      = $attachment->countAttachment();
+        $id         = "BAT".str_pad($index,5,'0',STR_PAD_LEFT);
+        $directory  = "userAttachment/".$id.".".$extension;
+        $title = $name;
+        $status = "1";
+        $attachment->insertBoardAttachment($boardId,$cardId,$title,$directory,$status);
+        file_put_contents($directory, $url);
+        $this->view->disable();
+        echo $id;
+    }
+
     public function getAttachmentAction()
     {
         $cardId = $_POST["id"];
@@ -1197,15 +1670,31 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function getBoardAction()
     {
-        $boardId    = $_POST["id"];
+        $boardId    = $_POST["boardId"];
+        $userId     = $_POST["userId"];
         $board      = array();
-        $board      = Board::find(
+        $board      = Board::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
+        $favorite = Boardfavorite::findFirst(
+            [
+                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
+            ]
+        );
+        $subscribe = Boardsubscribe::findFirst(
+            [
+                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
+            ]
+        );
+        $arr = array(
+            "board" => $board,
+            "favorite" => $favorite,
+            "subscribe"=>$subscribe
+        );
         $this->view->disable();
-        echo json_encode($board);
+        echo json_encode($arr);
     }
 
     public function changeBackgroundAction()
@@ -1271,7 +1760,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $posTujuan = $_POST["posTujuan"];
         $list = Boardlist::find(
             [
-                "listBoardId='".$boardId."'",
+                "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1' AND listPosition > 0",
                 "order"=>"listPosition ASC"
             ]
         );
@@ -1290,7 +1779,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $ctr = 0;
         foreach($list as $l)
         {
-            if($l->listArchive == "0" && $l->listStatus == "1" && $ctr < $diff)
+            if($ctr < $diff)
             {
 
                 $listId2 = $l->listId;
@@ -1318,6 +1807,66 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo $gerak;
     }
+
+    public function sortListPositionAction()
+    {
+        $boardId = $_POST["boardId"];
+        $listId = $_POST["listId"];
+        $posTujuan = $_POST["posTujuan"];
+        $list = Boardlist::findFirst(
+            [
+                "listId='".$listId."'"
+            ]
+        );
+        $posAwal = $list->listPosition;
+
+
+        $list2 = Boardlist::find(
+            [
+                "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1' AND listPosition > 0",
+                "order"=>"listPosition ASC"
+            ]
+        );
+        $gerak = "";
+        $diff = 0;
+        if($posAwal < $posTujuan)
+        {
+            $diff = $posTujuan - $posAwal;
+            $gerak = "atas";
+        }
+        else
+        {
+            $diff = $posAwal - $posTujuan;
+            $gerak = "bawah";
+        }
+        $ctr = 0;
+        foreach($list2 as $l)
+        {
+            if($ctr < $diff)
+            {
+
+                $listId2 = $l->listId;
+                $position = $l->listPosition;
+                if($gerak == "atas" && $position>$posAwal)
+                {
+                    $position2 = $position-1;
+                    $l->setPosition($listId2,$position2);
+                    $ctr++;
+                }
+                else if($gerak == "bawah" && $position>=$posTujuan)
+                {
+                    $position2 = $position+1;
+                    $l->setPosition($listId2,$position2);
+                    $ctr++;
+                }
+            }
+        }
+        
+        $list->setPosition($listId,$posTujuan);
+        $this->view->disable();
+        echo $gerak;
+    }
+
 
     public function getMoveCardPositionAction()
     {
@@ -1821,6 +2370,69 @@ class BoardController extends \Phalcon\Mvc\Controller
         echo "Berhasil";
     }
 
+    public function getGanttChartAction()
+    {
+        $boardId = $_POST["boardId"];
+        $list = Boardlist::find(
+            [
+                "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'"
+            ]
+        );
+        $datas = [];
+        foreach($list as $list)
+        {
+            $listId = $list->listId;
+            $card = Boardcard::find(
+                [
+                    "conditions"=>"cardListId='".$listId."' AND cardArchive='0' AND cardStatus='1'"
+                ]
+            );
+            $arrCard = [];            
+            foreach($card as $card)
+            {
+                $cardId = $card->cardId;
+                $start = Boardstartdate::findFirst(
+                    [   
+                        "conditions" => "cardId='".$cardId."' AND startDateStatus='1'"
+                    ]
+                );
+                $due = Boardduedate::findFirst(
+                    [
+                        "conditions"=>"cardId='".$cardId."' AND dueDateStatus='1'"
+                    ]
+                );
+                $checklist = Boardchecklist::find(
+                    [
+                        "conditions"=>"cardId='".$cardId."' AND checklistStatus='1'"
+                    ]
+                );
+                $arrChecklist = [];
+                foreach($checklist as $checklist)
+                {
+                    $checklistId = $checklist->checklistId;
+                    $item = Boardchecklistitem::find(
+                        [
+                            "conditions"=>"checklistId='".$checklistId."' AND itemStatus='1'"
+                        ]
+                    );
+                    $arr = array(
+                        'checklist' =>$checklist,
+                        'item'=>$item
+                    );
+                    array_push($arrChecklist,$arr);
+                }
+                $arrC = array(
+                    'card'=>$card,
+                    'startDate'=>$start,
+                    'dueDate'=>$due,
+                    'checklist'=>$arrChecklist
+                );
+                array_push($datas,$arrC);
+            }
+        }
+        $this->view->disable();
+        echo json_encode($datas);
+    }
     public function getCardListAction()
     {
         $listId = $_POST["listId"];
@@ -2166,34 +2778,25 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo "Berhasil";
     }
-
-    public function getProgressDateAction()
+    public function getProgressAction()
     {
         $boardId = $_POST["boardId"];
-        $d = "";
         $date = Boardprogressdate::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
-        if($date != null)
-        { 
-            $d = $date->date;
-        }
-        $this->view->disable();
-        echo $d;
-    }
-
-    public function getProgressItemAction()
-    {
-        $boardId = $_POST["boardId"];
         $item = Boardprogressitem::find(
             [
-                "boardId='".$boardId."'"
+                "conditions"=>"boardId='".$boardId."' AND itemStatus='1'"
             ]
         );
+        $datas = array(
+            "date"=>$date,
+            "item"=>$item
+        );
         $this->view->disable();
-        echo json_encode($item);
+        echo json_encode($datas);
     }
 
     public function setProgressItemAction()
@@ -2254,59 +2857,29 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->view->disable();
         echo "Berhasil";
     }
-
-    public function getRoleCollaboratorAction()
+    public function getRoleCollaboratorClientAction()
     {
         $boardId = $_POST["boardId"];
-        $role = Boardrolecollaborator::find(
+        $collaborator = Boardrolecollaborator::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
-        $this->view->disable();
-        echo json_encode($role);
-
-    }
-
-    public function getRoleClientAction()
-    {
-        $boardId = $_POST["boardId"];
-        $role = Boardroleclient::find(
+        $client = Boardroleclient::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
-        $this->view->disable();
-        echo json_encode($role);
-    }
-
-    public function setRoleClientAction()
-    {
-        $boardId = $_POST["boardId"];
-        $cliListCreate  = $_POST["cliListCreate"];
-        $cliListEdit    = $_POST["cliListEdit"];
-        $cliListDelete  = $_POST["cliListDelete"];
-        $cliCardCreate  = $_POST["cliCardCreate"];
-        $cliCardEdit    = $_POST["cliCardEdit"];
-        $cliCardDelete  = $_POST["cliCardDelete"];
-        $cliActAM       = $_POST["cliActAM"];
-        $cliActLabel    = $_POST["cliActLabel"];
-        $cliActCheck    = $_POST["cliActCheck"];
-        $cliActStart    = $_POST["cliActStart"];
-        $cliActDue      = $_POST["cliActDue"];
-        $cliActAtt      = $_POST["cliActAtt"];
-
-        $cli = Boardroleclient::findFirst(
-            [
-                "boardId='".$boardId."'"
-            ]
+        $datas = array(
+            "collaborator"=>$collaborator,
+            "client"=>$client
         );
-        $cli->setRoleClient($boardId,$cliListCreate,$cliListEdit,$cliListDelete,$cliCardCreate,$cliCardCreate,$cliCardDelete,$cliActAM,$cliActLabel,$cliActCheck,$cliActStart,$cliActDue,$cliActAtt);
         $this->view->disable();
-        echo "Berhasil";
+        echo json_encode($datas);
+
     }
 
-    public function setRoleCollaboratorAction()
+    public function setRoleCollaboratorClientAction()
     {
         $boardId = $_POST["boardId"];
         $collListCreate = $_POST["collListCreate"];
@@ -2321,7 +2894,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $collActStart   = $_POST["collActStart"];
         $collActDue     = $_POST["collActDue"];
         $collActAtt     = $_POST["collActAtt"];
-        /*$cliListCreate  = $_POST["cliListCreate"];
+        $cliListCreate  = $_POST["cliListCreate"];
         $cliListEdit    = $_POST["cliListEdit"];
         $cliListDelete  = $_POST["cliListDelete"];
         $cliCardCreate  = $_POST["cliCardCreate"];
@@ -2332,19 +2905,19 @@ class BoardController extends \Phalcon\Mvc\Controller
         $cliActCheck    = $_POST["cliActCheck"];
         $cliActStart    = $_POST["cliActStart"];
         $cliActDue      = $_POST["cliActDue"];
-        $cliActAtt      = $_POST["cliActAtt"];*/
+        $cliActAtt      = $_POST["cliActAtt"];
         $coll = Boardrolecollaborator::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
         $coll->setRoleCollaborator($boardId,$collListCreate,$collListEdit,$collListDelete,$collCardCreate,$collCardEdit,$collCardDelete,$collActAM,$collActLabel,$collActCheck,$collActStart,$collActDue,$collActAtt);
-        /*$cli = Boardroleclient::findFirst(
+        $cli = Boardroleclient::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
         );
-        $cli->setRoleClient($boardId,$collListCreate,$collListEdit,$collListDelete,$collCardCreate,$collCardEdit,$collCardDelete,$collActAM,$collActLabel,$collActCheck,$collActStart,$collActDue,$collActAtt);*/
+        $cli->setRoleClient($boardId,$cliListCreate,$cliListEdit,$cliListDelete,$cliCardCreate,$cliCardCreate,$cliCardDelete,$cliActAM,$cliActLabel,$cliActCheck,$cliActStart,$cliActDue,$cliActAtt);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2371,69 +2944,716 @@ class BoardController extends \Phalcon\Mvc\Controller
         echo $response;
     }
 
-    public function createPDFAction()
+    public function createPDFAction($boardId)
     {
         set_time_limit(0);
+        $boardId = $boardId;
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+
+        function getUser($userId)
+        {
+            $user = User::findFirst(
+                [
+                    "userId='".$userId."'"
+                ]
+            );
+            return $user;
+        }
+        function getProgressDate($boardId)
+        {
+            $pd = Boardprogressdate::findFirst(
+                [
+                    "boardId='".$boardId."'"
+                ]
+            );
+            return $pd;
+        }
+        function getProgressItem($boardId)
+        {
+            $pi = Boardprogressitem::find(
+                [
+                    "conditions" => "boardId='".$boardId."' AND itemStatus='1'"
+                ]
+            );
+            return $pi;
+
+        }
+        function getBoardMember($boardId)
+        {
+            $bm = Boardmember::find(
+                [
+                    "conditions" => "boardId='".$boardId."' AND memberStatus='1'"
+                ]
+            );
+            return $bm;
+        }
+        function getBoardList($boardId)
+        {
+            $list = Boardlist::find(
+                [
+                    "conditions" => "listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'",
+                    "order" => "listPosition ASC"
+                ]
+            );
+            return $list;
+        }
+        function getBoardCard($listId)
+        {
+            $card = Boardcard::find(
+                [
+                    "conditions" => "cardListId='".$listId."' AND cardArchive='0' AND cardStatus='1'",
+                    "order" => "cardPosition ASC"
+                ]
+            );
+            return $card;
+        }
+        function getStartDate($cardId)
+        {
+            $date = Boardstartdate::findFirst(
+                [
+                    "conditions" => "cardId='".$cardId."' AND startDateStatus='1'"
+                ]
+            );
+            return $date;
+        }
+        function getDueDate($cardId)
+        {
+            $date = Boardduedate::findFirst(
+                [
+                    "conditions" => "cardId='".$cardId."' AND dueDateStatus='1'"
+                ]
+            );
+            return $date;
+        }
+        function getChecklist($cardId)
+        {
+            $checklist = Boardchecklist::find(
+                [
+                    "conditions" => "cardId='".$cardId."' AND checklistStatus='1'"
+                ]
+            );
+            return $checklist;
+        }
+        function getChecklistItem($checklistId)
+        {
+            $item = Boardchecklistitem::find(
+                [
+                    "conditions" => "checklistId='".$checklistId."' AND itemStatus = '1'"
+                ]
+            );
+            return $item;
+        }
         $this->view->disable();
+        $creator = getUser($board->boardOwner);
+        $creator_name = $creator->userName;
+        $pd = getProgressDate($boardId);
+        if($pd == null)
+            $pd = "";
+        else
+            $pd = date_format(new DateTime($pd->date),"d M Y");
+        $pi = getProgressItem($boardId);
+        $pi_string = "";
+        $pi_count = 0;
+        if($pi != null)
+        {
+            $pi_total = 0;
+            $pi_checked = 0;
+            foreach($pi as $item)
+            {
+                if($item->itemChecked == "1")
+                {
+                    $pi_string .= '<input type="checkbox" checked="checked"> '.$item->itemTitle."<br>";
+                    $pi_checked++;
+                }
+                else
+                    $pi_string .= '<input type="checkbox"> '.$item->itemTitle."<br>";
+
+                $pi_total++;
+            }
+            $pi_count = $pi_checked*100/$pi_total;
+        }
+        $bm = getBoardMember($boardId);
+        $bm_string = "";
+        if($bm != null)
+        {
+            foreach($bm as $member)
+            {
+                $userId = $member->userId;
+                $user = getUser($userId);
+                $bm_string .= "- ".$user->userName." (".$member->memberRole.")<br>";
+            }
+        }
+        $list = getBoardList($boardId);
+        $list_string = "";
+        $list_count = 0;
+        if($list != null)
+        {
+            $list_string .='<div class="row">';
+            foreach($list as $l)
+            {
+                $listId = $l->listId;
+                $list_string .= '
+                    <div class="list">
+                        <p class="center-align" style="margin:auto;"><b>'.$l->listTitle.'</b></p>
+                        <hr style="margin-top:-1px;">';
+                $card = getBoardCard($listId);
+                if($card != null)
+                {
+                    
+                    foreach($card as $c)
+                    {
+                        $list_string .="<div class='card'>";
+                        $list_string .= "<b>".$c->cardTitle.'</b><br>';
+                        if($c->cardDescription != null)
+                        {
+                            $list_string .= $c->cardDescription.'<br>';
+                        }
+                        $sd = getStartDate($c->cardId);
+                        $dd = getDueDate($c->cardId);
+                        if($sd!= null)
+                        {
+                            if($sd->startDateChecked == '1')
+                                $list_string .= "Start date : <input type='checkbox' checked='checked'>".date_format(new DateTime($sd->startDate),"d M Y")."<br>";
+                            else
+                                $list_string .= "Start date : <input type='checkbox'>".date_format(new DateTime($sd->startDate),"d M Y")."<br>";
+                        }
+                        if($dd!= null)
+                        {
+                            if($dd->dueDateChecked == '1')
+                                $list_string .= "Due date : <input type='checkbox' checked='checked'>".date_format(new DateTime($dd->dueDate),"d M Y")."<br>";
+                            else
+                                $list_string .= "Due date : <input type='checkbox'>".date_format(new DateTime($dd->dueDate),"d M Y")."<br>";
+                        }
+                        $checklist = getChecklist($c->cardId);
+                        if($checklist != null)
+                        {
+                            foreach($checklist as $check)
+                            {
+                                $checklist_string = "";
+                                //$list_string .= $check->checklistTitle." - "."0%"."<br>";
+                                $item = getChecklistItem($check->checklistId);
+                                $itemCount = 0;
+                                if($item != null)
+                                {
+                                    $itemTotal = 0;
+                                    $itemChecked = 0;
+                                    $item_string = "";
+                                    foreach($item as $i)
+                                    {
+                                        if($i->itemChecked == '1')
+                                        {
+                                            $item_string .= "<input type='checkbox' checked='checked'>".$i->itemTitle."<br>";
+                                            $itemChecked++;
+                                        }
+                                        else
+                                        {
+                                            $item_string .= "<input type='checkbox'>".$i->itemTitle."<br>";
+                                        }
+                                        $itemTotal++;
+                                    }
+                                    $itemCount = $itemChecked*100/$itemTotal;
+                                }
+                                $checklist_string .= $check->checklistTitle." - ".$itemCount."%"."<br>";
+                                $checklist_string .= $item_string;
+                                $list_string .= $checklist_string; 
+                            }
+                        }
+                        $list_string .="</div>";
+                        //$list_string .= "<p class='left-align' style='margin:auto;font-size:10px;'>".$c->cardTitle."</p>";
+                    }
+                }
+
+
+
+                $list_string.='</div>';
+                $list_count++;
+                if($list_count > 0 && $list_count%4==0)
+                {
+                    $list_string .= '</div>';
+                    $list_string .='<div class="row">';
+                }
+            }
+            $list_string .= '</div>';
+        }
         $mpdf = new \Mpdf\Mpdf();
-        $mpdf->WriteHTML('<h1>Hello world!</h1>');
-        $mpdf->Output('filename.pdf', \Mpdf\Output\Destination::DOWNLOAD);
+        //$mpdf->WriteHTML('<h1>Hello world!</h1>');
+        $stylesheet = '';
+        $stylesheet .= '
+            @page
+            {
+                margin:20px;
+            }
+            .title{
+                font-weight:bold;
+                font-size:24px;
+                text-align:center;
+            }
+            .divTitle
+            {
+                width:100%;
+                float:left;
+            }
+            .row
+            {
+                width:100%;
+                float:left;
+            }
+            p
+            {
+                font-size:12px;
+            }
+            .col
+            {
+                width:50%;
+                float:left;
+            }
+            ul.b 
+            {
+                list-style-type: square;
+                padding:0;
+                margin:0;
+            }
+            li
+            {
+                font-size:12px;
+            }
+            .list
+            {
+                width:23%;
+                float:left;
+                margin-left:5px;
+                margin-bottom:5px;
+                border:1px solid black;
+                height:90px;
+            }
+            .center-align
+            {
+                text-align:center;
+            }
+            .left-align
+            {
+                text-align:left;
+            }
+            .card
+            {
+                width:95%;
+                height:75px;
+                margin-bottom:5px;
+                margin-left:auto;
+                margin-right:auto;
+                border: 1px solid black;
+                float:left;
+                font-size:10px;
+                padding:2px;
+            }
+        ';
+        $html = '';
+        $html .= '<div class="divTitle"><h1 class="title">'.'Taff.top'.'</h1></div>';
+        $html .= '<hr>';
+        $html .= '  <div class="row" style="margin-top:-15px;">
+                        <div class="col">
+                            <p><b>Board details</b><br>
+                            Title : '.$board->boardTitle.'<br>
+                            Creator : '.$creator_name.'<br>
+                            Created : '.date_format(new DateTime($b->boardCreated),"d M Y").'<br>
+                            Deadline : '.$pd.'<br>
+                            Progress : '.$pi_count.'%'.'<br>'
+                            .$pi_string.'</p>'.
+                        '</div>
+                        <div class="col">
+                            <p><b>Members</b><br>
+                            '.$bm_string.'
+                            </p>
+                        </div>'. 
+                    '</div>';
+        $html .= '<hr>';
+        if($list_count != 0)
+        {
+            $html .= $list_string;
+        }
+
+        $mpdf->WriteHTML($stylesheet,1);
+        $mpdf->WriteHTML($html,2);
+        $filename = $board->boardTitle.".pdf";
+        $mpdf->Output($filename, \Mpdf\Output\Destination::DOWNLOAD);
         exit();
+    }
+
+    public function createExcelAction($boardId)
+    {
+        set_time_limit(0);
+        $boardId = $boardId;
+        $board = Board::findFirst(
+            [
+                "boardId='".$boardId."'"
+            ]
+        );
+
+        function getUser($userId)
+        {
+            $user = User::findFirst(
+                [
+                    "userId='".$userId."'"
+                ]
+            );
+            return $user;
+        }
+        function getProgressDate($boardId)
+        {
+            $pd = Boardprogressdate::findFirst(
+                [
+                    "boardId='".$boardId."'"
+                ]
+            );
+            return $pd;
+        }
+        function getProgressItem($boardId)
+        {
+            $pi = Boardprogressitem::find(
+                [
+                    "conditions" => "boardId='".$boardId."' AND itemStatus='1'"
+                ]
+            );
+            return $pi;
+
+        }
+        function getBoardMember($boardId)
+        {
+            $bm = Boardmember::find(
+                [
+                    "conditions" => "boardId='".$boardId."' AND memberStatus='1'"
+                ]
+            );
+            return $bm;
+        }
+        function getBoardList($boardId)
+        {
+            $list = Boardlist::find(
+                [
+                    "conditions" => "listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'",
+                    "order" => "listPosition ASC"
+                ]
+            );
+            return $list;
+        }
+        function getBoardCard($listId)
+        {
+            $card = Boardcard::find(
+                [
+                    "conditions" => "cardListId='".$listId."' AND cardArchive='0' AND cardStatus='1'",
+                    "order" => "cardPosition ASC"
+                ]
+            );
+            return $card;
+        }
+        function getStartDate($cardId)
+        {
+            $date = Boardstartdate::findFirst(
+                [
+                    "conditions" => "cardId='".$cardId."' AND startDateStatus='1'"
+                ]
+            );
+            return $date;
+        }
+        function getDueDate($cardId)
+        {
+            $date = Boardduedate::findFirst(
+                [
+                    "conditions" => "cardId='".$cardId."' AND dueDateStatus='1'"
+                ]
+            );
+            return $date;
+        }
+        function getChecklist($cardId)
+        {
+            $checklist = Boardchecklist::find(
+                [
+                    "conditions" => "cardId='".$cardId."' AND checklistStatus='1'"
+                ]
+            );
+            return $checklist;
+        }
+        function getChecklistItem($checklistId)
+        {
+            $item = Boardchecklistitem::find(
+                [
+                    "conditions" => "checklistId='".$checklistId."' AND itemStatus = '1'"
+                ]
+            );
+            return $item;
+        }
+        $creator = getUser($board->boardOwner);
+        $creator_name = $creator->userName;
+        $pd = getProgressDate($boardId);
+        if($pd == null)
+            $pd = "";
+        else
+            $pd = date_format(new DateTime($pd->date),"d M Y");
+        $pi = getProgressItem($boardId);
+        $pi_string = "";
+        $pi_count = 0;
+        if($pi != null)
+        {
+            $pi_total = 0;
+            $pi_checked = 0;
+            foreach($pi as $item)
+            {
+                if($item->itemChecked == "1")
+                {
+                    $pi_checked++;
+                }
+                
+                $pi_total++;
+            }
+            $pi_count = $pi_checked*100/$pi_total;
+        }
+        // Create new Spreadsheet object
+        $spreadsheet = new Spreadsheet();
+
+        // Set document properties
+        $spreadsheet->getProperties()->setCreator('Taff.top')
+            ->setLastModifiedBy('Taff.top')
+            ->setTitle('Office Taff')
+            ->setSubject('Office Taff')
+            ->setDescription('Taff.top report.')
+            ->setKeywords('office 2007 openxml php')
+            ->setCategory('Report');
+
+        // Add some data
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'Taff.top')
+            ->setCellValue('A2', 'Title : '.$board->boardTitle)
+            ->setCellValue('A3', 'Creator :'.$creator_name)
+            ->setCellValue('A4', 'Created :'.date_format(new DateTime($board->boardCreated),"d M Y"))
+            ->setCellValue('A5', 'Deadline :'.$pd)
+            ->setCellValue('A6', 'Progress : '.$pi_count.'%');
+
+        $ctr = 7;
+        foreach($pi as $item)
+        {
+            if($item->itemChecked == "1")
+            {
+                $spreadsheet->setActiveSheetIndex(0)->getCell('A'.$ctr)->setValue('[X]'.$item->itemTitle);
+            }
+            else
+            {
+                $spreadsheet->setActiveSheetIndex(0)->getCell('A'.$ctr)->setValue('[ ]'.$item->itemTitle);
+            }
+            $ctr++;
+        }
+        $temp = 3;
+        $huruf = ["E","G","I"];
+        $spreadsheet->setActiveSheetIndex(0)->getCell('E2')->setValue('Members');
+        $bm = getBoardMember($boardId);
+        if($bm != null)
+        {
+            $indeks = 0;
+            foreach($bm as $member)
+            {
+                $userId = $member->userId;
+                $user = getUser($userId);
+                $bm_string = $user->userName." (".$member->memberRole.")";
+                $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[$indeks].$temp)->setValue($bm_string);
+                if($temp <= $ctr)
+                {
+                    $temp++;
+                }
+                else
+                {
+                    $temp = 3;
+                    $indeks++;
+                }
+            }
+        }
+
+        $ctr+=2;
+        $ctrawal = $ctr;
+        $huruf2 = ["A","E","J","I","M","Q","U","Y","AC","AG","AK","AO","AS","AW","BA","BE","BI","BM","BQ","BU","BY","CC","CG","CK","CO","CS","CW","DA","DE","DI","DM","DQ","DU","DY","EC","EG","EK"];
+        $list = getBoardList($boardId);
+        $indeks = 0;
+        $temp = $ctrawal;
+        foreach($list as $l)
+        {
+            $list_id = $l->listId;
+            $list_title = $l->listTitle;
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($list_title);
+            $card = getBoardCard($list_id);
+            foreach($card as $card)
+            {
+                $cardId = $card->cardId;
+                $temp++;
+                $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($card->cardTitle);
+                if($card->cardDescription != null || $card->cardDescription != "")
+                {
+                    $temp++;
+                    $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($card->cardDescription);
+                }
+
+                $sd = getStartDate($cardId);
+                $dd = getDueDate($cardId);
+                if($sd != null)
+                {
+                    $temp++;
+                    $checked = " ";
+                    if($sd->startDateChecked == "1")
+                        $checked = "X";
+                    $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue("Start Date : [".$checked."]".date_format(new DateTime($sd->startDate),"d M Y"));
+                }
+                if($dd != null)
+                {
+                    $temp++;
+                    $checked = " ";
+                    if($dd->dueDateChecked == "1")
+                        $checked = "X";
+                    $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue("Due Date : [".$checked."]".date_format(new DateTime($dd->dueDate),"d M Y"));
+                }
+                $checklist = getChecklist($cardId);
+                if($checklist != null)
+                {
+                    foreach($checklist as $check)
+                    {
+                        $checklist_string = "";
+                        //$list_string .= $check->checklistTitle." - "."0%"."<br>";
+                        $item = getChecklistItem($check->checklistId);
+                        $temp++;
+                        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($check->checklistTitle);
+                        $itemCount = 0;
+                        if($item != null)
+                        {
+                            $itemTotal = 0;
+                            $itemChecked = 0;
+                            //$item_string = "";
+                            foreach($item as $i)
+                            {
+                                $checked = " ";
+                                if($i->itemChecked =="1")
+                                {
+                                    $checked = "X";
+                                }
+                                $temp++;
+                                $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue("[".$checked."]".$i->itemTitle);
+                                /*if($i->itemChecked == '1')
+                                {
+                                    //$item_string .= "<input type='checkbox' checked='checked'>".$i->itemTitle."<br>";
+                                    $itemChecked++;
+                                }
+                                else
+                                {
+                                    //$item_string .= "<input type='checkbox'>".$i->itemTitle."<br>";
+                                }
+                                $itemTotal++;*/
+                            }
+                            //$itemCount = $itemChecked*100/$itemTotal;
+                        }
+                        //$checklist_string .= $check->checklistTitle." - ".$itemCount."%"."<br>";
+                        //$checklist_string .= $item_string;
+                        //$list_string .= $checklist_string; 
+                    }
+                }
+            }
+            $indeks++;
+            $temp = $ctrawal;
+        }
+
+        // Rename worksheet
+        $spreadsheet->getActiveSheet()->setTitle('Simple');
+
+        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
+        $spreadsheet->setActiveSheetIndex(0);
+
+        // Redirect output to a client’s web browser (Xls)
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="taff.xls"');
+        header('Cache-Control: max-age=0');
+        // If you're serving to IE 9, then the following may be needed
+        header('Cache-Control: max-age=1');
+
+        // If you're serving to IE over SSL, then the following may be needed
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT'); // always modified
+        header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+        header('Pragma: public'); // HTTP/1.0
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xls');
+        $writer->save('php://output');
+        exit;
     }
 
     public function createInviteAction()
     {
-        /*$loader = new Loader();
-        $loader->registerDirs(
-            [
-                APP_PATH . '/library/PHPMailer/src/',
-            ]
-        );
-        $loader->register();*/
-        $filepath = APP_PATH . '/library/PHPMailer/src/PHPMailer.php';
-        if (file_exists($filepath)) {
-        }
-        $filepath2 = APP_PATH . '/library/PHPMailer/src/Exception.php';
-        $filepath3 = APP_PATH . '/library/PHPMailer/src/SMTP.php';
-        require_once $filepath;
-        require_once $filepath2;
-        require_once $filepath3;
+        $boardId = $_POST["boardId"];
+        $email = $_POST["email"];
+        $role = $_POST["role"];
         $this->view->disable();
-        $mail = new PHPMailer\PHPMailer\PHPMailer; //Server settings
-            
-        try {
-            $mail->isSMTP();    
-            $mail->SMTPDebug = 2;                                       // Set mailer to use SMTP
-            $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-                                  // Enable verbose debug output
-            $mail->SMTPAuth = true;                            // Enable SMTP authentication
-            $mail->Username = 'canzinzzide@gmail.com';                 // SMTP username
-            $mail->Password = 'cancan110796';                           // SMTP password
-            $mail->SMTPSecure = 'smtp';                            // Enable TLS encryption, `ssl` also accepted
-            $mail->Port = 465;                                    // TCP port to connect to
-            
-            //Recipients
-            $mail->setFrom('canzinzzide@gmail.com', 'Taff');
-            $mail->addAddress('web-ra4tr@mail-tester.com', '');
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
+        //$mail->SMTPDebug = 1;
+        //$mail->SMTPDebug = 3;                               // Enable verbose debug output
 
-            //Content
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-            //$mail->send();
-            if (!$mail->send()) {
+        $mail->Host     = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        $mail->Username = 'canzinzzide@gmail.com';                 // SMTP username
+        $mail->Password = 'cancan110796';                           // SMTP password
+        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port     = 587;
+        
+        $mail->setFrom('canzinzzide@gmail.com', 'Michael Chandra');
+        $mail->addReplyTo('michaelchandrag114@yahoo.co.id', 'gg');
+        $mail->addAddress($email);
+        $mail->Subject = 'Invitation from Taff.top';
+        $mail->isHTML(true);
+        $mail->Body = 'You have been invited to a board in taff.top<br>
+                        to join the board click the link below<br>
+                        localhost/trello/invite/getInvite/'.$boardId.'/'.$role;
+        if (!$mail->send()) {
             echo "Mailer Error: " . $mail->ErrorInfo;
-            }
-            else
-            {
-                echo 'Message has been sent';  
-            }
-        } catch (Exception $e) {
-            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+        } else {
+            echo "Message sent!";
         }
     }
+
+    public function removeMemberAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $bm = Boardmember::findFirst(
+            [
+                "conditions" => "boardId='".$boardId."' and userId='".$userId."'"
+            ]
+        );
+        $bm->memberStatus = '0';
+        $bm->save();
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
+    public function updateMemberRoleAction()
+    {
+        $boardId = $_POST["boardId"];
+        $userId = $_POST["userId"];
+        $role = $_POST["role"];
+        $bm = Boardmember::findFirst(
+            [
+                "conditions" => "boardId='".$boardId."' and userId='".$userId."'"
+            ]
+        );
+        $bm->memberRole = $role;
+        $bm->save();
+        $this->view->disable();
+        echo "Berhasil";
+    }
+
 
 }
 

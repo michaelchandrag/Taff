@@ -5,6 +5,8 @@ class DriveController extends \Phalcon\Mvc\Controller
 
     public function indexAction()
     {
+
+        $this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
     	$boardId = "";
     	$cardId = "";
     	if(isset($_GET["id"]))
@@ -16,22 +18,11 @@ class DriveController extends \Phalcon\Mvc\Controller
             $cardId = $_GET["cardId"];
         }
         $userId = $this->session->get("userId");
-        if($userId == null)
+        if($userId == null || $cardID == null || $boardId == null)
         {
-            $this->response->redirect("login");
+            //$this->response->redirect("home");
         }
-        if($boardId == null || $cardId == null)
-        {
-        	if($userId == null)
-	        {
-	            $this->response->redirect("login");
-	        }
-	        else
-	        {
-	        	$this->response->redirect("home");
-	        }
-        }
-    	$this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
+        $this->view->userId = $userId;
     	$this->view->boardId = $boardId;
     	$this->view->cardId = $cardId;
     }

@@ -3,10 +3,12 @@ function createBoard()
 	var title = $("#boardTitle").val();
 	var owner = $("#hiddenOwnerId").val();
 	//alert(owner);
+	$("#errorBoardTitle").hide();
 	var rules = true;
 	if(title == "")
 	{
 		rules = false;
+		$("#errorBoardTitle").show();
 	}
 	if(rules == true)
 	{
@@ -73,8 +75,7 @@ function createBoard()
 				  gabung += '<div class="col s12 m6 l3">';
 				  gabung += '<a href="board?id='+response+'" >';
 				  gabung += '<div class="card">';
-				  gabung += '<div class="secondary-content yellow"><i class="mdi-action-grade"></i></div>';
-				  gabung += '<div class="card-content blue white-text">';
+				  gabung += '<div class="card-content blue black-text">';
 				  gabung += '<h2 class="card-stats-title">'+title+'</h2>';
 				  gabung += '</div>';
 				  gabung += '<div class="card-action  blue darken-2">';
@@ -84,6 +85,7 @@ function createBoard()
 				  gabung += '</a>';
 				  gabung += '</div>';
 				  $("#ajaxBoard"+owner).append(gabung);
+				  $("#modalcreateboard").closeModal();
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -94,7 +96,7 @@ function createBoard()
 	}
 	else
 	{
-		alert("Error");
+		$("#errorBoardTitle").show();
 	}
 
 }
@@ -103,6 +105,7 @@ function createGroup()
 {
 	var name = $("#groupName").val();
 	var rules = true;
+	$("#errorGroupTitle").hide();
 	if(name == "")
 	{
 		rules = false;
@@ -115,7 +118,7 @@ function createGroup()
 			  data: {name:name},
 			  success: function (response) {
 				  //alert(response);
-				  var gabung = "";
+				  /*var gabung = "";
 				  gabung += '<p class="caption"><img src="images/user/group.png" width="20px" height="20px" alt="Profile" /><a href="#" class="black-text"> <b>'+name+'</b> </a></p>';
 				  gabung += '<div id="card-stats">';
 				  gabung += '<div class="row">';
@@ -134,7 +137,8 @@ function createGroup()
 				  gabung += '</div>';
 				  gabung += "<div class='divider'></div>";
 				  $("#ajaxGroup").append(gabung);
-				  $("#groupName").val("");
+				  $("#groupName").val("");*/
+				  location.reload();
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -145,7 +149,7 @@ function createGroup()
 	}
 	else
 	{
-		alert("Error");
+		$("#errorGroupTitle").show();
 	}
 
 }

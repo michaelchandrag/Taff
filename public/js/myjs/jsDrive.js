@@ -64,9 +64,11 @@ function createPicker() {
         //picker.setVisible(true);
   }
 }
-
+var temp = 0;
 // A simple callback implementation.
 function pickerCallback(data) {
+  temp++;
+  var boardId = $("#hiddenBoardId").val();
   if (data.action == google.picker.Action.PICKED) {
     var fileId = data.docs[0].id;
     var title = data.docs[0].name;
@@ -88,5 +90,12 @@ function pickerCallback(data) {
           }
         });
     
+  }
+  else
+  {
+    if(temp > 1)
+    {
+      window.location.href="board?id="+boardId;
+    }
   }
 }

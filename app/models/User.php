@@ -137,4 +137,15 @@ class User extends \Phalcon\Mvc\Model
         $user->userName = $name;
         $user->save();
     }
+
+    public function setPassword($userId,$userPassword)
+    {
+        $user = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $user->userPassword = $userPassword;
+        $user->save();
+    }
 }

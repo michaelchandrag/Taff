@@ -1,12 +1,3 @@
-<!-- Start Page Loading -->
-<!--<div id="loader-wrapper">
-	<div id="loader"></div>        
-	<div class="loader-section section-left"></div>
-	<div class="loader-section section-right"></div>
-</div>-->
-<!-- End Page Loading -->
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
 
 <!-- START HEADER -->
 <header id="header" class="page-topbar">
@@ -78,7 +69,16 @@
 						<span>Home</span>
 					</a>
 				</li>
-				<li>
+				<?php
+					if($role == "Creator")
+					{
+						echo '<li class="roleCreator" style="">';
+					}
+					else
+					{
+						echo '<li class="roleCreator" style="display:none;">';
+					}
+				?>
 					<a href="javascript:void(0);" onclick="openModalInvite()" class="cyan-text">
 						<i class="mdi-social-person-add"></i>
 						<span>Invite</span>
@@ -91,13 +91,33 @@
 					</a>
 				</li>
 				<li>
-					<a href="#modalcreatelist" class="cyan-text modal-trigger roleCreateList" style="display:none;">
+					<?php
+						if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+						{
+							echo '<a href="#modalcreatelist" class="cyan-text modal-trigger roleCreateList">';
+						}
+						else
+						{
+							echo '<a href="#modalcreatelist" class="cyan-text modal-trigger roleCreateList" style="display:none;">';
+						}
+					?>
+					
 						<i class="mdi-action-list"></i>
 						<span>Create List</span>
 					</a>
 				</li> 
 				<li>
-					<a href="#modalcreatecarddua" class="cyan-text modal-trigger roleCreateCard" style="display:none;">
+					<?php
+						if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+						{
+							echo '<a href="#modalcreatecarddua" class="cyan-text modal-trigger roleCreateCard">';
+						}
+						else
+						{
+							echo '<a href="#modalcreatecarddua" class="cyan-text modal-trigger roleCreateCard" style="display:none;">';
+						}
+					?>
+					
 						<i class="mdi-content-add"></i>
 						<span>Create Card</span>
 					</a>
@@ -166,7 +186,7 @@
         </li>
         <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
         </li>
-        <li class="bold active"><a href="javascript:void(0);" onclick="openModalInvite()" class="waves-effect waves-cyan"><i class="mdi-social-person-add"></i>Invite</a>
+        <li class="bold active roleClient"><a href="javascript:void(0);" onclick="openModalInvite()" class="waves-effect waves-cyan"><i class="mdi-social-person-add"></i>Invite</a>
         </li>
         <li class="bold active"><a href="#modalcreatelist" class="waves-effect waves-cyan modal-trigger"><i class="mdi-action-list"></i> Create List</a>
         </li>
@@ -186,12 +206,6 @@
     </ul>
     <a href="javascript:void(0);" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
 </aside>
-<!-- END LEFT SIDEBAR NAV-->
-
-
-
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
 
 <!-- START MAIN -->
 <div id="main">
@@ -216,6 +230,8 @@
 										echo "<p id='boardTitle'>".$r->boardTitle."</p>";
 										echo "<input type='hidden' id='hiddenBoardId' value='".$r->boardId."'>";
 										echo "<input type='hidden' id='hiddenUserId' value='".$userId."'>";
+										echo "<input type='hidden' id='hiddenUserRole' value='".$role."'>";
+
 									}
 								?>
 							</b></h1>
@@ -240,62 +256,18 @@
 							<div class="row">
 								<div class="col s12 m6 l6">
 									<p><b>Invite</b></p>
-									<input type="email" placeholder="Email">
-								</div>
-								<div class="col s12 m6 l6">
-									<p><b>Invited Members</b></p>
-									<p>michaelchandrag114@yahoo.co.id</p>
-									<p>canzinzzide@gmail.com</p>
+									<input type="email" placeholder="Email" id="inviteEmail">
+									<label>Invite as..</label>
+									<select id="inviteRoleMember">
+										<option value="Collaborator">Collaborator</option>
+										<option value="Client">Client</option>
+									</select>
+									<a href="javacsript:void(0);" class="waves-effect waves-red btn" onclick="sendInvite()">Invite</a>
+
 								</div>
 								<div class="col s12 m6 l12">
 									<p><b>Members</b></p>
-									<div class="row">
-										<div class="col s12 m4 l1">
-											<img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
-
-		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-										</div>
-										<div class="col s12 m4 l11">
-											<p class="">	
-												<b>Steven Gerrard </b> <a href="#" class="ultra-small red-text">Remove</a> 
-											</p>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col s12 m4 l1">
-											<img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
-
-		                    ?>" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />
-										</div>
-										<div class="col s12 m4 l11">
-											<p class="">	
-												<b>Steven Gerrard </b> <a href="#" class="ultra-small red-text">Remove</a> 
-											</p>
-										</div>
+									<div class="row" id="ajaxInviteMember">
 									</div>
 								</div>
 							</div>
@@ -303,7 +275,6 @@
 					  </div>
 					  <div class="modal-footer">
 						<a href="javacsript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="javascript:void(0);" onclick="createInvite()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
 					<div id="modalcreatelist" class="modal">
@@ -366,7 +337,7 @@
 								<p>Title</p>
 								<input type="text" placeholder="Title.." id="titleCardManual">
 								<select id="listCardManual">
-									<option value="0"  disabled>Choose list..</option>
+									<option value="0"  disabled selected>Choose list..</option>
 									<?php
 										foreach($boardList as $l)
 										{
@@ -389,7 +360,17 @@
 							<div class="row">
 								<h6><b>More Menu..</b></h6>    
 								<div class="col s12 m6 l6">
-									<div class="col s12 m6 l12 roleCreator" style="display:none;">
+									<?php
+										if($role == "Creator")
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownboard">Change Background<i class="mdi-navigation-arrow-drop-down right"></i></a>
 											<ul id="dropdownboard" class="dropdown-content">
 												<li onclick="changeBackground('red')">
@@ -438,33 +419,59 @@
 										<label for="testsub" class="black-text">Subscribe</label>
 										</p>
 									</div>
-									<div class="col s12 m6 l12 roleCreator" style="display:none;">
+									<?php
+										if($role=="Creator")
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openRole()">Setting Role</a>
 									</div>
-									<div class="col s12 m6 l12 roleCollaboratorClient" style="display:none;">
+									<?php
+										if($role == "Collaborator" || $role == "Client")
+										{
+											echo '<div class="col s12 m6 l12 roleCollaboratorClient" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleCollaboratorClient" style="display:none;">';
+										}
+									?>
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="leaveBoard()">Leave Board</a>
 									</div>
 
 								</div>
 								<div class="col s12 m6 l6">
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text modal-trigger roleCreator" style="display:none;" href="#modaleditboard">Edit Board</a>
+										<?php
+											if($role == "Creator")
+											{
+												echo '<a class="btn-flat waves-effect black-text modal-trigger roleCreator" style="" href="#modaleditboard">Edit Board</a>';
+											}
+											else
+											{
+												echo '<a class="btn-flat waves-effect black-text modal-trigger roleCreator" style="display:none;" href="#modaleditboard">Edit Board</a>';
+											}
+										?>
+										
 									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text modal-trigger" href="#modalcopyboard">Copy Board</a>
-									</div>
-									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text" href="javascript:void(0);">Print</a>
 									</div>
 									<div class="col s12 m6 l12">
 										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownexport">Export<i class="mdi-navigation-arrow-drop-down right"></i></a>
 										
 										<ul id="dropdownexport" class="dropdown-content">
 											<li>
-												<a href="#" onclick="createPDF()">PDF</a>
+												<a href="javascript:void(0);" onclick="createPDF()">PDF</a>
 											</li>
 											<li>
-												<a href="#">Excel</a>
+												<a href="javascript:void(0);" onclick="createExcel()">Excel</a>
 											</li>
 										</ul>
 									</div>
@@ -475,7 +482,17 @@
 									<div class="col s12 m6 l12">
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalGanttChart()">Gantt Chart</a>
 									</div>
-									<div class="col s12 m6 l12 roleCreator" style="display:none;" id="closeboard">
+									<?php
+										if($role == "Creator")
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="" id="closeboard">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleCreator" style="display:none;" id="closeboard">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="closeBoard()">Close Board</a>
 									</div>
 									<div class="col s12 m6 l12" id="openboard" style="display:none;">
@@ -501,21 +518,81 @@
 								<h6><b>List Menu..</b></h6>    
 								<div class="col s12 m6 l12">
 									<div class="col s12 m6 l12">
-										<a class="btn-flat waves-effect black-text roleCreateCardMenu" href="javascript:void(0);" onclick="openModalListAddCard()" style="display:none;">Add a card..</a>
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardCreate == "1") || ($role == "Client" && $roleClient->cardCreate == "1") )
+										{
+											echo '<a class="btn-flat waves-effect black-text roleCreateCardMenu" href="javascript:void(0);" onclick="openModalListAddCard()" style="">Add a card..</a>';
+										}
+										else
+										{
+											echo '<a class="btn-flat waves-effect black-text roleCreateCardMenu" href="javascript:void(0);" onclick="openModalListAddCard()" style="display:none;">Add a card..</a>';
+										}
+									?>
+										
 									</div>
-									<div class="col s12 m6 l12 roleCreateListMenu" style="display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+										{
+											echo '<div class="col s12 m6 l12 roleCreateListMenu" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleCreateListMenu" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListCopyList()">Copy list..</a>
 									</div>
-									<div class="col s12 m6 l12 roleEditListMenu" style="display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listEdit == "1") || ($role == "Client" && $roleClient->listEdit == "1") )
+										{
+											echo '<div class="col s12 m6 l12 roleEditListMenu" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleEditListMenu" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalMoveList()">Move list..</a>
 									</div>
-									<div class="col s12 m6 l12 roleEditCardMenu" style="display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardEdit == "1") || ($role == "Client" && $roleClient->cardEdit == "1") )
+										{
+											echo '<div class="col s12 m6 l12 roleEditCardMenu" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleEditCardMenu" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListMoveAllCard()">Move all card in this list..</a>
 									</div>
-									<div class="col s12 m6 l12 roleDeleteCardMenu" style="display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardDelete == "1") || ($role == "Client" && $roleClient->cardDelete == "1") )
+										{
+											echo '<div class="col s12 m6 l12 roleDeleteCardMenu" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleDeleteCardMenu" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveAllCard()">Archive all card in this list..</a>
 									</div>
-									<div class="col s12 m6 l12 roleDeleteListMenu" style="display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listDelete == "1") || ($role == "Client" && $roleClient->listDelete == "1") )
+										{
+											echo '<div class="col s12 m6 l12 roleDeleteListMenu" style="">';
+										}
+										else
+										{
+											echo '<div class="col s12 m6 l12 roleDeleteListMenu" style="display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat waves-effect black-text" href="javascript:void(0);" onclick="openModalListArchiveList()">Archive this list..</a>
 									</div>
 
@@ -888,11 +965,11 @@
 								<h6><b>Archived items..</b></h6>
 								<div class="divider"></div>
 								<div class="col s12 m6 l6" id="archiveList">
-									<p><b>Cards</b></p>
+									<p><b>Lists</b></p>
 									<div class="divider"></div>
 								</div>
 								<div class="col s12 m6 l6" id="archiveCard">
-									<p><b>Lists</b></p>
+									<p><b>Cards</b></p>
 									<div class="divider"></div>
 								</div>
 							</div>
@@ -997,45 +1074,6 @@
 					  </div>
 					</div>
 					<div id="modalattachment" class="modal modal-fixed-footer white">
-					  <!--<div class="modal-content white">
-						<div class="col s12 m6 l12">
-							<div class="row">
-								<h6><b>Add a attachment..</b></h6>
-								<div class="divider"></div>
-								<div class="file-field input-field">
-			                      <div class="btn">
-			                        <span>Computer</span>
-			                        <input type="file" id="">
-			                      </div>
-			                      <div class="file-path-wrapper">
-			                        <input class="file-path validate" type="text">
-			                      </div>
-			                    </div>
-			                    <div class="file-field input-field">
-			                      <div class="btn">
-			                        <span>Google Drive</span>
-			                        <input type="file" id="inputGoogleDrive">
-			                      </div>
-			                      <div class="file-path-wrapper">
-			                        <input class="file-path validate" type="text">
-			                      </div>
-			                    </div>
-			                    <div class="file-field input-field">
-			                      <div class="btn">
-			                        <span>Dropbox</span>
-			                        <input type="file" id="inputDropbox">
-			                      </div>
-			                      <div class="file-path-wrapper">
-			                        <input class="file-path validate" type="text">
-			                      </div>
-			                    </div>
-							</div>
-						</div>
-					  </div>
-					  <div class="modal-footer teal lighten-4">
-						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
-						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close" onclick="createAttachment()">Save</a>
-					  </div>-->
 					</div>
 					<div id="modalmove" class="modal modal-fixed-footer white">
 					  <div class="modal-content white">
@@ -1092,7 +1130,18 @@
 									<div class="row">
 										<div class="col s12 m6 l12">
 										<h5 id="modalCardTitle"><b>Card Title</b> </h5>
-										<a href="#modaleditcard" class="ultra-small modal-trigger roleEditCard" style="display:none;">Edit Title</a>
+										<?php
+											if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardEdit == "1") || ($role == "Client" && $roleClient->cardEdit == "1") )
+											{
+												echo '<a href="#modaleditcard" class="ultra-small modal-trigger roleEditCard" style="">Edit Title</a>';
+											}
+											else
+											{
+												echo '<a href="#modaleditcard" class="ultra-small modal-trigger roleEditCard" style="display:none;">Edit Title</a>';
+											}
+										?>
+
+										
 										</div>
 									</div>
 									<div class="row">
@@ -1106,7 +1155,17 @@
 											<h6><b>Description</b></h6>
 											<h6 id="modalCardDescription">Ini adalah deskripsi</h6>
 											<div id="tes"></div>
-											<a href="#modaleditdescription" class="modal-trigger roleEditCard" style="display:none;">Edit description</a>
+											<?php
+												if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardEdit == "1") || ($role == "Client" && $roleClient->cardEdit == "1") )
+												{
+													echo '<a href="#modaleditdescription" class="modal-trigger roleEditCard" style="">Edit description</a>';
+												}
+												else
+												{
+													echo '<a href="#modaleditdescription" class="modal-trigger roleEditCard" style="display:none;">Edit description</a>';
+												}
+											?>
+											
 										</div>
 									</div>
 									<div class="divider"></div>
@@ -1159,7 +1218,17 @@
 								<div class="col s12 m6 l3">
 									<h5 class="large"><b>Add</b></h5>
 									<div class="divider"></div>
-									<div class="row roleActivityAttachment" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityAttachment == "1") || ($role == "Client" && $roleClient->activityAttachment == "1") )
+										{
+											echo '<div class="row roleActivityAttachment" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityAttachment" style="margin-top:5px;display:none;">';
+										}
+									?>
+									
 										<a class="btn-flat dropdown-button waves-effect black-text" href="javascript:void(0);" data-activates="dropdownattachment">Attachment<i class="mdi-navigation-arrow-drop-down right"></i></a>
 											<ul id="dropdownattachment" class="dropdown-content">
 												<li>
@@ -1176,42 +1245,138 @@
 													<a href="javascript:void(0);" onclick="openGoogleDrive()" class="black-text left-align btn-flat waves-effect">Google Drive</a>
 												</li>
 												<li>
-													<a href="javascript:void(0);" onclick="" class="black-text left-align btn-flat waves-effect">Dropbox</a>
+													<a href="javascript:void(0);" onclick="openDropbox()" class="black-text left-align btn-flat waves-effect">Dropbox</a>
 												</li>
 											</ul>
 									</div>
-									<div class="row roleActivityAM" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityAM == "1") || ($role == "Client" && $roleClient->activityAM == "1") )
+										{
+											echo '<div class="row roleActivityAM" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityAM" style="margin-top:5px;display:none;">';
+										}
+									?>
+									
 										<a href="#modalassignmembers" class="modal-trigger btn-flat waves-effect" style="font-size:90%;">Assign Members</a>
 									</div>
-									<div class="row roleActivityLabel" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityLabel == "1") || ($role == "Client" && $roleClient->activityLabel == "1") )
+										{
+											echo '<div class="row roleActivityLabel" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityLabel" style="margin-top:5px;display:none;">';
+										}
+									?>
 										<a href="#modallabelcard" class="modal-trigger btn-flat waves-effect">Label Card</a>
 									</div>
-									<div class="row roleActivityChecklist" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityChecklist == "1") || ($role == "Client" && $roleClient->activityChecklist == "1") )
+										{
+											echo '<div class="row roleActivityChecklist" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityChecklist" style="margin-top:5px;display:none;">';
+										}
+									?>
 										<a href="#modalchecklist" class="modal-trigger btn-flat waves-effect">Checklist</a>
 									</div>
-									<div class="row roleActivityStartDate" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityStartDate == "1") || ($role == "Client" && $roleClient->activityStartDate == "1") )
+										{
+											echo '<div class="row roleActivityStartDate" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityStartDate" style="margin-top:5px;display:none;">';
+										}
+									?>
 										<a href="#modalstartdate" class="modal-trigger btn-flat waves-effect">Start Date</a>
 									</div>
-									<div class="row roleActivityDueDate" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->activityDueDate == "1") || ($role == "Client" && $roleClient->activityDueDate == "1") )
+										{
+											echo '<div class="row roleActivityDueDate" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleActivityDueDate" style="margin-top:5px;display:none;">';
+										}
+									?>
 										<a href="#modalduedate" class="modal-trigger btn-flat waves-effect">Due Date</a>
 									</div>
 									<h5 class="large"><b>Menu</b></h5>
 									<div class="divider"></div>
-									<div class="row roleEditCard" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardEdit == "1") || ($role == "Client" && $roleClient->cardEdit == "1") )
+										{
+											echo '<div class="row roleEditCard" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleEditCard" style="margin-top:5px;display:none;">';
+										}
+									?>
+									
 										<a href="#modalmove" class="modal-trigger btn-flat waves-effect">Move</a>
 									</div>
-									<div class="row roleCreateCard" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+										{
+											echo '<div class="row roleCreateCard" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div class="row roleCreateCard" style="margin-top:5px;display:none;">';
+										}
+									?>
+									
 										<a href="#modalcopy" onclick="openModalCopy()" class="modal-trigger btn-flat waves-effect">Copy</a>
 									</div>
-									<div id="changeArchive" class="row roleDeleteCard" style="margin-top:5px;display:none;">
+									<?php
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardDelete == "1") || ($role == "Client" && $roleClient->cardDelete == "1") )
+										{
+											echo '<div id="changeArchive" class="row roleDeleteCard" style="margin-top:5px;">';
+										}
+										else
+										{
+											echo '<div id="changeArchive" class="row roleDeleteCard" style="margin-top:5px;display:none;">';
+										}
+									?>
+									
 										<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
 									</div>
 									<div id="changeSend" style="display:none;">
 										<div class="divider"></div>
-										<div class="row roleDeleteCard" style="margin-top:5px;display:none;">
+										<?php
+											if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardDelete == "1") || ($role == "Client" && $roleClient->cardDelete == "1") )
+											{
+												echo '<div class="row roleDeleteCard" style="margin-top:5px;">';
+											}
+											else
+											{
+												echo '<div class="row roleDeleteCard" style="margin-top:5px;display:none;">';
+											}
+										?>
+										
 											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeSend()">Send to Board</a>
 										</div>
-										<div class="row roleDeleteCard" style="margin-top:5px;display:none;">
+										<?php
+											if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardDelete == "1") || ($role == "Client" && $roleClient->cardDelete == "1") )
+											{
+												echo '<div class="row roleDeleteCard" style="margin-top:5px;">';
+											}
+											else
+											{
+												echo '<div class="row roleDeleteCard" style="margin-top:5px;display:none;">';
+											}
+										?>
+										
 											<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeDelete()">Delete</a>
 										</div>
 									</div>
@@ -1224,26 +1389,24 @@
 					</div>
 					<!-- END OF MODAL ACTION CARD-->
 					<div id="card-stats">
-						<div id="rowList">
 							<!-- LIST -->
 							<?php
-								$list = -1;
-								$ajaxList = 1;
-								echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">'; // BUKA ROW MINIMAL 1
 								foreach($boardList as $l)
 								{
 									if($l->listArchive == "0" && $l->listStatus == "1")
 									{
-										echo '<div class="col s12 m6 l2 colListUser" id="colList'.$l->listId.'">';
+										echo '<div class="colListUser" id="colList'.$l->listId.'" style="">';
 										echo	'<div class="card">';
-										echo		'<div class="card-content grey lighten-2 white-text" style="height:100%;">';
+										echo		'<div class="card-content grey lighten-2 white-text" style="height:100%;">'; //warna list
 							            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="javascript:void(0);" onclick="openModalListMenu(\''.$l->listId.'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-							            echo 			'<div id="list'.$l->listId.'" class="listUser">';
+							            echo 			'<div id="list'.$l->listId.'" class="listUser dropable sortable" style="height:100%;min-height:60px;width:100%;">';
+										
 										foreach($boardCard as $c)
 										{
 											if($c->cardListId == $l->listId && $c->cardArchive == "0" && $c->cardStatus == "1")
 											{
-												echo			'<a id="card'.$c->cardId.'" href="javascript:void(0);" class="cardUser'.$c->cardListId.' aCardUserLabel" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
+												echo 			'<div class="dragable cDrag'.$c->cardId.' cardUser'.$c->cardListId.'" id="cDrag'.$c->cardId.'" style="width:100%;height:100%;">';
+												echo			'<a id="card'.$c->cardId.'" href="javascript:void(0);" class="aCardUserLabel" onclick="ajaxModalCard(\''.$c->cardId.'\')">';
 												echo				'<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 												echo 				"<div class='row cardUserLabel' id='labelCard".$c->cardId."' style='margin:auto;'>";
 												foreach($boardLabelCard as $lc)
@@ -1277,33 +1440,41 @@
 													}
 												}
 
-												echo 					'</div>';
-												echo					'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
+												echo 				'</div>';
+												echo				'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
 												echo				'</div>';
 												echo			'</a>';
+												echo 			'</div>';
 											}
+
 										}
-										echo 				'</div>';
-				                        echo            '<div class="card-compare grey lighten-2 roleCreateCard" style="margin-top:8px;border-radius:5px;display:none;">';
+										echo 			'</div>';
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+										{
+											echo            '<div class="card-compare grey lighten-2 roleCreateCard" style="margin-top:8px;border-radius:5px;">';
+										}
+										else
+										{
+											echo            '<div class="card-compare grey lighten-2 roleCreateCard" style="margin-top:8px;border-radius:5px;display:none;">';
+										}
+				                        
 			                            echo           		'<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0);" class="grey-text" onclick="setHiddenListId(\''.$l->listId.'\')">Add a Card..</a></div>';
 			                            echo       		'</div>';
 
 										echo		'</div>';
 										echo	'</div>';
 										echo '</div>';
-										$list++;
-										if($list%5 == 0 && $list>0)
-										{
-											$list = -1;
-											$ajaxList++;
-											echo '</div>';
-											echo '<div class="row ajaxList" id="ajaxList'.$ajaxList.'">';
-										}
 									}
 									
 								}
-
-								echo '<div class="col s12 m6 l2 roleCreateList" style="margin-left:0px;display:none;" id="listCreateList">';
+								if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+								{
+									echo '<div class="colListUser roleCreateList" style="" id="listCreateList">';
+								}
+								else
+								{
+									echo '<div class="colListUser roleCreateList" style="" id="listCreateList">';	
+								}
 								echo	'<div class="card">';
 								echo		'<div class="card-content grey white-text">';
 			                    echo           '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
@@ -1312,9 +1483,7 @@
 								echo		'</div>';
 								echo	'</div>';
 								echo '</div>';
-								echo '</div>'; // TUTUP ROW
 							?>
-						</div>
 					</div>
 				
 				</div>
@@ -1352,7 +1521,7 @@
                         <input id="chatText" type="text" class="validate">
                         <label for="chatText">Chat</label>
                     </div>
-                        <a class="btn waves-effect waves-light green" onclick="createChat()">Send</a>
+                        <a class="btn waves-effect waves-light green" id="sendChat">Send</a>
                 </div>
             </div>
             </li>
@@ -1376,5 +1545,7 @@
 <!-- END MAIN -->
 
 <script>
-var myVar = setInterval(function(){ myTimer() }, 1000);
+//var myVar = setInterval(function(){ myTimer() }, 1000);
+
+//document.getElementById("btnDropbox").appendChild(button);
 </script>

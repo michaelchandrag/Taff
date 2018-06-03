@@ -3,16 +3,235 @@
 $( ".listUserDrag" ).draggable({
 	containment:"#main"
 });
+*/
 
-$( ".cardUserDrag" ).draggable({
-	appendTo :"body",
-	helper:"clone",
-	start: function(e, ui)
+function bindUiList()
+{
+
+	$( ".sortable" ).sortable({
+		appendTo:"body",
+		dropOnEmpty:"false",
+		stop : function (e,ui)
+		 {
+		 	//alert();
+		 },
+		 change : function(e,ui)
+		 {
+		 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+		 }
+	});
+	$( "#card-stats" ).sortable({
+		appendTo:"body",
+		dropOnEmpty:"false",
+		cancel: "#listCreateList",
+		 update : function(e,ui)
+		 {
+		 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+		 	var boardId = $("#hiddenBoardId").val();
+		 	var kids = $("#card-stats").children();
+		 	var listId = ui.item.attr("id").substr(7);
+		 	var posTujuan = 1;
+		 	var pojok = false;
+		 	for(var i=0;i<kids.length;i++)
+		 	{
+		 		if($(kids[i]).is(ui.item))
+		 		{
+		 			posTujuan = i+1;
+		 		}
+		 	}
+		 	if(posTujuan == kids.length)
+		 	{
+		 		posTujuan = kids.length-1;
+		 		pojok = true;
+		 	}
+		 	$.ajax({
+			  type: "POST",
+			  url: "board/sortListPosition",
+			  data: {boardId:boardId,listId:listId,posTujuan:posTujuan},
+			  success: function (response) {
+			  		if(pojok == true)
+			  		{
+			  			$(ui.item).insertBefore("#listCreateList");
+			  		}
+				  },
+				  error: function (xhr, ajaxOptions, thrownError) {
+					alert(xhr.status);
+					alert(thrownError);
+					alert(xhr.responseText);
+				  }
+				});
+
+		 }
+	});
+$("#card-stats").disableSelection();
+
+}
+
+function bindUiCard()
+{
+	$( ".dragable" ).draggable({
+		appendTo :"body",
+		helper:"clone",
+		grid: [1, 1],
+		revert:false,
+		connectToSortable:".sortable",
+		start: function(e, ui)
+		 {
+		  var draggableId = e.target.id;
+		  var width = $("#"+draggableId).css("width");
+		  var height = $("#"+draggableId).css("height");
+		 	$(ui.helper).css("width",width);
+		  $(ui.helper).css("height",height);
+		 },
+		 stop : function (e,ui)
+		 {
+		  var draggableId = e.target.id;
+		  //$("#"+draggableId+":eq(0)").remove();
+		  var asd = (ui.helper).parent();
+		  var id = asd.attr("id");
+		  var banyak = $(".listUser").length;
+		  var kids = $("#"+id).children();
+		  for(var i=0;i<kids.length;i++)
+		  {
+		  	if($(kids[i]).is(ui.helper))
+		  	{
+		  		var selectId = id.substr(4);
+		  		var cardId = draggableId.substr(5);
+		  		var pos = i+1;
+		  		if(pos >= kids.length)
+		  		{
+		  			pos = kids.length-1;
+		  		}
+		  		$.ajax({
+						  type: "POST",
+						  url: "board/updateCardPosition",
+						  data: {cardId:cardId,listSelect:selectId,position:pos},
+						  success: function (response) {
+								location.reload();
+					  		},
+					  error: function (xhr, ajaxOptions, thrownError) {
+						alert(xhr.status);
+						alert(thrownError);
+						alert(xhr.responseText);
+					  }
+					});
+		  	}
+		  }
+		 }
+	});
+}
+
+$( ".sortable" ).sortable({
+	appendTo:"body",
+	dropOnEmpty:"false",
+	stop : function (e,ui)
 	 {
-	  $(ui.helper).addClass("ui-draggable-helper");
+	 	//alert();
+	 },
+	 change : function(e,ui)
+	 {
+	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
 	 }
 });
-$( ".listUser" ).sortable()*/
+
+$( "#card-stats" ).sortable({
+	appendTo:"body",
+	dropOnEmpty:"false",
+	cancel: "#listCreateList",
+	 update : function(e,ui)
+	 {
+	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+	 	var boardId = $("#hiddenBoardId").val();
+	 	var kids = $("#card-stats").children();
+	 	var listId = ui.item.attr("id").substr(7);
+	 	var posTujuan = 1;
+	 	var pojok = false;
+	 	for(var i=0;i<kids.length;i++)
+	 	{
+	 		if($(kids[i]).is(ui.item))
+	 		{
+	 			posTujuan = i+1;
+	 		}
+	 	}
+	 	if(posTujuan == kids.length)
+	 	{
+	 		posTujuan = kids.length-1;
+	 		pojok = true;
+	 	}
+	 	$.ajax({
+		  type: "POST",
+		  url: "board/sortListPosition",
+		  data: {boardId:boardId,listId:listId,posTujuan:posTujuan},
+		  success: function (response) {
+		  		if(pojok == true)
+		  		{
+		  			$(ui.item).insertBefore("#listCreateList");
+		  		}
+			  },
+			  error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
+				alert(xhr.responseText);
+			  }
+			});
+
+	 }
+});
+$("#card-stats").disableSelection();
+$( ".dragable" ).draggable({
+	appendTo :"body",
+	helper:"clone",
+	grid: [1, 1],
+	revert:false,
+	connectToSortable:".sortable",
+	start: function(e, ui)
+	 {
+	  var draggableId = e.target.id;
+	  var width = $("#"+draggableId).css("width");
+	  var height = $("#"+draggableId).css("height");
+	 	$(ui.helper).css("width",width);
+	  $(ui.helper).css("height",height);
+	 },
+	 stop : function (e,ui)
+	 {
+
+	  var draggableId = e.target.id;
+	  //$("#"+draggableId+":eq(0)").remove();
+	  var asd = (ui.helper).parent();
+	  var id = asd.attr("id");
+	  var banyak = $(".listUser").length;
+	  var kids = $("#"+id).children();
+	  for(var i=0;i<kids.length;i++)
+	  {
+	  	if($(kids[i]).is(ui.helper))
+	  	{
+	  		var selectId = id.substr(4);
+	  		var cardId = draggableId.substr(5);
+	  		var pos = i+1;
+	  		if(pos >= kids.length)
+	  		{
+	  			pos = kids.length-1;
+	  		}
+	  		$.ajax({
+					  type: "POST",
+					  url: "board/updateCardPosition",
+					  data: {cardId:cardId,listSelect:selectId,position:pos},
+					  success: function (response) {
+
+							$(ui.helper).replaceWith($("#"+draggableId));
+							$(ui.helper).remove();
+				  		},
+				  error: function (xhr, ajaxOptions, thrownError) {
+					alert(xhr.status);
+					alert(thrownError);
+					alert(xhr.responseText);
+				  }
+				});
+	  	}
+	  }
+	 }
+});
+
 
 function createList()
 {
@@ -33,75 +252,29 @@ function createList()
 			//alert(response);
 			var rowList = $('div.ajaxList').length;
 			var listUser = $('div.listUser').length;
-			if((listUser+1) %6 ==  0 && listUser != 0)
-			{
-				$("#listCreateList").remove();
-				var gabung = "";
-				gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+response+'">';
-				gabung += '<div class="card">';
-				gabung += '<div class="card-content grey lighten-2 white-text">';
-				gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+response+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-				gabung += '<div id="list'+response+'" class="listUser">';
-				gabung += '</div>';
-				gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-				gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+response+'\')">Add a Card..</a></div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				$("#ajaxList"+rowList).append(gabung);
-
-				var gabung2 = "";
-				gabung2 += '<div class="row ajaxList" id="ajaxList'+(rowList+1)+'">';
-				gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-				gabung2 += '<div class="card">';
-				gabung2 += '<div class="card-content grey white-text">';
-				gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-				gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="white-text">Add a List..</a></div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>'; 
-				gabung2 += '</div>';
-				$("#rowList").append(gabung2);
-			}
-			else
-			{
-				$("#listCreateList").remove();
-				var gabung = "";
-				gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+response+'">';
-				gabung += '<div class="card">';
-				gabung += '<div class="card-content grey lighten-2 white-text">';
-				gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+response+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-				gabung += '<div id="list'+response+'" class="listUser">';
-				gabung += '</div>';
-				gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-				gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+response+'\')">Add a Card..</a></div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				$("#ajaxList"+rowList).append(gabung);
-
-				var gabung2 = "";
-				gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-				gabung2 += '<div class="card">';
-				gabung2 += '<div class="card-content grey white-text">';
-				gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-				gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="modal-trigger white-text">Add a List..</a></div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>';
-				gabung2 += '</div>'; 
-				$("#ajaxList"+rowList).append(gabung2);
-
-			}
-				$('#listCreateList').prop('onclick',null).off('click');
-				$('#listCreateList').on('click', function() {
-					//alert("klik + "+ cardId +" owner : "+owner);
-					//var href = $(this).attr("href");
-					$("#modalcreatelist").openModal();
-				});
+			//$("#listCreateList").remove();
+			var gabung = "";
+			gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+response+'">';
+			gabung += '<div class="card">';
+			gabung += '<div class="card-content grey lighten-2 white-text">';
+			gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+response+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
+			gabung += '<div id="list'+response+'" class="listUser dropable sortable" style="height:100%;min-height:60px;width:100%;">';
+			gabung += '</div>';
+			gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
+			gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+response+'\')">Add a Card..</a></div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			$(gabung).insertBefore($("#listCreateList"));
+			bindUiList();
+			bindUiCard();
+			$('#listCreateList').prop('onclick',null).off('click');
+			$('#listCreateList').on('click', function() {
+				//alert("klik + "+ cardId +" owner : "+owner);
+				//var href = $(this).attr("href");
+				$("#modalcreatelist").openModal();
+			});
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -145,15 +318,18 @@ function createCard()
 			  data: {title:title,owner:owner},
 			  success: function (response) {
 				cardId = response;
-				var gabung	= '<a id="card'+cardId+'" href="javascript:void(0);" class="cardUser'+owner+'" onclick="ajaxModalCard(\''+cardId+'\')">';
+				var gabung = '<div class="dragable cDrag'+cardId+' cardUser'+owner+'" id="cDrag'+cardId+'" style="width:100%;height:100%;">';
+				gabung		+= '<a id="card'+cardId+'" href="javascript:void(0);" class="cardUser'+owner+'" onclick="ajaxModalCard(\''+cardId+'\')">';
 				gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 				gabung 		+= '<div class="row" id="labelCard'+cardId+'" style="margin:auto;">';
 				gabung 		+= '</div>'
 				gabung 		+= '<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'+response+'">'+title+'</div>';
 				gabung 		+= '</div>';
 				gabung 		+= '</a>';
+				gabung 		+= '</div>';
 				//alert(gabung);
 				$("#list"+owner).append(gabung);
+				bindUiCard();
 				$("#titleCard").val("");
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
@@ -235,15 +411,18 @@ function createCardDua()
 			  data: {title:title,owner:owner},
 			  success: function (response) {
 				 cardId = response;
-				var gabung = '<a id="card'+response+'" href="javascript:void(0)" class="cardUser'+owner+'" onclick="ajaxModalCard(\''+response+'\')">';
+				 var gabung = '<div class="dragable cDrag'+cardId+' cardUser'+owner+'" id="cDrag'+cardId+'" style="width:100%;height:100%;">';
+				gabung += '<a id="card'+response+'" href="javascript:void(0)" class="cardUser'+owner+'" onclick="ajaxModalCard(\''+response+'\')">';
 				gabung += '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 				gabung += "<div class='row' id='labelCard"+response+"' style='margin:auto;'>";
 				gabung += "</div>";
 				gabung += '<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'+response+'">'+title+'</div>';
 				gabung += '</div>';
 				gabung += '</a>';
+				gabung += '</div>';
 				//alert(gabung);
 				$("#list"+owner).append(gabung);
+				bindUiCard();
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -339,7 +518,8 @@ function createCopyCard(id)
 					  		labelBlue = true;
 					  	}
 				    });
-				  var gabung	= '<a id="card'+response+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+response+'\')">';
+				  gabung 		= '<div class="dragable cDrag'+response+' cardUser'+listId+'" id="cDrag'+response+'" style="width:100%;height:100%;">'; 
+				  gabung		+= '<a id="card'+response+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+response+'\')">';
 				  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 				  gabung 		+= '<div class="row" id="labelCard'+response+'" style="margin:auto;">';
 				  if(labelRed)
@@ -371,6 +551,7 @@ function createCopyCard(id)
 				  gabung 		+= '</div>';
 				  gabung 		+= '</a>';
 				  $("#list"+listId).append(gabung);
+				  bindUiCard();
 				  },
 				  error: function (xhr, ajaxOptions, thrownError) {
 					alert(xhr.status);
@@ -444,9 +625,8 @@ function createCopyList()
 	var boardId = owner;
 	var listId = $("#hiddenListId").val();
 	var title = $("#copyListTitle").val();
-	var rowList = $('div.ajaxList').length;
 	var jumlahList = $(".colListUser").length;
-	alert(jumlahList);
+	//alert(jumlahList);
 	var posTujuan = jumlahList+1;
 	var listTujuan = "";
 	var rules = false;
@@ -458,141 +638,100 @@ function createCopyList()
 	if(rules == true)
 	{
 		$.ajax({
-		  async:false,
 		  type: "POST",
-		  url: "board/createList",
-		  data: {title:title,owner:owner},
+		  url: "board/copyList",
+		  data: {title:title,owner:owner,listId:listId},
+		  dataType:"json",
 		  success: function (response) {
-			//alert(response);
-				listTujuan = response;
-				var gabung = "";
-				gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+response+'">';
-				gabung += '<div class="card">';
-				gabung += '<div class="card-content grey lighten-2 white-text">';
-				gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+response+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-				gabung += '<div id="list'+response+'" class="listUser">';
-				gabung += '</div>';
-				gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-				gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+response+'\')">Add a Card..</a></div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				gabung += '</div>';
-				//$("#ajaxList"+rowList).append(gabung);
-				if(posTujuan %6 == 1)
-				{
-					//awal
-					$(gabung).insertBefore("#listCreateList");
-				}
-				else if(posTujuan %6 == "0" && posTujuan > 0)
-				{
-					//akhir
-					$(gabung).insertAfter(".colListUser:eq("+ (jumlahList-1)+")");
-					$("#listCreateList").remove();
-					var gabung2 = "";
-					gabung2 += '<div class="row ajaxList" id="ajaxList'+(rowList+1)+'">';
-					gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-					gabung2 += '<div class="card">';
-					gabung2 += '<div class="card-content grey white-text">';
-					gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-					gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="white-text">Add a List..</a></div>';
-					gabung2 += '</div>';
-					gabung2 += '</div>';
-					gabung2 += '</div>';
-					gabung2 += '</div>'; 
-					gabung2 += '</div>';
-					$("#rowList").append(gabung2);
-					$('#listCreateList').prop('onclick',null).off('click');
-					$('#listCreateList').on('click', function() {
-						//alert("klik + "+ cardId +" owner : "+owner);
-						//var href = $(this).attr("href");
-						$("#modalcreatelist").openModal();
-					});
-				}
-				else
-				{
-					$(gabung).insertAfter(".colListUser:eq("+ (jumlahList-1)+")");
-				}
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-
-		$.ajax({
-			async:false,
-		  type: "POST",
-		  url: "board/copyAllCard",
-		  data: {boardId:boardId,listTujuan:listTujuan,listId:listId},
-		  success: function (response) {
-			    //alert(response);
-			    //%20id%10title%20id%10title
-			    var split = response.split("%20");
-			    for(var i=1;i<split.length;i++)
-			    {
-			    	var split2 = split[i].split("%10");
-			    	var cardId = split2[0];
-			    	var title = split2[1];
-			    	var label = getLabelCard(cardId);
-				  	var labelRed = false;
-				  	var labelYellow = false;
-				  	var labelBlue = false;
-				 	var labelGreen = false;
-				 	$.each(label, function(idx, response){
-					  	if(response.labelRed == "true")
-					  	{
-					  		labelRed = true;
-					  	}
-					  	if(response.labelYellow == "true")
-					  	{
-					  		labelYellow = true;
-					  	}
-					  	if(response.labelGreen == "true")
-					  	{
-					  		labelGreen = true;
-					  	}
-					  	if(response.labelBlue == "true")
-					  	{
-					  		labelBlue = true;
-					  	}
-				    });
-		    		var gabung	= '<a id="card'+cardId+'" href="javascript:void(0);" class="cardUser'+listTujuan+'" onclick="ajaxModalCard(\''+cardId+'\')">';
-					gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-					gabung 		+= '<div class="row" id="labelCard'+cardId+'" style="margin:auto;">';
-					if(labelRed)
-					  {
-					  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelYellow)
-					  {
-					  	gabung+= '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelBlue)
-					  {
-					  	gabung+= '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelGreen)
-					  {
-					  	gabung+= '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					gabung 		+= '</div>'
-					gabung 		+= '<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'+cardId+'">'+title+'</div>';
-					gabung 		+= '</div>';
-					gabung 		+= '</a>';
-					//alert(gabung);
-					$("#list"+listTujuan).append(gabung);
-
-			    }
+		  	console.log(response);
+		  	var listId = response["listId"];
+		  	var card = response["card"];
+			var gabung = "";
+			gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+listId+'">';
+			gabung += '<div class="card">';
+			gabung += '<div class="card-content grey lighten-2 white-text">';
+			gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+listId+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
+			gabung += '<div id="list'+listId+'" class="listUser dropable sortable" style="height:100%;min-height:60px;width:100%;">';
+			gabung += '</div>';
+			gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
+			gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+listId+'\')">Add a Card..</a></div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			$(gabung).insertBefore("#listCreateList");
+			$('#listCreateList').prop('onclick',null).off('click');
+			bindUiList();
+			$('#listCreateList').on('click', function() {
+				//alert("klik + "+ cardId +" owner : "+owner);
+				//var href = $(this).attr("href");
+				$("#modalcreatelist").openModal();
+			});
+			$.each(card, function(idx, res){
+				var cardId = res.cardId;
+				var listTujuan = listId;
+		    	var title = res.cardTitle;
+		    	var label = res.label;
+			  	var labelRed = false;
+			  	var labelYellow = false;
+			  	var labelBlue = false;
+			 	var labelGreen = false;
+			 	if(label != false || label != null)
+			 	{
+			 		if(label.labelRed == "true")
+				  	{
+				  		labelRed = true;
+				  	}
+				  	if(label.labelYellow == "true")
+				  	{
+				  		labelYellow = true;
+				  	}
+				  	if(label.labelGreen == "true")
+				  	{
+				  		labelGreen = true;
+				  	}
+				  	if(label.labelBlue == "true")
+				  	{
+				  		labelBlue = true;
+				  	}
+			 	}
+			 	gabung 		= '<div class="dragable cDrag'+cardId+' cardUser'+listTujuan+'" id="cDrag'+cardId+'" style="width:100%;height:100%;">';
+	    		gabung		+= '<a id="card'+cardId+'" href="javascript:void(0);" class="cardUser'+listTujuan+'" onclick="ajaxModalCard(\''+cardId+'\')">';
+				gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
+				gabung 		+= '<div class="row" id="labelCard'+cardId+'" style="margin:auto;">';
+				if(labelRed)
+				  {
+				  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelYellow)
+				  {
+				  	gabung+= '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelBlue)
+				  {
+				  	gabung+= '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelGreen)
+				  {
+				  	gabung+= '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				gabung 		+= '</div>'
+				gabung 		+= '<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'+cardId+'">'+title+'</div>';
+				gabung 		+= '</div>';
+				gabung 		+= '</a>';
+				gabung 		+= '</div>';
+				//alert(gabung);
+				$("#list"+listTujuan).append(gabung);
+		    });
+		    
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -666,15 +805,16 @@ function openModalListArchiveList()
 	var boardId = $("#hiddenBoardId").val();
 	var posAwal = getPositionList(listId);
 	var rowAwal = (posAwal-1)/6;
-	var jumlahRow = $(".ajaxList").length;
 	var jumlahList = $(".colListUser").length;
 	$.ajax({
 		  type: "POST",
 		  url: "board/archiveList",
 		  data: {boardId:boardId,listId:listId},
 		  success: function (response) {
-		  	//alert(response);
+		  		//alert(response);
 			  
+				//hanya remove
+				$("#colList"+listId).remove();
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -682,51 +822,6 @@ function openModalListArchiveList()
 				alert(xhr.responseText);
 			  }
 			});
-	if(rowAwal < 0)
-	{
-		rowAwal = 0;
-	}
-	rowAwal = parseInt(rowAwal);
-	rowAwal+=1;
-	if(rowAwal == jumlahRow)
-	{
-		//hanya remove
-		$("#colList"+listId).remove();
-	}
-	else
-	{
-		var diff = jumlahRow-rowAwal;
-		for(var i =0;i<diff;i++)
-		{
-			var rowDiff = (rowAwal+i);
-			var temp = rowDiff*6+1;
-			var z = $(".colListUser:eq("+(temp-1)+")").appendTo("#ajaxList"+rowDiff);
-		}
-		$("#colList"+listId).remove();
-		if(jumlahList%6 == 0 && jumlahList > 0)
-		{
-			//list create list ikut pindah
-			$("#listCreateList").remove();
-			$("#ajaxList"+jumlahRow).remove();
-			var gabung2 = "";
-			gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-			gabung2 += '<div class="card">';
-			gabung2 += '<div class="card-content grey white-text">';
-			gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-			gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="white-text">Add a List..</a></div>';
-			gabung2 += '</div>';
-			gabung2 += '</div>';
-			gabung2 += '</div>';
-			gabung2 += '</div>'; 
-			$("#ajaxList"+(jumlahRow-1)).append(gabung2);
-			$('#listCreateList').prop('onclick',null).off('click');
-			$('#listCreateList').on('click', function() {
-				//alert("klik + "+ cardId +" owner : "+owner);
-				//var href = $(this).attr("href");
-				$("#modalcreatelist").openModal();
-			});
-		}
-	}
 
 }
 
@@ -737,18 +832,32 @@ function changeListPosition()
 	var posAwal = getPositionList(listId);
 	var boardId = $("#hiddenBoardId").val();
 	var jumlahList = $("#selectListPosition option").size(); //jumlahList
-	var arah = "awal";
-	var rowList = $('div.ajaxList').length;
-	var listUser = $('div.listUser').length;
-	var rowTujuan = (posTujuan-1)/6;
-	var rowAwal = (posAwal-1)/6;
+	var listUser = $('.colListUser').length;
 	$.ajax({
 		  type: "POST",
 		  url: "board/changeListPosition",
 		  data: {boardId:boardId,listId:listId,posAwal:posAwal,posTujuan:posTujuan},
 		  success: function (response) {
-		  	alert(response);
-			  
+		  	//alert(response);
+				if(posTujuan == "1")
+				{
+					$("#colList"+listId).prependTo("#card-stats");
+				}
+				else if(posTujuan == listUser)
+				{
+					$("#colList"+listId).insertBefore("#listCreateList");
+				}
+				else
+				{
+					if(posAwal < posTujuan)
+					{
+						$("#colList"+listId).insertAfter(".colListUser:eq("+(posTujuan-1)+")");
+					}
+					else if(posAwal > posTujuan)
+					{
+						$("#colList"+listId).insertBefore(".colListUser:eq("+(posTujuan-1)+")");
+					}
+				}
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -756,67 +865,6 @@ function changeListPosition()
 				alert(xhr.responseText);
 			  }
 			});
-	if(rowTujuan < 0)
-	{
-		rowTujuan = 0;
-	}
-	if(rowAwal < 0)
-	{
-		rowAwal = 0;
-	}
-	rowTujuan = parseInt(rowTujuan);
-	rowTujuan+=1;
-	rowAwal = parseInt(rowAwal);
-	rowAwal+=1;
-	var diff = 0;
-	var gerak="atas";
-	if(rowTujuan > rowAwal)
-	{
-		gerak = "atas";
-		diff = rowTujuan-rowAwal; //list pindah ke bawah, gerak ke atas
-	}
-	else
-	{
-		gerak = "bawah";
-		diff = rowAwal-rowTujuan; //list pindah ke atas, gerak ke bawah
-	}
-	if(gerak == "atas")
-	{
-		for(var i =0;i<diff;i++)
-		{
-			var rowDiff = (rowAwal+i);
-			var temp = rowDiff*6+1;
-			var z = $(".colListUser:eq("+(temp-1)+")").appendTo("#ajaxList"+rowDiff);
-		}
-	}
-	else if(gerak == "bawah")
-	{
-		for(var i =0;i<diff;i++)
-		{
-			var rowDiff = (rowAwal-i-1);
-			var temp = rowDiff*6;
-			var z = $(".colListUser:eq("+(temp-1)+")").prependTo("#ajaxList"+(rowDiff+1));
-		}
-	}
-	if(posTujuan%6 == "1")
-	{
-		$("#colList"+listId).prependTo("#ajaxList"+rowTujuan);
-	}
-	else if(posTujuan %6 == "0" && posTujuan > 0)
-	{
-		$("#colList"+listId).appendTo("#ajaxList"+rowTujuan);
-	}
-	else
-	{
-		if(posAwal < posTujuan)
-		{
-			$("#colList"+listId).insertAfter(".colListUser:eq("+(posTujuan-1)+")");
-		}
-		else if(posAwal > posTujuan)
-		{
-			$("#colList"+listId).insertBefore(".colListUser:eq("+(posTujuan-1)+")");
-		}
-	}
 	
 }
 
@@ -824,29 +872,23 @@ function getPositionList(id)
 {
 	var listId = id;
 	var position = "1";
-	$.ajax({
-	  async:false,
-	  type: "POST",
-	  url: "board/getListPosition",
-	  data: {listId:listId},
-	  success: function (response) {
-		  //alert("response");
-		  position = response;
-	  },
-	  error: function (xhr, ajaxOptions, thrownError) {
-		alert(xhr.status);
-		alert(thrownError);
-		alert(xhr.responseText);
-	  }
-	});
+	var listUser = $(".colListUser").length;
+	for(var i=0;i<listUser;i++)
+	{
+		var listIdCheck = $(".colListUser:eq("+i+")").attr("id");
+		listIdCheck = listIdCheck.substr(7); 
+		if(listId == listIdCheck && listIdCheck != "listCreateList" )
+		{
+			position = i+1;
+		}
+	}
+
 	return position;
 }
 
 function openModalListMenu(id)
 {
 	$("#hiddenListId").val(id);
-
-	checkRoleListMenu();
 	$("#modallistmenu").openModal();
 }
 
@@ -894,81 +936,25 @@ function saveMoveAllCardList()
 function ajaxModalCard(id)
 {
 	$("#hiddenCardId").val(id);
-	getBoardCard(id);
-
-	getBoardMember(id);
-
-	getBoardLabelCard(id);
-
-	getStartDate(id);
-
-	getDueDate(id);
-
-	getChecklist(id);
-
-	getComment(id);
-
-	getAttachment(id);
-
-	getMoveCard(id);
-
-	$("#changeArchive").show();
-	$("#changeSend").hide();
-	checkRoleCard();
-	$("#modal3").openModal();
-}
-
-
-function getBoardCard(id)
-{
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getBoardCard",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  //alert("response");
-			  $.each(response, function(idx, response){
-			  	  $("#modalCardTitle").text(response.cardTitle);
-			  	  $("#modalListTitle").text("in list "+response.listTitle);
-			  	  $("#txtCardTitle").val(response.cardTitle);
-			  	  $("#hiddenListId").val(response.cardListId);
-			  	  $("#textareaDescription").text(response.cardDescription);
-			  	  $("#modalCardDescription").text(response.cardDescription);
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-}
-
-function getMoveCard(id)
-{
-	var id = id;
 	var boardId = $("#hiddenBoardId").val();
 	$.ajax({
 		  type: "POST",
-		  url: "board/getMoveCard",
+		  url: "board/getCardDetails",
 		  data: {id:id,boardId:boardId},
 		  dataType:"json",
 		  success: function (response) {
-			  //alert("response");
-			  $("#selectListCard").empty();
-			  var gabung = "";
-			    gabung += "<option value=0 disabled selected>Choose a list</option>";
-			    $("#selectListCard").append(gabung);
-			  $.each(response, function(idx, response){
-			  	if(response.listStatus == "1" && response.listArchive == "0")
-			  	{
-			  		var gabung = "";
-			    	gabung += "<option value='"+response.listId+"'>"+response.listTitle+"</option>";
-			    	$("#selectListCard").append(gabung);
-			  	}
-			    });
+			  getBoardCard(response["header"]);
+			  getBoardMember(response["member"]);
+			  getBoardLabelCard(response["label"]);
+			  getStartDate(response["startDate"]);
+			  getDueDate(response["dueDate"]);
+			  getChecklist(response["checklist"]);
+			  getComment(response["comment"]);
+			  getAttachment(response["attachment"]);
+			  getMoveCard(response["move"]);
+			  $("#changeArchive").show();
+			  $("#changeSend").hide();
+			  $("#modal3").openModal();
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -976,6 +962,38 @@ function getMoveCard(id)
 			alert(xhr.responseText);
 		  }
 		});
+
+	//$("#changeArchive").show();
+	//$("#changeSend").hide();
+	//$("#modal3").openModal();
+}
+
+
+function getBoardCard(header)
+{
+	$("#modalCardTitle").text(header["0"].cardTitle);
+    $("#modalListTitle").text("in list "+header["0"].listTitle);
+    $("#txtCardTitle").val(header["0"].cardTitle);
+    $("#hiddenListId").val(header["0"].cardListId);
+    $("#textareaDescription").text(header["0"].cardDescription);
+    $("#modalCardDescription").text(header["0"].cardDescription);
+}
+
+function getMoveCard(response)
+{
+	  //alert("response");
+	  $("#selectListCard").empty();
+	  var gabung = "";
+	  gabung += "<option value=0 disabled selected>Choose a list</option>";
+	  $("#selectListCard").append(gabung);
+	  $.each(response, function(idx, response){
+	  	if(response.listStatus == "1" && response.listArchive == "0")
+	  	{
+	  		var gabung = "";
+	    	gabung += "<option value='"+response.listId+"'>"+response.listTitle+"</option>";
+	    	$("#selectListCard").append(gabung);
+	  	}
+	  });
 
 }
 
@@ -1008,12 +1026,12 @@ function changeCardPosition()
 			  	if(pos == 1)
 				{
 					//awal
-					$("#card"+cardId).prependTo($("#list"+selectId));
+					$("#cDrag"+cardId).prependTo($("#list"+selectId));
 				}
 				else if(pos==size)
 				{
 					//akhir
-					$("#card"+cardId).appendTo($("#list"+selectId));
+					$("#cDrag"+cardId).appendTo($("#list"+selectId));
 				}
 				else
 				{
@@ -1024,15 +1042,15 @@ function changeCardPosition()
 					//pos = 4 -> 2 tengah
 					if(response == "bawah")
 					{
-						$("#card"+cardId).insertAfter(".cardUser"+selectId+":eq( "+pos+" )");
+						$("#cDrag"+cardId).insertAfter(".cardUser"+selectId+":eq( "+pos+" )");
 					}
 					else if(response == "atas")
 					{
-						$("#card"+cardId).insertBefore(".cardUser"+selectId+":eq( "+pos+" )");
+						$("#cDrag"+cardId).insertBefore(".cardUser"+selectId+":eq( "+pos+" )");
 					}
 					else if(response == "Berhasil")
 					{
-						$("#card"+cardId).insertBefore(".cardUser"+selectId+":eq( "+pos+" )");
+						$("#cDrag"+cardId).insertBefore(".cardUser"+selectId+":eq( "+pos+" )");
 					}
 					
 				}
@@ -1091,49 +1109,34 @@ function changeList()
 		});
 }
 
-function getBoardMember(id)
+function getBoardMember(response)
 {
-	var id = id;
-	var boardId = $("#hiddenBoardId").val();
-	$.ajax({
-		  type: "POST",
-		  url: "board/getBoardMember",
-		  data: {boardId:boardId},
-		  dataType:"json",
-		  success: function (response) {
-			  	$("#assignMembers").empty();
-			  	$("#iconMember").empty();
-			  	$("#iconMember").append("<h6><b>Members</b></h6>");
-			  $.each(response, function(idx, response){
-				  	if(response.memberStatus == "1") //Artinya terdapat didalam board sbg member, jika di kick atau leave tidak akan ditampilkan
-				  	{
-			  			var checked = getBoardAssignChecked(response.userId);
-			  			var name = getNameUser(response.userId);
-			  			var gabung = "<p>";
-			  			if(checked == "true")
-			  			{
-			  				gabung += "<input type='checkbox' class='assignMembers' id='"+response.userId+"' checked='checked'/>";
-				  			var directory = getDirectoryUser(response.userId);
-				  			var gabung2 = '<img src="'+directory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
-				  			$("#iconMember").append(gabung2);
-			  			}
-			  			else
-			  			{
-			  				gabung += "<input type='checkbox' class='assignMembers' id='"+response.userId+"' />";
-			  			}
-			  			gabung += "<label class='black-text' for='"+response.userId+"' />"+name+"</label>";
-			  			gabung +=  "</p>";
-			  			$("#assignMembers").append(gabung);
-				  	}
+	$("#assignMembers").empty();
+  	$("#iconMember").empty();
+  	$("#iconMember").append("<h6><b>Members</b></h6>");
+	  $.each(response, function(idx, response){
+		  	if(response.memberStatus == "1") //Artinya terdapat didalam board sbg member, jika di kick atau leave tidak akan ditampilkan
+		  	{
+	  			var checked = response.checked;
+	  			var name = response.userName;
+	  			var gabung = "<p>";
+	  			if(checked == "true")
+	  			{
+	  				gabung += "<input type='checkbox' class='assignMembers' id='"+response.userId+"' checked='checked'/>";
+		  			var directory = response.userImage;
+		  			var gabung2 = '<img src="'+directory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
+		  			$("#iconMember").append(gabung2);
+	  			}
+	  			else
+	  			{
+	  				gabung += "<input type='checkbox' class='assignMembers' id='"+response.userId+"' />";
+	  			}
+	  			gabung += "<label class='black-text' for='"+response.userId+"' />"+response.userName+"</label>";
+	  			gabung +=  "</p>";
+	  			$("#assignMembers").append(gabung);
+		  	}
 
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+	    });
 }
 
 function getBoardAssignChecked(id)
@@ -1200,336 +1203,250 @@ function createAssignMembers()
 	}
 }
 
-function getBoardLabelCard(id)
+function getBoardLabelCard(response)
 {
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getLabelCard",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  //alert(response);
-			  	$("#labelred").prop("checked",false);
-			  	$("#labelyellow").prop("checked",false);
-			  	$("#labelgreen").prop("checked",false);
-			  	$("#labelblue").prop("checked",false);
-			  	$("#ajaxLabelCard").empty();
-				$("#ajaxLabelCard").append("<h6><b>Label</b></h6>");
-			  $.each(response, function(idx, response){
-			  		if(response.labelRed == "true")
-			  		{
-			  			$("#labelred").prop("checked",true);
-			  			var label = '<div class="red" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
-			  			$("#ajaxLabelCard").append(label);
-			  		}
-			  		if(response.labelYellow == "true")
-			  		{
-			  			$("#labelyellow").prop("checked",true);
-			  			var label = '<div class="yellow" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
-			  			$("#ajaxLabelCard").append(label);
-			  		}
-			  		if(response.labelGreen == "true")
-			  		{
-			  			$("#labelgreen").prop("checked",true);
-			  			var label = '<div class="green" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
-			  			$("#ajaxLabelCard").append(label);
-			  		}
-			  		if(response.labelBlue == "true")
-			  		{
-			  			$("#labelblue").prop("checked",true);
-			  			var label = '<div class="blue" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
-			  			$("#ajaxLabelCard").append(label);
-			  		}
-			  		if(response.labelRed == "false" && response.labelYellow == "false" && response.labelGreen == "false" && response.labelBlue == "false")
-			  		{
-			  			$("#ajaxLabelCard").empty();
-			  		}
-
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+	$("#labelred").prop("checked",false);
+  	$("#labelyellow").prop("checked",false);
+  	$("#labelgreen").prop("checked",false);
+  	$("#labelblue").prop("checked",false);
+  	$("#ajaxLabelCard").empty();
+	$("#ajaxLabelCard").append("<h6><b>Label</b></h6>");
+	if(response.labelRed == "true")
+	{
+		$("#labelred").prop("checked",true);
+		var label = '<div class="red" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
+		$("#ajaxLabelCard").append(label);
+	}
+	if(response.labelYellow == "true")
+	{
+		$("#labelyellow").prop("checked",true);
+		var label = '<div class="yellow" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
+		$("#ajaxLabelCard").append(label);
+	}
+	if(response.labelGreen == "true")
+	{
+		$("#labelgreen").prop("checked",true);
+		var label = '<div class="green" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
+		$("#ajaxLabelCard").append(label);
+	}
+	if(response.labelBlue == "true")
+	{
+		$("#labelblue").prop("checked",true);
+		var label = '<div class="blue" style="width:28px;height:28px;border-radius:15%;margin:1px;float:left;"></div>';
+		$("#ajaxLabelCard").append(label);
+	}
+	if(response.labelRed == "false" && response.labelYellow == "false" && response.labelGreen == "false" && response.labelBlue == "false")
+	{
+		$("#ajaxLabelCard").empty();
+	}
 }
 
-function getStartDate(id)
+function getStartDate(response)
 {
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getStartDate",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  $("#ajaxStartDate").empty();
-			  if(response != "")
-			  {
-			  }
-			  
-			  $.each(response, function(idx, response){
-			  	//alert(response.startDate); //2018-03-07 12:00:00
-			  	var date = response.startDate;
-			  	var pecah = date.split(" ");
-			  	var tanggal = pecah[0];
-			  	var waktu = pecah[1];
-			  	var tanggal2 = tanggal.split("-");
-			  	var waktu2 = waktu.split(":");
-			  	var tgl = tanggal2[2];
-			  	var bln = tanggal2[1];
-			  	var jam = waktu2[0];
-			  	if(bln == "01")
+	$("#ajaxStartDate").empty();
+	if(response.startDate != null)
+	{
+	  	//alert(response.startDate); //2018-03-07 12:00:00
+	  	var date = response.startDate;
+	  	var pecah = date.split(" ");
+	  	var tanggal = pecah[0];
+	  	var waktu = pecah[1];
+	  	var tanggal2 = tanggal.split("-");
+	  	var waktu2 = waktu.split(":");
+	  	var tgl = tanggal2[2];
+	  	var bln = tanggal2[1];
+	  	var jam = waktu2[0];
+	  	if(bln == "01")
+	  	{
+	  		bln = "Jan";
+	  	}
+	  	else if(bln == "02")
+	  	{
+	  		bln = "Feb";
+	  	}
+	  	else if(bln == "03")
+	  	{
+	  		bln = "Mar";
+	  	}
+	  	else if(bln == "04")
+	  	{
+	  		bln = "Apr";
+	  	}
+	  	else if(bln == "05")
+	  	{
+	  		bln = "May";
+	  	}
+	  	else if(bln == "06")
+	  	{
+	  		bln = "Jun";
+	  	}
+	  	else if(bln == "07")
+	  	{
+	  		bln = "Jul";
+	  	}
+	  	else if(bln == "08")
+	  	{	
+	  		bln = "Aug";
+	  	}
+	  	else if(bln == "09")
+	  	{
+	  		bln = "Sep";
+	  	}
+	  	else if(bln == "10")
+	  	{
+	  		bln = "Oct";
+	  	}
+	  	else if(bln == "11")
+	  	{
+	  		bln = "Nov";
+	  	}
+	  	else if(bln == "12")
+	  	{
+	  		bln = "Dec";
+	  	}
+	  	if(response.startDateStatus == "1")
+	  	{
+	  		$("#ajaxStartDate").append("<h6><b>Start Date</b></h6>");
+	  		var gabung = "<p>";
+	  		if(response.startDateChecked == "1")
+	  		{
+	  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' checked='checked'/>";
+	  		}
+	  		else
+	  		{
+	  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' />";
+	  		}
+	  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 </label><a class='roleActivityStartDate' href='javascript:void(0);' onclick='deleteStartDate(\""+response.cardId+"\")' > - Remove</a>";
+	  		gabung += "</p>";
+	  	}
+	  	$("#ajaxStartDate").append(gabung);
+	}
+}
+
+function getDueDate(response)
+{
+	$("#ajaxDueDate").empty();
+  	if(response.dueDate != null)
+  	{
+  		var date = response.dueDate;
+	  	var pecah = date.split(" ");
+	  	var tanggal = pecah[0];
+	  	var waktu = pecah[1];
+	  	var tanggal2 = tanggal.split("-");
+	  	var waktu2 = waktu.split(":");
+	  	var tgl = tanggal2[2];
+	  	var bln = tanggal2[1];
+	  	var jam = waktu2[0];
+	  	if(bln == "01")
+	  	{
+	  		bln = "Jan";
+	  	}
+	  	else if(bln == "02")
+	  	{
+	  		bln = "Feb";
+	  	}
+	  	else if(bln == "03")
+	  	{
+	  		bln = "Mar";
+	  	}
+	  	else if(bln == "04")
+	  	{
+	  		bln = "Apr";
+	  	}
+	  	else if(bln == "05")
+	  	{
+	  		bln = "May";
+	  	}
+	  	else if(bln == "06")
+	  	{
+	  		bln = "Jun";
+	  	}
+	  	else if(bln == "07")
+	  	{
+	  		bln = "Jul";
+	  	}
+	  	else if(bln == "08")
+	  	{	
+	  		bln = "Aug";
+	  	}
+	  	else if(bln == "09")
+	  	{
+	  		bln = "Sept";
+	  	}
+	  	else if(bln == "10")
+	  	{
+	  		bln = "Oct";
+	  	}
+	  	else if(bln == "11")
+	  	{
+	  		bln = "Nov";
+	  	}
+	  	else if(bln == "12")
+	  	{
+	  		bln = "Dec";
+	  	}
+	  	var id = response.cardId;
+	  	if(response.dueDateStatus == "1")
+	  	{
+	  		$("#ajaxDueDate").append("<h6><b>Due Date</b></h6>");
+	  		var gabung = "<p>";
+	  		if(response.dueDateChecked == "1")
+	  		{
+	  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' checked='checked'/>";
+	  		}
+	  		else
+	  		{
+	  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' />";
+	  		}
+	  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 </label><a class='roleActivityDueDate' href='javascript:void(0);' onclick='deleteDueDate(\""+id+"\")' >Remove</a>";
+	  		gabung += "</p>";
+	  	}
+	  	$("#ajaxDueDate").append(gabung);
+  	}
+  	
+}
+
+function getChecklist(response)
+{
+  $("#ajaxChecklist").empty();
+  $.each(response, function(idx, response){
+	  	if(response.checklistStatus == "1")
+	  	{
+	  		var atas = '<div id="checklist'+response.checklistId+'">';
+	  		var luaratas1 = '<div class="col s12 m6 l10 ">';
+	  		var header = '<h6><b>'+response.checklistTitle+'</b></h6>';
+	  		var progressbar = '<div class="progress"><div id="pb'+response.checklistId+'" class="determinate" style="width:0%"></div></div>';
+	  		var item ='<div id="checklistItem'+response.checklistId+'"></div>';
+	  		var addatas ='<div id="item'+response.checklistId+'">';
+	  		var add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
+	  		var addbawah ='</div>';
+	  		var luaratas2 = '</div>';
+	  		var luarbawah1 = '<div class="col s12 m6 l1 roleActivityChecklist" style="">';
+	  		var tengah = '<a href="javascript:void(0);" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
+	  		var luarbawah2 = '</div>';
+	  		var a = "</div>";
+	  		var gabung = atas+luaratas1+header+progressbar+item+addatas+add+addbawah+luaratas2+luarbawah1+tengah+luarbawah2+a;
+	  		$("#ajaxChecklist").append(gabung);
+	  		$.each(response.item, function(index, res){
+			  	if(res.itemStatus == "1")
 			  	{
-			  		bln = "Jan";
-			  	}
-			  	else if(bln == "02")
-			  	{
-			  		bln = "Feb";
-			  	}
-			  	else if(bln == "03")
-			  	{
-			  		bln = "Mar";
-			  	}
-			  	else if(bln == "04")
-			  	{
-			  		bln = "Apr";
-			  	}
-			  	else if(bln == "05")
-			  	{
-			  		bln = "May";
-			  	}
-			  	else if(bln == "06")
-			  	{
-			  		bln = "Jun";
-			  	}
-			  	else if(bln == "07")
-			  	{
-			  		bln = "Jul";
-			  	}
-			  	else if(bln == "08")
-			  	{	
-			  		bln = "Aug";
-			  	}
-			  	else if(bln == "09")
-			  	{
-			  		bln = "Sep";
-			  	}
-			  	else if(bln == "10")
-			  	{
-			  		bln = "Oct";
-			  	}
-			  	else if(bln == "11")
-			  	{
-			  		bln = "Nov";
-			  	}
-			  	else if(bln == "12")
-			  	{
-			  		bln = "Dec";
-			  	}
-			  	if(response.startDateStatus == "1")
-			  	{
-			  		$("#ajaxStartDate").append("<h6><b>Start Date</b></h6>");
-			  		var gabung = "<p>";
-			  		if(response.startDateChecked == "1")
+
+			  		if(res.itemChecked == "1")
 			  		{
-			  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+id+"\")' checked='checked'/>";
+			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" checked="checked" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
 			  		}
 			  		else
 			  		{
-			  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+id+"\")' />";
+			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;display:none;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+
 			  		}
-			  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a class='roleActivityStartDate' style='display:none;' href='javascript:void(0);' onclick='deleteStartDate(\""+id+"\")' >Remove</a>";
-			  		gabung += "</p>";
+			  		countPb(response.checklistId);
 			  	}
-
-			  	/*$("#ajaxStartDate").append("<p>");
-			  	$("#ajaxStartDate").append("<input type='checkbox' id='a2' />");
-			  	$("#ajaxStartDate").append("<label for='a2'>"+bln+" "+tgl+" at " +jam+":00</label>");//Feb 26 at 12:00PM*/
-			  	$("#ajaxStartDate").append(gabung);
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-}
-
-function getDueDate(id)
-{
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getDueDate",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  $("#ajaxDueDate").empty();
-			  if(response != "")
-			  {
-			  }
-			  
-			  $.each(response, function(idx, response){
-			  	//alert(response.startDate); //2018-03-07 12:00:00
-			  	var date = response.dueDate;
-			  	var pecah = date.split(" ");
-			  	var tanggal = pecah[0];
-			  	var waktu = pecah[1];
-			  	var tanggal2 = tanggal.split("-");
-			  	var waktu2 = waktu.split(":");
-			  	var tgl = tanggal2[2];
-			  	var bln = tanggal2[1];
-			  	var jam = waktu2[0];
-			  	if(bln == "01")
-			  	{
-			  		bln = "Jan";
-			  	}
-			  	else if(bln == "02")
-			  	{
-			  		bln = "Feb";
-			  	}
-			  	else if(bln == "03")
-			  	{
-			  		bln = "Mar";
-			  	}
-			  	else if(bln == "04")
-			  	{
-			  		bln = "Apr";
-			  	}
-			  	else if(bln == "05")
-			  	{
-			  		bln = "May";
-			  	}
-			  	else if(bln == "06")
-			  	{
-			  		bln = "Jun";
-			  	}
-			  	else if(bln == "07")
-			  	{
-			  		bln = "Jul";
-			  	}
-			  	else if(bln == "08")
-			  	{	
-			  		bln = "Aug";
-			  	}
-			  	else if(bln == "09")
-			  	{
-			  		bln = "Sept";
-			  	}
-			  	else if(bln == "10")
-			  	{
-			  		bln = "Oct";
-			  	}
-			  	else if(bln == "11")
-			  	{
-			  		bln = "Nov";
-			  	}
-			  	else if(bln == "12")
-			  	{
-			  		bln = "Dec";
-			  	}
-			  	if(response.dueDateStatus == "1")
-			  	{
-			  		$("#ajaxDueDate").append("<h6><b>Due Date</b></h6>");
-			  		var gabung = "<p>";
-			  		if(response.dueDateChecked == "1")
-			  		{
-			  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' checked='checked'/>";
-			  		}
-			  		else
-			  		{
-			  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' />";
-			  		}
-			  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 - </label><a class='roleActivityDueDate' style='display:none;' href='javascript:void(0);' onclick='deleteDueDate(\""+id+"\")' >Remove</a>";
-			  		gabung += "</p>";
-			  	}
-			  	$("#ajaxDueDate").append(gabung);
-
-		   		});
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-}
-
-function getChecklist(id)
-{
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getChecklist",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-		  	$("#ajaxChecklist").empty();
-			  $.each(response, function(idx, response){
-				  	if(response.checklistStatus == "1")
-				  	{
-				  		var atas = '<div id="checklist'+response.checklistId+'">';
-				  		var luaratas1 = '<div class="col s12 m6 l10 ">';
-				  		var header = '<h6><b>'+response.checklistTitle+'</b></h6>';
-				  		var progressbar = '<div class="progress"><div id="pb'+response.checklistId+'" class="determinate" style="width:0%"></div></div>';
-				  		//var item ='<p> <input type="checkbox" id="test3" /><label for="test3">Satu</label></p>';
-				  		var item ='<div id="checklistItem'+response.checklistId+'"></div>';
-				  		var addatas ='<div id="item'+response.checklistId+'">';
-				  		var add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
-				  		var addbawah ='</div>';
-				  		var luaratas2 = '</div>';
-				  		var luarbawah1 = '<div class="col s12 m6 l1 roleActivityChecklist" style="display:none;">';
-				  		var tengah = '<a href="javascript:void(0);" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
-				  		var luarbawah2 = '</div>';
-				  		var a = "</div>";
-				  		var gabung = atas+luaratas1+header+progressbar+item+addatas+add+addbawah+luaratas2+luarbawah1+tengah+luarbawah2+a;
-				  		$("#ajaxChecklist").append(gabung);
-				  		//alert(response.checklistId);
-				  		$.ajax({
-						  type: "POST",
-						  url: "board/getChecklistItem",
-						  data: {id:response.checklistId},
-						  dataType:"json",
-						  success: function (response) {
-							  $.each(response, function(idx, response){
-							  	if(response.itemStatus == "1")
-							  	{
-
-							  		if(response.itemChecked == "1")
-							  		{
-							  			$("#checklistItem"+response.checklistId).append('<p id="item'+response.itemId+'"> <input type="checkbox" checked="checked" class="cb'+response.checklistId+'" id="test'+response.itemId+'" onchange="changeItem(\''+response.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+response.itemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+response.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
-							  		}
-							  		else
-							  		{
-							  			$("#checklistItem"+response.checklistId).append('<p id="item'+response.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+response.itemId+'" onchange="changeItem(\''+response.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+response.itemId+'">'+response.itemTitle+'</label><span style="margin-left:7%;display:none;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+response.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
-
-							  		}
-							  		countPb(response.checklistId);
-							  	}
-							  		
-							  	});
-
-						  },
-						  error: function (xhr, ajaxOptions, thrownError) {
-							alert(xhr.status);
-							alert(thrownError);
-							alert(xhr.responseText);
-						  }
-						});
-				  	}
-			  		
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+		  		
+		  	});
+	  	}
+  		
+    });
 }
 
 function getDirectoryUser(id)
@@ -1602,100 +1519,79 @@ function getLabelCard(id)
 
 }
 
-function getComment(id)
+function getComment(response)
 {
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getComment",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  //alert(response);
-			  $("#ajaxComment").empty();
-			  $.each(response, function(idx, response){
-			  	if(response.commentStatus == "1")
-			  	{
-			  		var directory = getDirectoryUser(response.userId);
-			  		var name = getNameUser(response.userId);
-			  		var gabung = "";
-			  		gabung  +=	'<div class="row" id="comment'+response.commentId+'">';
-					gabung  +=		'<div class="col s12 m4 l1">';
-					gabung  +=			'<img src="'+directory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
-					gabung  +=		'</div>';
-					gabung  +=		'<div class="col s12 m4 l11">';
-					gabung  +=			'<p style="margin-top:-3px;">';
-					gabung  +=				'<b><u>'+name+'</u></b>';
-					gabung  +=			'</p>';
-					gabung  +=			'<p style="margin-top:-13px;" id="textComment'+response.commentId+'">'+response.commentText+'</p>';
-					gabung  +=				'<div id="changeComment'+response.commentId+'" style="margin-top:-25px;margin-bottom:15px;display:none;">';
-					gabung 	+= 					'<textarea id="textareaChangeComment'+response.commentId+'" class="materialize-textarea" >'+response.commentText+'</textarea>';
-					gabung	+= 					'<a class="btn waves-effect waves-light green" style="margin-right:10px;" onclick="changeCommentText(\''+response.commentId+'\')">Change</a>';
-					gabung	+= 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditComment(\''+response.commentId+'\')"><i class="mdi-content-clear"></i></a>';
-					gabung  += 				'</div>';
-					gabung  +=			'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
-					gabung  +=				'yesterday at 8:17 PM - <a href="javascript:void(0);" onclick="changeReply(\''+response.commentId+'\')"><u>Reply</u></a> - <a href="javascript:void(0);" onclick="editComment(\''+response.commentId+'\')"><u>Edit</u></a> - <a href="javascript:void(0)" onclick="deleteComment(\''+response.commentId+'\')"><u>Delete</u></a>' ;
-					gabung  +=			'</p>';
-					gabung	+=			'<div id="ajaxReplyComment'+response.commentId+'">';
-					gabung 	+= 				'<div class="col s12 m6 l12" id="changeReply'+response.commentId+'">';
-					gabung 	+= 				'</div>';
-					gabung 	+=			'</div>';
-					gabung  +=		'</div>';
-					gabung  +=	'</div>';
-					$("#ajaxComment").append(gabung);
-					$.ajax({
-					  type: "POST",
-					  url: "board/getReplyComment",
-					  data: {commentId:response.commentId},
-					  dataType:"json",
-					  success: function (response) {
-						  //alert(response);
-						  $("#ajaxReplyComment"+response.commentId).empty();
-						  $.each(response, function(idx, response){
-						  	if(response.replyStatus == "1")
-						  	{
-						  		var name2 = getNameUser(response.userId);
-						  		var directory2 = getDirectoryUser(response.userId);
-						  		var gabung2 = "";
-						  		gabung2  += '<div id="replyUser'+response.replyId+'">';
-								gabung2  +=	'<div class="col s12 m4 l1">';
-								gabung2  +=		'<img src="'+directory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
-								gabung2  +=	'</div>';
-								gabung2  +=	'<div class="col s12 m4 l11">';
-								gabung2  +=		'<p style="margin-top:-3px;">';
-								gabung2  +=			'<b><u>'+name+'</u></b>';
-								gabung2  +=		'</p>';
-								gabung2  +=		'<p id="textReply'+response.replyId+'" style="margin-top:-13px;">'+response.replyText+'</p>';
-								gabung2  +=				'<div id="changeReply'+response.replyId+'" style="margin-top:-25px;margin-bottom:15px;display:none;">';
-								gabung2  += 					'<textarea id="textareaChangeReply'+response.replyId+'" class="materialize-textarea" >'+response.replyText+'</textarea>';
-								gabung2	 += 					'<a class="btn waves-effect waves-light green" style="margin-right:10px;" onclick="changeReplyText(\''+response.replyId+'\')">Change</a>';
-								gabung2	 += 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditReply(\''+response.replyId+'\')"><i class="mdi-content-clear"></i></a>';
-								gabung2  += 				'</div>';
-								gabung2  +=		'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
-								gabung2  +=			'yesterday at 8:17 PM - <a href="javascript:void(0);" onclick="editReply(\''+response.replyId+'\')"><u>Edit</u></a> - <a href="javascript:void(0);" onclick="deleteReply(\''+response.replyId+'\')"><u>Delete</u></a>' ;
-								gabung2  +=		'</p>';
-								gabung2  +=	'</div>';
-								gabung2  += '</div>';
-								$("#ajaxReplyComment"+response.commentId).append(gabung2);
-						  	}
-						    });
-					  },
-					  error: function (xhr, ajaxOptions, thrownError) {
-						alert(xhr.status);
-						alert(thrownError);
-						alert(xhr.responseText);
-					  }
-					});
-			  	}
+	//alert(response);
+  $("#ajaxComment").empty();
+  $.each(response, function(idx, response){
+  	if(response.commentStatus == "1")
+  	{
+  		var gabung = "";
+  		gabung  +=	'<div class="row" id="comment'+response.commentId+'">';
+		gabung  +=		'<div class="col s12 m4 l1">';
+		gabung  +=			'<img src="'+response.commentDirectory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
+		gabung  +=		'</div>';
+		gabung  +=		'<div class="col s12 m4 l11">';
+		gabung  +=			'<p style="margin-top:-3px;">';
+		gabung  +=				'<b><u>'+response.commentName+'</u></b>';
+		gabung  +=			'</p>';
+		gabung  +=			'<p style="margin-top:-13px;" id="textComment'+response.commentId+'">'+response.commentText+'</p>';
+		gabung  +=				'<div id="changeComment'+response.commentId+'" style="margin-top:-25px;margin-bottom:15px;display:none;">';
+		gabung 	+= 					'<textarea id="textareaChangeComment'+response.commentId+'" class="materialize-textarea" >'+response.commentText+'</textarea>';
+		gabung	+= 					'<a class="btn waves-effect waves-light green" style="margin-right:10px;" onclick="changeCommentText(\''+response.commentId+'\')">Change</a>';
+		gabung	+= 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditComment(\''+response.commentId+'\')"><i class="mdi-content-clear"></i></a>';
+		gabung  += 				'</div>';
+		gabung  +=			'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
+		gabung  +=				'<a href="javascript:void(0);" onclick="changeReply(\''+response.commentId+'\')"><u>Reply</u></a>' ;
+		if($("#hiddenUserId").val == response.commentUserId)
+		{
+			$gabung += ' - <a href="javascript:void(0);" onclick="editComment(\''+response.commentId+'\')"><u>Edit</u></a> - <a href="javascript:void(0)" onclick="deleteComment(\''+response.commentId+'\')"><u>Delete</u></a>';
+		}
+		gabung  +=			'</p>';
+		gabung 	+= 				'<div class="col s12 m6 l12" id="changeReply'+response.commentId+'">';
+		gabung 	+= 				'</div>';
+		gabung	+=			'<div id="ajaxReplyComment'+response.commentId+'">';
+		
+		gabung 	+=			'</div>';
+		gabung  +=		'</div>';
+		gabung  +=	'</div>';
+		$("#ajaxComment").append(gabung);
+
+		//alert(response);
+		$("#ajaxReplyComment"+response.commentId).empty();
+		$.each(response.commentReply, function(idx, res){
+		  	if(res.replyStatus == "1")
+		  	{
+		  		var gabung2 = "";
+		  		gabung2  += '<div id="replyUser'+res.replyId+'">';
+				gabung2  +=	'<div class="col s12 m4 l1">';
+				gabung2  +=		'<img src="'+res.replyDirectory+'" style="border-radius:50%;" width="32px" height="32px" alt="Profile" />';
+				gabung2  +=	'</div>';
+				gabung2  +=	'<div class="col s12 m4 l11">';
+				gabung2  +=		'<p style="margin-top:-3px;">';
+				gabung2  +=			'<b><u>'+res.replyName+'</u></b>';
+				gabung2  +=		'</p>';
+				gabung2  +=		'<p id="textReply'+res.replyId+'" style="margin-top:-13px;">'+res.replyText+'</p>';
+				gabung2  +=				'<div id="changeReply'+res.replyId+'" style="margin-top:-25px;margin-bottom:15px;display:none;">';
+				gabung2  += 					'<textarea id="textareaChangeReply'+res.replyId+'" class="materialize-textarea" >'+res.replyText+'</textarea>';
+				gabung2	 += 					'<a class="btn waves-effect waves-light green" style="margin-right:10px;" onclick="changeReplyText(\''+res.replyId+'\')">Change</a>';
+				gabung2	 += 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditReply(\''+res.replyId+'\')"><i class="mdi-content-clear"></i></a>';
+				gabung2  += 				'</div>';
+				gabung2  +=		'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
+				if($("#hiddenUserId").val() == res.replyUserId)
+				{
 					
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
+				gabung2  +=			'<a href="javascript:void(0);" onclick="editReply(\''+res.replyId+'\')"><u>Edit</u></a> - <a href="javascript:void(0);" onclick="deleteReply(\''+res.replyId+'\')"><u>Delete</u></a>' ;
+				}
+				gabung2  +=		'</p>';
+				gabung2  +=	'</div>';
+				gabung2  += '</div>';
+				$("#ajaxReplyComment"+response.commentId).append(gabung2);
+		  	}
 		});
+  	}
+		
+    });
 }
 
 
@@ -1730,7 +1626,7 @@ function createCardReply(id)
 		gabung2	 += 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditReply(\''+response+'\')"><i class="mdi-content-clear"></i></a>';
 		gabung2  += 				'</div>';
 		gabung2  +=		'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
-		gabung2  +=			'yesterday at 8:17 PM - <a href="javascript:void(0);" onclick="editReply(\''+response+'\')"><u>Edit</u></a> - <a href="javascript:void(0);" onclick="deleteReply(\''+response+'\')"><u>Delete</u></a>' ;
+		gabung2  +=			'<a href="javascript:void(0);" onclick="editReply(\''+response+'\')"><u>Edit</u></a> - <a href="javascript:void(0);" onclick="deleteReply(\''+response+'\')"><u>Delete</u></a>' ;
 		gabung2  +=		'</p>';
 		gabung2  +=	'</div>';
 		gabung2  +=	'</div>';
@@ -2149,6 +2045,7 @@ function changeArchiveMenu(id) //kembali ke board
 			  gabung 		+= '</div>';
 			  gabung 		+= '</a>';
 			  $("#list"+listId).append(gabung);
+			  bindUiCard();
 			  $("#archiveC"+id).remove();
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
@@ -2169,148 +2066,93 @@ function changeArchiveList(id)
 	var status = "0";
 	var title = "";
 	$.ajax({
-			async:false,
 		  type: "POST",
 		  url: "board/sendBackList",
+		  dataType:"json",
 		  data: {listId:listId,status:status,boardId:boardId},
 		  success: function (response) {
-		  	title = response;
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	var gabung = "";
-	gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+listId+'">';
-	gabung += '<div class="card">';
-	gabung += '<div class="card-content grey lighten-2 white-text">';
-	gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+listId+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
-	gabung += '<div id="list'+listId+'" class="listUser">';
-	gabung += '</div>';
-	gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
-	gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+listId+'\')">Add a Card..</a></div>';
-	gabung += '</div>';
-	gabung += '</div>';
-	gabung += '</div>';
-	gabung += '</div>';
-	if(listUser%6 == 5 && listUser > 0 )
-	{
-		$("#ajaxList"+jumlahRow).append(gabung);
-		//create list pindah bawah
-		$("#listCreateList").remove();
-		var gabung2 = "";
-		gabung2 += '<div class="row ajaxList" id="ajaxList'+(jumlahRow+1)+'">';
-		gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-		gabung2 += '<div class="card">';
-		gabung2 += '<div class="card-content grey white-text">';
-		gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-		gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="white-text">Add a List..</a></div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>'; 
-		gabung2 += '</div>';
-		$("#rowList").append(gabung2);
-		$('#listCreateList').prop('onclick',null).off('click');
-		$('#listCreateList').on('click', function() {
-			//alert("klik + "+ cardId +" owner : "+owner);
-			//var href = $(this).attr("href");
-			$("#modalcreatelist").openModal();
-		});
-	}
-	else
-	{
-		$("#ajaxList"+jumlahRow).append(gabung);
-		$("#listCreateList").remove();
-		var gabung2 = "";
-		gabung2 += '<div class="col s12 m6 l2" style="margin-left:0px;" id="listCreateList">';
-		gabung2 += '<div class="card">';
-		gabung2 += '<div class="card-content grey white-text">';
-		gabung2 += '<div class="card-compare  grey" style="margin-top:8px;border-radius:5px;">';
-		gabung2 += '<div id="invoice-line" class="left-align white-text"><a href="javascript:void(0)" class="white-text">Add a List..</a></div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>';
-		gabung2 += '</div>'; 
-		$("#ajaxList"+jumlahRow).append(gabung2);
-		$('#listCreateList').prop('onclick',null).off('click');
-		$('#listCreateList').on('click', function() {
-			//alert("klik + "+ cardId +" owner : "+owner);
-			//var href = $(this).attr("href");
-			$("#modalcreatelist").openModal();
-		});
-	}
-	$("#archiveL"+id).remove();
-
-	$.ajax({
-		  type: "POST",
-		  url: "board/getCardList",
-		  data: {listId:listId},
-		  dataType:"json",
-		  success: function (response) {
-			  $.each(response, function(idx, response){
-				  	if(response.cardArchive == "0" && response.cardStatus == "1" && response.cardPosition > 0)
+		  	title = response["listTitle"];
+		  	cardList = response["cardList"];
+		  	var gabung = "";
+			gabung += '<div class="col s12 m6 l2 colListUser" id="colList'+listId+'">';
+			gabung += '<div class="card">';
+			gabung += '<div class="card-content grey lighten-2 white-text">';
+			gabung += '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'+title+'<a href="javascript:void(0);" onclick="openModalListMenu(\''+listId+'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
+			gabung += '<div id="list'+listId+'" class="listUser dropable sortable" style="height:100%;min-height:60px;width:100%;">';
+			gabung += '</div>';
+			gabung += '<div class="card-compare  grey lighten-2" style="margin-top:8px;border-radius:5px;">';
+			gabung += '<div id="invoice-line" class="left-align grey-text"><a href="javascript:void(0)" class="grey-text" onclick="setHiddenListId(\''+listId+'\')">Add a Card..</a></div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			gabung += '</div>';
+			$(gabung).insertBefore("#listCreateList");
+			$('#listCreateList').prop('onclick',null).off('click');
+			bindUiList();
+				$('#listCreateList').on('click', function() {
+					//alert("klik + "+ cardId +" owner : "+owner);
+					//var href = $(this).attr("href");
+					$("#modalcreatelist").openModal();
+				});
+			$("#archiveL"+id).remove();
+			$.each(cardList, function(idx, res){
+				  var labelRed = false;
+				  var labelYellow = false;
+				  var labelBlue = false;
+				  var labelGreen = false;
+				  	if(res.label.labelRed == "true")
 				  	{
-					  var label = getLabelCard(response.cardId);
-					  var labelRed = false;
-					  var labelYellow = false;
-					  var labelBlue = false;
-					  var labelGreen = false;
-					  $.each(label, function(idx, response){
-						  	if(response.labelRed == "true")
-						  	{
-						  		labelRed = true;
-						  	}
-						  	if(response.labelYellow == "true")
-						  	{
-						  		labelYellow = true;
-						  	}
-						  	if(response.labelGreen == "true")
-						  	{
-						  		labelGreen = true;
-						  	}
-						  	if(response.labelBlue == "true")
-						  	{
-						  		labelBlue = true;
-						  	}
-					    });
-					  var gabung	= '<a id="card'+response.cardId+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+response.cardId+'\')">';
-					  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-					  gabung 		+= '<div class="row" id="labelCard'+response.cardId+'" style="margin:auto;">';
-					  if(labelRed)
-					  {
-					  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelYellow)
-					  {
-					  	gabung+= '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelBlue)
-					  {
-					  	gabung+= '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  if(labelGreen)
-					  {
-					  	gabung+= '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
-					  	gabung+= "Blank Text";
-					  	gabung+= "</div>";
-					  }
-					  gabung 		+= '</div>'
-					  gabung 		+= '<div class="left-align black-text" id="cardTitle'+listId+'">'+response.cardTitle+'</div>';
-					  gabung 		+= '</div>';
-					  gabung 		+= '</a>';
-					  $("#list"+listId).append(gabung);		  		
+				  		labelRed = true;
 				  	}
-			  		
-			    });
+				  	if(res.label.labelYellow == "true")
+				  	{
+				  		labelYellow = true;
+				  	}
+				  	if(res.label.labelGreen == "true")
+				  	{
+				  		labelGreen = true;
+				  	}
+				  	if(res.label.labelBlue == "true")
+				  	{
+				  		labelBlue = true;
+				  	}
+				  var gabung 	= '<div class="dragable cDrag'+res.card.cardId+'" id="cDrag'+res.cardId+'" style="width:100%;height:100%;">';
+				  gabung		+= '<a id="card'+res.card.cardId+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+res.card.cardId+'\')">';
+				  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
+				  gabung 		+= '<div class="row" id="labelCard'+res.card.cardId+'" style="margin:auto;">';
+				  if(labelRed)
+				  {
+				  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelYellow)
+				  {
+				  	gabung+= '<div class="task-cat yellow left-align yellow-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelBlue)
+				  {
+				  	gabung+= '<div class="task-cat blue left-align blue-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  if(labelGreen)
+				  {
+				  	gabung+= '<div class="task-cat green left-align green-text" style="width:45%;float:left;margin:2px;">';
+				  	gabung+= "Blank Text";
+				  	gabung+= "</div>";
+				  }
+				  gabung 		+= '</div>'
+				  gabung 		+= '<div class="left-align black-text" id="cardTitle'+listId+'">'+res.card.cardTitle+'</div>';
+				  gabung 		+= '</div>';
+				  gabung 		+= '</a>';
+				  gabung 		+= '</div>';
+				  $("#list"+listId).append(gabung);	
+		  		
+		    });
+			bindUiCard();
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -2318,8 +2160,6 @@ function changeArchiveList(id)
 			alert(xhr.responseText);
 		  }
 		});
-
-
 	$("#modallistmenu").closeModal();
 	
 }
@@ -2385,46 +2225,24 @@ function modalArchive()
 	//alert(boardId);
 	$.ajax({
 		  type: "POST",
-		  url: "board/getCardArchive",
-		  data: {},
+		  url: "board/getArchive",
+		  data: {boardId:boardId},
 		  dataType:"json",
 		  success: function (response) {
 			// alert(response);
+			//console.log(response);
+			card = response["card"];
+			list = response["list"];
 			$("#archiveCard").empty();
 			$("#archiveCard").append('<p><b>Cards</b></p><div class="divider"></div>');
-			  $.each(response, function(idx, response){
-			  		if(response.cardBoardId == boardId && response.cardStatus == "1")
-			  		{
-			  			//alert(response.cardId);
-			  			$("#archiveCard").append('<p class="roleDeleteCard" id="archiveC'+response.cardId+'" style="font-size:100%;display:none;"><b>'+response.cardTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveMenu(\''+response.cardId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteCard(\''+response.cardId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
-			  			
-			  		}
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-
-	$.ajax({
-		  type: "POST",
-		  url: "board/getListArchive",
-		  data: {},
-		  dataType:"json",
-		  success: function (response) {
-			// alert(response);
 			$("#archiveList").empty();
 			$("#archiveList").append('<p><b>Lists</b></p><div class="divider"></div>');
-			  $.each(response, function(idx, response){
-			  		if(response.listBoardId == boardId && response.listStatus == "1")
-			  		{
-			  			//alert(response.cardId);
-			  			$("#archiveList").append('<p class="roleDeleteList" id="archiveL'+response.listId+'" style="font-size:100%;display:none;"><b>'+response.listTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveList(\''+response.listId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteList(\''+response.listId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
-			  			
-			  		}
-			    });
+			$.each(card, function(idx, res){
+	  			$("#archiveCard").append('<p class="roleDeleteCard" id="archiveC'+res.cardId+'" style="font-size:100%;"><b>'+res.cardTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveMenu(\''+res.cardId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteCard(\''+res.cardId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+		    });
+		    $.each(list, function(idx, res){
+		  			$("#archiveList").append('<p class="roleDeleteList" id="archiveL'+res.listId+'" style="font-size:100%;"><b>'+res.listTitle+'</b> -<a href="javascript:void(0);" class="ultra-small green-text" onclick="changeArchiveList(\''+res.listId+'\')" style="margin-left:8px;">Send to Board </a>-<a href="javascript:void(0);" onclick="deleteList(\''+res.listId+'\')" class="ultra-small red-text" style="margin-left:8px;">Delete</a></p>');
+		    });
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -2432,7 +2250,6 @@ function modalArchive()
 			alert(xhr.responseText);
 		  }
 		});
-	checkRoleMore();
 }
 
 function createCardComment()
@@ -2465,7 +2282,7 @@ function createCardComment()
 		gabung	+= 					'<a class="btn-floating waves-effect waves-light" onclick="closeEditComment(\''+response+'\')"><i class="mdi-content-clear"></i></a>';
 		gabung  += 				'</div>';
 		gabung  +=			'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
-		gabung  +=				'yesterday at 8:17 PM - <a href="javascript:void(0);" onclick="changeReply(\''+response+'\')"><u>Reply</u></a> - <a href="javascript:void(0);" onclick="editComment(\''+response+'\')"><u>Edit</u></a> - <a href="javascript:void(0)" onclick="deleteComment(\''+response+'\')"><u>Delete</u></a>' ;
+		gabung  +=				'<a href="javascript:void(0);" onclick="changeReply(\''+response+'\')"><u>Reply</u></a> - <a href="javascript:void(0);" onclick="editComment(\''+response+'\')"><u>Edit</u></a> - <a href="javascript:void(0)" onclick="deleteComment(\''+response+'\')"><u>Delete</u></a>' ;
 		gabung  +=			'</p>';
 		gabung	+=			'<div id="ajaxReplyComment'+response+'">';
 		gabung 	+= 				'<div class="col s12 m6 l12" id="changeReply'+response+'">';
@@ -2489,9 +2306,9 @@ function changeReply(id)
 {
 	$("#changeReply"+id).empty();
 	var gabung ="";
-	gabung 	+= 					'<textarea id="textareaReply'+id+'" class="materialize-textarea" ></textarea>';
-	gabung	+= 					'<a class="btn waves-effect waves-light green" onclick="createCardReply(\''+id+'\')" style="margin-right:10px;">Add</a>';
-	gabung	+= 					'<a class="btn-floating waves-effect waves-light" onclick="closeReply(\''+id+'\')" ><i class="mdi-content-clear"></i></a>';
+	gabung 	+= 	'<textarea id="textareaReply'+id+'" class="materialize-textarea" ></textarea>';
+	gabung	+= 	'<a class="btn waves-effect waves-light green" onclick="createCardReply(\''+id+'\')" style="margin-right:10px;">Add</a>';
+	gabung	+= 	'<a class="btn-floating waves-effect waves-light" onclick="closeReply(\''+id+'\')" ><i class="mdi-content-clear"></i></a>';
 	$("#changeReply"+id).append(gabung);
 }
 
@@ -2500,38 +2317,6 @@ function closeReply(id)
 	$("#changeReply"+id).empty();
 }
 
-function createChat()
-{
-	var boardId = $("#hiddenBoardId").val();
-	var chatText = $("#chatText").val();
-	var rules = true;
-	if(chatText == "")
-	{
-		rules = false;
-	}
-	if(rules == true)
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/createChat",
-		  data: {boardId:boardId,chatText:chatText},
-		  success: function (response) {
-			alert(response);
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-		$("#chatText").val("");
-	}
-	else
-	{
-		alert("Error");
-	}
-
-}
 
 function createLabelCard()
 {
@@ -2704,69 +2489,55 @@ function createAttachment()
 	}	
 }
 
-function getAttachment(id)
+function getAttachment(response)
 {
-	var id = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getAttachment",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-			  //alert(response);
-			  	$("#ajaxAttachment").empty();
-			  		var gabung = "";
-			  		gabung += '<h6><b>Attachment</b></h6>';
-			  		$("#ajaxAttachment").append(gabung);
+  	//alert(response);
+  	$("#ajaxAttachment").empty();
+	var gabung = "";
+	gabung += '<h6><b>Attachment</b></h6>';
+	$("#ajaxAttachment").append(gabung);
 
-			  	$.each(response, function(idx, response){
-			  		if(response.attachmentStatus == "1")
-			  		{
-				  		var gabung = '';
-				  		gabung += '<div class="row" id="attachmentUser'+response.attachmentId+'">';
-				  		gabung += '<div class="col s12 m6 l2">';
-				  		var title = response.attachmentTitle;
-				  		var extension = title.substr( (title.lastIndexOf('.') +1) );
-				  		var img = "";
-				  		if(extension == "jpg" || extension == "png" || extension == "jpeg")
-				  		{
-				  			img = response.attachmentDirectory;
-				  		}
-				  		else if(extension == "pdf")
-				  		{
-				  			img = "userAttachment/pdf.png";
-				  		}
-				  		else if(extension == "doc" || extension == "docx")
-				  		{
-				  			img = "userAttachment/doc.png";
-				  		}
-				  		else if(extension == "rar" || extension == "zip")
-				  		{
-				  			img = "userAttachment/zip.jpg";
-				  		}
-				  		else
-				  		{
-				  			img = "userAttachment/file.jpg";
-				  		}
-				  		gabung += '<img src="'+img+'" style="width:90px;height:70px;" alt="Profile" />';
-				  		gabung += '</div>';
-				  		gabung += '<div class="col s12 m6 l9" style="margin-left:15px;margin-top:-15px;">';
-				  		gabung += '<p>'+response.attachmentTitle+'</p>';
-				  		gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download <a class="roleActivityAttachment" style="display:none;" href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">- Delete</a>';
-				  		gabung += '</div>';
-				  		gabung += '</div>';
-				  		$("#ajaxAttachment").append(gabung);
-			  		}
+  	$.each(response, function(idx, response){
+  		if(response.attachmentStatus == "1")
+  		{
+	  		var gabung = '';
+	  		gabung += '<div class="row" id="attachmentUser'+response.attachmentId+'">';
+	  		gabung += '<div class="col s12 m6 l2">';
+	  		var title = response.attachmentTitle;
+	  		var extension = title.substr( (title.lastIndexOf('.') +1) );
+	  		var img = "";
+	  		if(extension == "jpg" || extension == "png" || extension == "jpeg")
+	  		{
+	  			img = response.attachmentDirectory;
+	  		}
+	  		else if(extension == "pdf")
+	  		{
+	  			img = "userAttachment/pdf.png";
+	  		}
+	  		else if(extension == "doc" || extension == "docx")
+	  		{
+	  			img = "userAttachment/doc.png";
+	  		}
+	  		else if(extension == "rar" || extension == "zip")
+	  		{
+	  			img = "userAttachment/zip.jpg";
+	  		}
+	  		else
+	  		{
+	  			img = "userAttachment/file.jpg";
+	  		}
+	  		gabung += '<img src="'+img+'" style="width:90px;height:70px;" alt="Profile" />';
+	  		gabung += '</div>';
+	  		gabung += '<div class="col s12 m6 l9" style="margin-left:15px;margin-top:-15px;">';
+	  		gabung += '<p>'+response.attachmentTitle+'</p>';
+	  		gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download <a class="roleActivityAttachment" style="" href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">- Delete</a>';
+	  		gabung += '</div>';
+	  		gabung += '</div>';
+	  		$("#ajaxAttachment").append(gabung);
+  		}
 
 
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+    });
 }
 
 function downloadAttachment(id)
@@ -2779,111 +2550,83 @@ function downloadAttachment(id)
 function ajaxModalMore()
 {
 	var boardId = $("#hiddenBoardId").val();
+	var userId = $("#hiddenUserId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getBoard",
+		  data: {boardId:boardId,userId:userId},
+		  dataType:"json",
+		  success: function (response) {
+		  		getBoard(response["board"]);
+		  		getBoardFavorite(response["favorite"]);
+		  		getBoardSubscribe(response["subscribe"]);
+				$("#modalmore").openModal();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	//getBoard(boardId);
 
-	getBoard(boardId);
+	//getBoardFavorite(boardId);
 
-	getBoardFavorite(boardId);
+	//getBoardSubscribe(boardId);
 
-	getBoardSubscribe(boardId);
+	//checkRoleMore();
 
-	checkRoleMore();
-
-	$("#modalmore").openModal();
 	/*$("#closeboard").show();
 	$("#openboard").hide();*/
 }
 
-function getBoard(id)
+function getBoard(response)
 {
-	var boardId = id;
-	$.ajax({
-		  type: "POST",
-		  url: "board/getBoard",
-		  data: {id:id},
-		  dataType:"json",
-		  success: function (response) {
-		  		$("#bgRed").hide();
-		  		$("#bgYellow").hide();
-		  		$("#bgGreen").hide();
-		  		$("#bgBlue").hide();
-			  	$.each(response, function(idx, response){
-		  		$("#txtEditBoard").val(response.boardTitle);
-			  		if(response.boardBackground == "red")
-			  		{
-			  			$("#bgRed").show();
-			  		}
-			  		else if(response.boardBackground == "yellow")
-			  		{
-			  			$("#bgYellow").show();
-			  		}
-			  		else if(response.boardBackground == "green")
-			  		{
-			  			$("#bgGreen").show();
-			  		}
-			  		else if(response.boardBackground == "blue")
-			  		{
-			  			$("#bgBlue").show();
-			  		}
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+	$("#bgRed").hide();
+	$("#bgYellow").hide();
+	$("#bgGreen").hide();
+	$("#bgBlue").hide();
+	$("#txtEditBoard").val(response.boardTitle);
+	if(response.boardBackground == "red")
+	{
+		$("#bgRed").show();
+	}
+	else if(response.boardBackground == "yellow")
+	{
+		$("#bgYellow").show();
+	}
+	else if(response.boardBackground == "green")
+	{
+		$("#bgGreen").show();
+	}
+	else if(response.boardBackground == "blue")
+	{
+		$("#bgBlue").show();
+	}
 }
 
-function getBoardFavorite(id)
+function getBoardFavorite(response)
 {
-	var boardId = id;
-	var userId = $("#hiddenUserId").val();
-	$.ajax({
-		  type: "POST",
-		  url: "board/getFavorite",
-		  data: {boardId:boardId,userId:userId},
-		  dataType:"json",
-		  success: function (response) {
-			  	$.each(response, function(idx, response){
-			  		if(response.boardId == boardId && response.userId == userId && response.favoriteCheck == "1")
-			  		{
-						$("#testfav").prop('checked', true);
-			  		}
-
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+	if(response != null)
+	{
+		if(response.favoriteCheck == "1")
+		{
+			$("#testfav").prop('checked', true);
+		}
+	}
+	
 }
 
-function getBoardSubscribe(id)
+function getBoardSubscribe(response)
 {
-	var boardId = id;
-	var userId = $("#hiddenUserId").val();
-	$.ajax({
-		  type: "POST",
-		  url: "board/getSubscribe",
-		  data: {boardId:boardId,userId:userId},
-		  dataType:"json",
-		  success: function (response) {
-			  	$.each(response, function(idx, response){
-			  		if(response.boardId == boardId && response.userId == userId && response.subscribeChecked == "1")
-			  		{
-						$("#testsub").prop('checked', true);
-			  		}
-
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
+	if(response != null)
+	{
+		if(response.subscribeChecked == "1")
+		{
+			$("#testsub").prop('checked', true);
+		}
+	}
+	
 }
 
 function changeBackground(color)
@@ -3160,6 +2903,80 @@ function openGoogleDrive()
 	window.location.href = "drive?id="+boardId+"&cardId="+cardId;
 }
 
+function openDropbox()
+{
+	Dropbox.choose({
+            linkType: "direct",
+            success: function (files) {
+                //alert(files[0].link);
+                var link = files[0].link;
+                var name = files[0].name;
+                var extension = name.substr( (name.lastIndexOf('.') +1) );
+                var cardId = $("#hiddenCardId").val();
+                var boardId = $("#hiddenBoardId").val();
+                $.ajax({
+				  type: "POST",
+				  url: "board/dropbox",
+				  data: {link:link,name:name,extension:extension,cardId:cardId,boardId:boardId},
+				  success: function (response) {
+				  	//alert(response);
+				  	if($("#ajaxAttachment").children().length <= 0)
+				  	{
+				  		var gabung = "";
+				  		gabung += '<h6><b>Attachment</b></h6>';
+				  		$("#ajaxAttachment").append(gabung);
+				  	}
+				  	var title = name;
+				  	var gabung = '';
+			  		gabung += '<div class="row" id="attachmentUser'+response+'">';
+			  		gabung += '<div class="col s12 m6 l2">';
+			  		var extension = title.substr( (title.lastIndexOf('.') +1) );
+			  		var img = "";
+			  		if(extension == "jpg" || extension == "png" || extension == "jpeg")
+			  		{
+			  			img = "userAttachment/"+response+"."+extension;;
+			  		}
+			  		else if(extension == "pdf")
+			  		{
+			  			img = "userAttachment/pdf.png";
+			  		}
+			  		else if(extension == "doc" || extension == "docx")
+			  		{
+			  			img = "userAttachment/doc.png";
+			  		}
+			  		else if(extension == "rar" || extension == "zip")
+			  		{
+			  			img = "userAttachment/zip.jpg";
+			  		}
+			  		else
+			  		{
+			  			img = "userAttachment/file.jpg";
+			  		}
+			  		gabung += '<img src="'+img+'" style="width:90px;height:70px;" alt="Profile" />';
+			  		gabung += '</div>';
+			  		gabung += '<div class="col s12 m6 l9" style="margin-left:15px;margin-top:-15px;">';
+			  		gabung += '<p>'+title+'</p>';
+			  		gabung += '<a href="javascript:void(0);" onclick="downloadAttachment(\''+response+'\')">Download - <a onclick="deleteAttachment(\''+response+'\')" href="javascript:void(0);">Delete</a>';
+			  		gabung += '</div>';
+			  		gabung += '</div>';
+			  		$("#ajaxAttachment").append(gabung);
+				  },
+				  error: function (xhr, ajaxOptions, thrownError) {
+					alert(xhr.status);
+					alert(thrownError);
+					alert(xhr.responseText);
+				  }
+				});
+            },
+            cancel: function() {
+			  //optional
+			},
+			linkType: "direct", // "preview" or "direct"
+			multiselect: false, // true or false
+			extensions: ['.png', '.jpg','.doc','.docx','.pdf','.rar','.zip','.jpeg'],
+        });
+}
+
 function createFavorite()
 {
 	var boardId = $("#hiddenBoardId").val();
@@ -3360,10 +3177,6 @@ function openModalGanttChart()
 	google.charts.load('current', {'packages':['gantt']});
     google.charts.setOnLoadCallback(drawChart);
     var boardId = $("#hiddenBoardId").val();
-    	
-
-
-
     function daysToMilliseconds(days) {
       return days * 24 * 60 * 60 * 1000;
     }
@@ -3384,78 +3197,91 @@ function openModalGanttChart()
 
       var rows = new Array();
 		$.ajax({
-			async:false,
+			  async:false,
 			  type: "POST",
-			  url: "board/getList",
+			  url: "board/getGanttChart",
 			  data: {boardId:boardId},
 			  dataType:"json",
 			  success: function (response) {
-				  	$.each(response, function(idx, response){
-				  		var listId = response.listId;
-				  		if(response.listArchive == "0" && response.listStatus == "1")
-				  		{
-				  			$.ajax({
-								async:false,
-								  type: "POST",
-								  url: "board/getCard",
-								  data: {listId:listId},
-								  dataType:"json",
-								  success: function (response) {
-									  	$.each(response, function(idx, response){
-									  		var cardId = response.cardId;
-									  		if(response.cardArchive == "0" && response.cardStatus == "1")
-									  		{
-									  			var startDate = getStartDateGantt(cardId);
-									  			var dueDate = getDueDateGantt(cardId);
-									  			//alert(startDate); //2018-04-12 12:00:00
-									  			var split = startDate.split(" ");
-									  			var split2 = dueDate.split(" ");
-									  			if(startDate != "" && dueDate != "" && dueDate > startDate)
-									  			{
-									  				var check = getChecklistChart(cardId);
-									  				var split3 = check.split(" ");
-									  				var checklistTitle = split3[0];
-									  				var progress = split3[1];
-									  				var startDate = split[0];
-									  				var dueDate = split2[0];
-									  				var start = startDate.split("-");
-									  				var tahun = start[0];
-									  				var bulan = start[1];
-									  				var tgl = start[2];
-									  				var due = dueDate.split("-");
-									  				var tahun2 = due[0];
-									  				var bulan2 = due[1];
-									  				var tgl2 = due[2];
-												      var r1 = checklistTitle;
-												      var r2 = checklistTitle;
-												      var r3 = response.cardTitle;
-												      var b1 = parseInt(bulan)+1;
-												      var b2 = parseInt(bulan2)+1;
-												      var r4 = new Date(tahun, b1, tgl);
-												      //alert(r4);
-												      var r5 = new Date(tahun2, b2, tgl2);
-												      //alert(r5);
-												      var r6 = null;
-												      var r7 = parseInt(progress);
-												      var r8 = null;
-												      if(checklistTitle != "")
-												      {
-												      	rows.push([r1,r2,r3,r4,r5,r6,r7,r8]);
-												      }
-												      //alert(rows);
-									  			}
-									  		}
-									  		//getDueDate(cardId);
-									    });
-								  },
-								  error: function (xhr, ajaxOptions, thrownError) {
-									alert(xhr.status);
-									alert(thrownError);
-									alert(xhr.responseText);
-								  }
-								});
-				  		}
-				    });
+			  	//console.log(response);
+			  	$.each(response, function(idx, response){
+		  			var checklist = response.checklist;
+		  			$.each(checklist, function(idx, res){
+				  		var startDate = response.startDate.startDate;
+			  			var dueDate = response.dueDate.dueDate;
+		  				var checklistTitle = res.checklist.checklistTitle;
+		  				var item = res.item;
+		  				if(startDate == null)
+		  				{
+		  					console.log("sd");
+		  				}
+			  			if(startDate != null && dueDate != null && dueDate>startDate)
+			  			{
+			  				var split = startDate.split(" ");
+			  				var split2 = dueDate.split(" ");
+			  				var progress = 0;
+			  				var itemTotal = 0;
+			  				var itemChecked = 0;
+			  				$.each(item, function(idx, resp){
+						  		itemTotal++;
+						  		if(resp.itemChecked == "1")
+						  		{
+						  			itemChecked++;
+						  		}
+						  	});
+						  	progress = itemChecked*100/itemTotal;
+						  	if(progress < 0)
+						  	{
+						  		progress = 0;
+						  	}
+			  				var startDate = split[0];
+			  				var dueDate = split2[0];
+			  				var start = startDate.split("-");
+			  				var tahun = start[0];
+			  				var bulan = start[1];
+			  				var tgl = start[2];
+			  				var due = dueDate.split("-");
+			  				var tahun2 = due[0];
+			  				var bulan2 = due[1];
+			  				var tgl2 = due[2];
+			  				var r1 = checklistTitle;
+						    var r2 = checklistTitle;
+						    var r3 = response.cardTitle;
+						    var b1 = parseInt(bulan)+1;
+						    var b2 = parseInt(bulan2)+1;
+						    var r4 = new Date(tahun, b1, tgl);
+						    //alert(r4);
+						    var r5 = new Date(tahun2, b2, tgl2);
+						    //alert(r5);
+						    var r6 = null;
+						    var r7 = parseInt(progress);
+						    var r8 = null;
+						    rows.push([r1,r2,r3,r4,r5,r6,r7,r8]);
+			  			}
+				  	});
+			  	});
+				if(rows.length > 0 )
+		      	{
+			      	data.addRows(
+				        rows
+				    );
+
+
+			      var options = {
+			        gantt: {
+			          trackHeight: 30
+			        }
+			      };
+
+			      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+			      chart.draw(data, options);
+		     	}
+			    else
+			    {
+			     	$("#chart_div").append("<p>You have to create a card that has a Start Date, Due Date and a Checklist with at least 1 item.</p>");
+			    }
+
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -3463,27 +3289,7 @@ function openModalGanttChart()
 				alert(xhr.responseText);
 			  }
 			});
-		if(rows.length > 0 )
-      	{
-	      	data.addRows(
-		        rows
-		    );
-
-
-	      var options = {
-	        gantt: {
-	          trackHeight: 30
-	        }
-	      };
-
-	      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
-
-	      chart.draw(data, options);
-     	}
-	    else
-	    {
-	     	$("#chart_div").append("<p>You have to create a card that has a Start Date, Due Date and a Checklist with an item</p>");
-	    }
+		
       
     }
 
@@ -3553,9 +3359,67 @@ function openBoard()
 
 function openStatus()
 {
-	getProgressDate();
-	getProgressChecklist();
-	$("#modalstatus").openModal();
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getProgress",
+		  data: {boardId:boardId},
+		  dataType:"json",
+		  success: function (response) {
+		  	var date = response["date"];
+		  	var item = response["item"];
+		  	console.log(item);
+		  	if(date != false || date != null)
+		  	{
+		  		var split = date.date.split(" ");
+		  		var date = split[0];
+		  		var $input = $('#progressDate').pickadate();
+		  		var split2 = date.split("-");
+		  		var tahun = split2[0];
+		  		var bulan = split2[1];
+		  		var tanggal = split2[2];
+
+				// Use the picker object directly.
+				var picker = $input.pickadate('picker');
+
+				picker.set('select', new Date(tahun, (bulan-1), tanggal));
+		  	}
+		  	$("#ajaxProgressChecklist").empty();
+			var gabung = "";
+			gabung += '<div id="progressChecklist">';
+			gabung += '<div class="col s12 m6 l10 ">';
+			gabung +=  '';
+			gabung +=  '<div class="progress"><div id="pb'+"ChecklistBoard"+'" class="determinate" style="width:0%"></div></div>';
+			//var item ='<p> <input type="checkbox" id="test3" /><label for="test3">Satu</label></p>';
+			gabung += '<div id="checklistItem'+"ProgressChecklist"+'"></div>';
+			gabung += '<div id="itemBoard'+'">';
+			gabung += '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+			gabung += '</div>';
+			gabung +=  '</div>';
+			gabung += '<div class="col s12 m6 l1 ">';
+			gabung += '';
+			gabung += '</div>';
+			gabung += "</div>";
+			$("#ajaxProgressChecklist").append(gabung);
+		  	$.each(item, function(idx, res){
+		  		if(res.itemChecked == "1")
+		  		{
+		  			$("#checklistItemProgressChecklist").append('<p id="itemBoard'+res.progressItemId+'"> <input type="checkbox" checked="checked" class="cbBoard" id="testBoard'+res.progressItemId+'" onchange="changeProgressItem(\''+res.progressItemId+'\')" onclick="countPbProgress(\''+res.progressItemId+'\')" /><label class="black-text" for="testBoard'+res.progressItemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteProgressItem(\''+res.progressItemId+'\')" class="right-align red-text">Delete</a></span></p>');
+		  		}
+		  		else
+		  		{
+		  			$("#checklistItemProgressChecklist").append('<p id="itemBoard'+res.progressItemId+'"> <input type="checkbox" class="cbBoard" id="testBoard'+res.progressItemId+'" onchange="changeProgressItem(\''+res.progressItemId+'\')" onclick="countPbProgress(\''+res.progressItemId+'\')" /><label class="black-text" for="testBoard'+res.progressItemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteProgressItem(\''+res.progressItemId+'\')" class="right-align red-text">Delete</a></span></p>');
+		  		}
+		  	});
+		  	countPbProgress();
+			$("#modalstatus").openModal();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
 }
 
 function getProgressDate()
@@ -3596,21 +3460,21 @@ function getProgressChecklist()
 {
 	$("#ajaxProgressChecklist").empty();
 	var boardId = $("#hiddenBoardId").val();
-	var atas = '<div id="progressChecklist">';
-	var luaratas1 = '<div class="col s12 m6 l10 ">';
-	var header = '';
-	var progressbar = '<div class="progress"><div id="pb'+"ChecklistBoard"+'" class="determinate" style="width:0%"></div></div>';
+	var gabung = "";
+	gabung += '<div id="progressChecklist">';
+	gabung += '<div class="col s12 m6 l10 ">';
+	gabung +=  '';
+	gabung +=  '<div class="progress"><div id="pb'+"ChecklistBoard"+'" class="determinate" style="width:0%"></div></div>';
 	//var item ='<p> <input type="checkbox" id="test3" /><label for="test3">Satu</label></p>';
-	var item ='<div id="checklistItem'+"ProgressChecklist"+'"></div>';
-	var addatas ='<div id="itemBoard'+'">';
-	var add = '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
-	var addbawah ='</div>';
-	var luaratas2 = '</div>';
-	var luarbawah1 = '<div class="col s12 m6 l1 ">';
-	var tengah = '';
-	var luarbawah2 = '</div>';
-	var a = "</div>";
-	var gabung = atas+luaratas1+header+progressbar+item+addatas+add+addbawah+luaratas2+luarbawah2+a;
+	gabung += '<div id="checklistItem'+"ProgressChecklist"+'"></div>';
+	gabung += '<div id="itemBoard'+'">';
+	gabung += '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+	gabung += '</div>';
+	gabung +=  '</div>';
+	gabung += '<div class="col s12 m6 l1 ">';
+	gabung += '';
+	gabung += '</div>';
+	gabung += "</div>";
 	$("#ajaxProgressChecklist").append(gabung);
 	$.ajax({
 		  type: "POST",
@@ -3727,6 +3591,10 @@ function countPbProgress()
 	var check = $(".cbBoard:checked").length;
 	var total = check*100/cb;
 	var total = total + "%";
+	if(cb == 0)
+	{
+		total = 0;
+	}
 	$("#pbChecklistBoard").width(total);
 }
 
@@ -3774,219 +3642,205 @@ function openRole()
 	var boardId = $("#hiddenBoardId").val();
 	$.ajax({
 		  type: "POST",
-		  url: "board/getRoleCollaborator",
+		  url: "board/getRoleCollaboratorClient",
 		  data: {boardId:boardId},
 		  dataType :"json",
 		  success: function (response) {
-			$.each(response, function(idx, response){
-					if(response.listCreate == "1")
-					{
-						$("#collListCreate").prop("checked",true);
-					}
-					else
-					{
-						$("#collListCreate").prop("checked",false);
-					}
-					if(response.listEdit == "1")
-					{
-						$("#collListEdit").prop("checked",true);
-					}
-					else
-					{
-						$("#collListEdit").prop("checked",false);
-					}
-					if(response.listDelete == "1")
-					{
-						$("#collListDelete").prop("checked",true);
-					}
-					else
-					{
-						$("#collListDelete").prop("checked",false);
-					}
-					if(response.cardCreate == "1")
-					{
-						$("#collCardCreate").prop("checked",true);
-					}
-					else
-					{
-						$("#collCardCreate").prop("checked",false);
-					}
-					if(response.cardEdit == "1")
-					{
-						$("#collCardEdit").prop("checked",true);
-					}
-					else
-					{
-						$("#collCardEdit").prop("checked",false);
-					}
-					if(response.cardDelete == "1")
-					{
-						$("#collCardDelete").prop("checked",true);
-					}
-					else
-					{
-						$("#collCardDelete").prop("checked",false);
-					}
-					if(response.activityAM == "1")
-					{
-						$("#collActAM").prop("checked",true);
-					}
-					else
-					{
-						$("#collActAM").prop("checked",false);
-					}
-					if(response.activityLabel == "1")
-					{
-						$("#collActLabel").prop("checked",true);
-					}
-					else
-					{
-						$("#collActLabel").prop("checked",false);
-					}
-					if(response.activityChecklist == "1")
-					{
-						$("#collActCheck").prop("checked",true);
-					}
-					else
-					{
-						$("#collActCheck").prop("checked",false);
-					}
-					if(response.activityStartDate == "1")
-					{
-						$("#collActStart").prop("checked",true);
-					}
-					else
-					{
-						$("#collActStart").prop("checked",false);
-					}
-					if(response.activityDueDate == "1")
-					{
-						$("#collActDue").prop("checked",true);
-					}
-					else
-					{
-						$("#collActDue").prop("checked",false);
-					}
-					if(response.activityAttachment == "1")
-					{	
-						$("#collActAtt").prop("checked",true);
-					}
-					else
-					{
-						$("#collActAtt").prop("checked",false);
-					}
-			    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	$.ajax({
-		  type: "POST",
-		  url: "board/getRoleClient",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-					if(response.listCreate == "1")
-					{
-						$("#cliListCreate").prop("checked",true);
-					}
-					else
-					{
-						$("#cliListCreate").prop("checked",false);
-					}
-					if(response.listEdit == "1")
-					{
-						$("#cliListEdit").prop("checked",true);
-					}
-					else
-					{
-						$("#cliListEdit").prop("checked",false);
-					}
-					if(response.listDelete == "1")
-					{
-						$("#cliListDelete").prop("checked",true);
-					}
-					else
-					{
-						$("#cliListDelete").prop("checked",false);
-					}
-					if(response.cardCreate == "1")
-					{
-						$("#cliCardCreate").prop("checked",true);
-					}
-					else
-					{
-						$("#cliCardCreate").prop("checked",false);
-					}
-					if(response.cardEdit == "1")
-					{
-						$("#cliCardEdit").prop("checked",true);
-					}
-					else
-					{
-						$("#cliCardEdit").prop("checked",false);
-					}
-					if(response.cardDelete == "1")
-					{
-						$("#cliCardDelete").prop("checked",true);
-					}
-					else
-					{
-						$("#cliCardDelete").prop("checked",false);
-					}
-					if(response.activityAM == "1")
-					{
-						$("#cliActAM").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActAM").prop("checked",false);
-					}
-					if(response.activityLabel == "1")
-					{
-						$("#cliActLabel").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActLabel").prop("checked",false);
-					}
-					if(response.activityChecklist == "1")
-					{
-						$("#cliActCheck").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActCheck").prop("checked",false);
-					}
-					if(response.activityStartDate == "1")
-					{
-						$("#cliActStart").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActStart").prop("checked",false);
-					}
-					if(response.activityDueDate == "1")
-					{
-						$("#cliActDue").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActDue").prop("checked",false);
-					}
-					if(response.activityAttachment == "1")
-					{	
-						$("#cliActAtt").prop("checked",true);
-					}
-					else
-					{
-						$("#cliActAtt").prop("checked",false);
-					}
-			    });
+		  	console.log(response);
+		  	var collaborator = response["collaborator"];
+		  	var client = response["client"];
+			if(collaborator.listCreate == "1")
+			{
+				$("#collListCreate").prop("checked",true);
+			}
+			else
+			{
+				$("#collListCreate").prop("checked",false);
+			}
+			if(collaborator.listEdit == "1")
+			{
+				$("#collListEdit").prop("checked",true);
+			}
+			else
+			{
+				$("#collListEdit").prop("checked",false);
+			}
+			if(collaborator.listDelete == "1")
+			{
+				$("#collListDelete").prop("checked",true);
+			}
+			else
+			{
+				$("#collListDelete").prop("checked",false);
+			}
+			if(collaborator.cardCreate == "1")
+			{
+				$("#collCardCreate").prop("checked",true);
+			}
+			else
+			{
+				$("#collCardCreate").prop("checked",false);
+			}
+			if(collaborator.cardEdit == "1")
+			{
+				$("#collCardEdit").prop("checked",true);
+			}
+			else
+			{
+				$("#collCardEdit").prop("checked",false);
+			}
+			if(collaborator.cardDelete == "1")
+			{
+				$("#collCardDelete").prop("checked",true);
+			}
+			else
+			{
+				$("#collCardDelete").prop("checked",false);
+			}
+			if(collaborator.activityAM == "1")
+			{
+				$("#collActAM").prop("checked",true);
+			}
+			else
+			{
+				$("#collActAM").prop("checked",false);
+			}
+			if(collaborator.activityLabel == "1")
+			{
+				$("#collActLabel").prop("checked",true);
+			}
+			else
+			{
+				$("#collActLabel").prop("checked",false);
+			}
+			if(collaborator.activityChecklist == "1")
+			{
+				$("#collActCheck").prop("checked",true);
+			}
+			else
+			{
+				$("#collActCheck").prop("checked",false);
+			}
+			if(collaborator.activityStartDate == "1")
+			{
+				$("#collActStart").prop("checked",true);
+			}
+			else
+			{
+				$("#collActStart").prop("checked",false);
+			}
+			if(collaborator.activityDueDate == "1")
+			{
+				$("#collActDue").prop("checked",true);
+			}
+			else
+			{
+				$("#collActDue").prop("checked",false);
+			}
+			if(collaborator.activityAttachment == "1")
+			{	
+				$("#collActAtt").prop("checked",true);
+			}
+			else
+			{
+				$("#collActAtt").prop("checked",false);
+			}
+			if(client.listCreate == "1")
+			{
+				$("#cliListCreate").prop("checked",true);
+			}
+			else
+			{
+				$("#cliListCreate").prop("checked",false);
+			}
+			if(client.listEdit == "1")
+			{
+				$("#cliListEdit").prop("checked",true);
+			}
+			else
+			{
+				$("#cliListEdit").prop("checked",false);
+			}
+			if(client.listDelete == "1")
+			{
+				$("#cliListDelete").prop("checked",true);
+			}
+			else
+			{
+				$("#cliListDelete").prop("checked",false);
+			}
+			if(client.cardCreate == "1")
+			{
+				$("#cliCardCreate").prop("checked",true);
+			}
+			else
+			{
+				$("#cliCardCreate").prop("checked",false);
+			}
+			if(client.cardEdit == "1")
+			{
+				$("#cliCardEdit").prop("checked",true);
+			}
+			else
+			{
+				$("#cliCardEdit").prop("checked",false);
+			}
+			if(client.cardDelete == "1")
+			{
+				$("#cliCardDelete").prop("checked",true);
+			}
+			else
+			{
+				$("#cliCardDelete").prop("checked",false);
+			}
+			if(client.activityAM == "1")
+			{
+				$("#cliActAM").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActAM").prop("checked",false);
+			}
+			if(client.activityLabel == "1")
+			{
+				$("#cliActLabel").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActLabel").prop("checked",false);
+			}
+			if(client.activityChecklist == "1")
+			{
+				$("#cliActCheck").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActCheck").prop("checked",false);
+			}
+			if(client.activityStartDate == "1")
+			{
+				$("#cliActStart").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActStart").prop("checked",false);
+			}
+			if(client.activityDueDate == "1")
+			{
+				$("#cliActDue").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActDue").prop("checked",false);
+			}
+			if(client.activityAttachment == "1")
+			{	
+				$("#cliActAtt").prop("checked",true);
+			}
+			else
+			{
+				$("#cliActAtt").prop("checked",false);
+			}
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
 			alert(xhr.status);
@@ -4218,8 +4072,8 @@ function createRole()
 	var boardId = $("#hiddenBoardId").val();
 	$.ajax({
 		  type: "POST",
-		  url: "board/setRoleCollaborator",
-		  data: {boardId:boardId,collListCreate:collListCreate,collListEdit:collListEdit,collListDelete:collListDelete,collCardCreate:collCardCreate,collCardEdit:collCardEdit,collCardDelete:collCardDelete,collActAM:collActAM,collActLabel:collActLabel,collActCheck:collActCheck,collActStart:collActStart,collActDue:collActDue,collActAtt:collActAtt},
+		  url: "board/setRoleCollaboratorClient",
+		  data: {boardId:boardId,collListCreate:collListCreate,collListEdit:collListEdit,collListDelete:collListDelete,collCardCreate:collCardCreate,collCardEdit:collCardEdit,collCardDelete:collCardDelete,collActAM:collActAM,collActLabel:collActLabel,collActCheck:collActCheck,collActStart:collActStart,collActDue:collActDue,collActAtt:collActAtt,cliListCreate:cliListCreate,cliListEdit:cliListEdit,cliListDelete:cliListDelete,cliCardCreate:cliCardCreate,cliCardEdit:cliCardEdit,cliCardDelete:cliCardDelete,cliActAM:cliActAM,cliActLabel:cliActLabel,cliActCheck:cliActCheck,cliActStart:cliActStart,cliActDue:cliActDue,cliActAtt:cliActAtt},
 		  success: function (response) {
 		  	//alert(response);
 		  },
@@ -4229,22 +4083,6 @@ function createRole()
 			alert(xhr.responseText);
 		  }
 		});
-	$.ajax({
-		  type: "POST",
-		  url: "board/setRoleClient",
-		  data: {boardId:boardId,cliListCreate:cliListCreate,cliListEdit:cliListEdit,cliListDelete:cliListDelete,cliCardCreate:cliCardCreate,cliCardEdit:cliCardEdit,cliCardDelete:cliCardDelete,cliActAM:cliActAM,cliActLabel:cliActLabel,cliActCheck:cliActCheck,cliActStart:cliActStart,cliActDue:cliActDue,cliActAtt:cliActAtt},
-		  success: function (response) {
-		  	//alert(response);
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	/*
-	cliListCreate:cliListCreate,cliListEdit:cliListEdit,cliListDelete:cliListDelete,cliCardCreate:cliCardCreate,cliCardEdit:cliCardEdit,cliCardDelete:cliCardDelete,cliActAM:cliActAM,cliActLabel:cliActLabel,cliActCheck:cliActCheck,cliActStart:cliActStart,cliActDue:cliActDue,cliActAtt:cliActAtt
-	*/
 }
 
 function findBoards()
@@ -4333,374 +4171,16 @@ function checkRoleListMenu()
 
 }
 
-function setRole(role,boardId)
-{
-	var boardId = boardId;
-	//disembunyikan semua dahulu
-	$(".roleCreateList").hide();
-	$(".roleCreateCard").hide();
-	$(".roleCreator").hide();
-	$(".roleCollaboratorClient").hide();
-	if(role == "Creator")
-	{
-		$(".roleCreateList").show();
-		$(".roleCreateCard").show();
-		$(".roleCreator").show();
-		$(".roleCollaboratorClient").hide();
-	}
-	else if(role == "Collaborator")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleCollaborator",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.listCreate == "1")
-				{
-					$(".roleCreateList").show();
-				}
-				if(response.cardCreate == "1")
-				{
-					$(".roleCreateCard").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-	else if(role == "Client")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleClient",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.listCreate == "1")
-				{
-					$(".roleCreateList").show();
-				}
-				if(response.cardCreate == "1")
-				{
-					$(".roleCreateCard").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-}
-
-function setRoleListMenu(role,boardId)
-{
-	var boardId = boardId;
-	//disembunyikan semua dahulu
-	$(".roleCreateCardMenu").hide();
-	$(".roleEditCardMenu").hide();
-	$(".roleDeleteCardMenu").hide();
-	$(".roleCreateListMenu").hide();
-	$(".roleEditListMenu").hide();
-	$(".roleDeleteListMenu").hide();
-	if(role == "Creator")
-	{
-		$(".roleCreateCardMenu").show();
-		$(".roleEditCardMenu").show();
-		$(".roleDeleteCardMenu").show();
-		$(".roleCreateListMenu").show();
-		$(".roleEditListMenu").show();
-		$(".roleDeleteListMenu").show();
-	}
-	else if(role == "Collaborator")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleCollaborator",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.cardCreate == "1")
-				{
-					$(".roleCreateCardMenu").show();
-				}
-				if(response.cardEdit == "1")
-				{
-					$(".roleEditCardMenu").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCardMenu").show();
-				}
-				if(response.listCreate == "1")
-				{
-					$(".roleCreateListMenu").show();
-				}
-				if(response.listEdit == "1")
-				{
-					$(".roleEditListMenu").show();
-				}
-				if(response.listDelete == "1")
-				{
-					$(".roleDeleteListMenu").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-	else if(role == "Client")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleClient",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.cardCreate == "1")
-				{
-					$(".roleCreateCardMenu").show();
-				}
-				if(response.cardEdit == "1")
-				{
-					$(".roleEditCardMenu").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCardMenu").show();
-				}
-				if(response.listEdit == "1")
-				{
-					$(".roleEditListMenu").show();
-				}
-				if(response.listDelete == "1")
-				{
-					$(".roleDeleteListMenu").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-}
-
-function setRoleCard(role,boardId)
-{
-	var boardId = boardId;
-	//disembunyikan semua dahulu
-	$(".roleEditCard").hide();
-	$(".roleDeleteCard").hide();
-	$(".roleActivityAM").hide();
-	$(".roleActivityLabel").hide();
-	$(".roleActivityChecklist").hide();
-	$(".roleActivityAttachment").hide();
-	$(".roleActivityStartDate").hide();
-	$(".roleActivityDueDate").hide();
-	if(role == "Creator")
-	{
-		$(".roleEditCard").show();
-		$(".roleDeleteCard").show();
-		$(".roleActivityAM").show();
-		$(".roleActivityLabel").show();
-		$(".roleActivityChecklist").show();
-		$(".roleActivityAttachment").show();
-		$(".roleActivityStartDate").show();
-		$(".roleActivityDueDate").show();
-	}
-	else if(role == "Collaborator")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleCollaborator",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.cardEdit == "1")
-				{
-					$(".roleEditCard").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCard").show();
-				}
-				if(response.activityAM == "1")
-				{
-					$(".roleActivityAM").show();
-				}
-				if(response.activityLabel == "1")
-				{
-					$(".roleActivityLabel").show();
-				}
-				if(response.activityChecklist == "1")
-				{
-					$(".roleActivityChecklist").show();
-				}
-				if(response.activityAttachment == "1")
-				{
-					$(".roleActivityAttachment").show();
-				}
-				if(response.activityStartDate == "1")
-				{
-					$(".roleActivityStartDate").show();
-				}
-				if(response.activityDueDate == "1")
-				{
-					$(".roleActivityDueDate").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-	else if(role == "Client")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleClient",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.cardEdit == "1")
-				{
-					$(".roleEditCard").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCard").show();
-				}
-				if(response.activityAM == "1")
-				{
-					$(".roleActivityAM").show();
-				}
-				if(response.activityLabel == "1")
-				{
-					$(".roleActivityLabel").show();
-				}
-				if(response.activityChecklist == "1")
-				{
-					$(".roleActivityChecklist").show();
-				}
-				if(response.activityAttachment == "1")
-				{
-					$(".roleActivityAttachment").show();
-				}
-				if(response.activityStartDate == "1")
-				{
-					$(".roleActivityStartDate").show();
-				}
-				if(response.activityDueDate == "1")
-				{
-					$(".roleActivityDueDate").show();
-				}
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-}
-
-function setRoleMore(role,boardId)
-{
-	var boardId = boardId;
-	//disembunyikan semua dahulu
-	$(".roleDeleteList").hide();
-	$(".roleDeleteCard").hide();
-	$(".roleCreator").hide();
-	$(".roleCollaboratorClient").hide();
-	if(role == "Creator")
-	{
-		$(".roleDeleteList").show();
-		$(".roleDeleteCard").show();
-		$(".roleCreator").show();
-	}
-	else if(role == "Collaborator")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleCollaborator",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.listDelete == "1")
-				{
-					$(".roleDeleteList").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCard").show();
-				}
-				$(".roleCollaboratorClient").show();
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-	else if(role == "Client")
-	{
-		$.ajax({
-		  type: "POST",
-		  url: "board/getRoleClient",
-		  data: {boardId:boardId},
-		  dataType :"json",
-		  success: function (response) {
-			$.each(response, function(idx, response){
-				if(response.listDelete == "1")
-				{
-					$(".roleDeleteList").show();
-				}
-				if(response.cardDelete == "1")
-				{
-					$(".roleDeleteCard").show();
-				}
-				$(".roleCollaboratorClient").show();
-		    });
-		  },
-		  error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert(thrownError);
-			alert(xhr.responseText);
-		  }
-		});
-	}
-}
-
 function createPDF()
 {
-	window.location.href="board/createPDF";
+	var boardId = $("#hiddenBoardId").val();
+	window.location.href="board/createPDF/"+boardId;
+}
+
+function createExcel()
+{
+	var boardId = $("#hiddenBoardId").val();
+	window.location.href ="board/createExcel/"+boardId;
 }
 
 function setFilter()
@@ -4753,10 +4233,147 @@ function setDisplayCard(red,yellow,green,blue)
 	}
 }
 
+function showMemberRole()
+{
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/getBoardMember",
+		  data: {boardId:boardId},
+		  dataType:"json",
+		  success: function (response) {
+			//alert(response);
+			$("#ajaxInviteMember").empty();
+			$.each(response, function(idx, response){
+				var directory = getDirectoryUser(response.userId);
+				var name = getNameUser(response.userId);
+				var gabung = "";
+				gabung += '<div class="row">';
+				gabung += '<div class="col s6 m4 l1">';
+				gabung += '<img src="'+directory+'" style="border-radius:50%;margin-left:10px;" width="32px" height="32px" alt="Profile" />';
+				gabung += '</div>';
+				gabung += '<div class="col s6 m8 l11">';
+				gabung += '<div style="margin-top:5px;"><a href="userProfile?userId='+response.userId+'">'+name+'</a> ('+response.memberRole+')';
+				
+				if(response.memberRole == "Creator")
+				{
+					var userId = $("#hiddenUserId").val();
+					if(userId != response.userId)
+					{
+						gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToCollaborator(\''+response.userId+'\')" class="green-text lighten-2 ultra-small"> Change to Collaborator</a>';
+					}
+				}
+				else if(response.memberRole == "Collaborator")
+				{
+					gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToClient(\''+response.userId+'\')" class="green-text lighten-2 ultra-small"> Change to Client</a>';
+				}
+				else if(response.memberRole == "Client")
+				{
+					gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToCollaborator(\''+response.userId+'\')" class="green-text lighten-2 ultra-small"> Change to Collaborator</a>';
+				}
+				if(userId != response.userId)
+				{
+					gabung += ' -<a href="javascript:void(0);" onclick="removeMember(\''+response.userId+'\')" class="red-text ultra-small"> Remove</a>';
+				}
+				gabung += '</div>';
+				gabung += '</div>';
+				gabung += '</div>';
+				$("#ajaxInviteMember").append(gabung);
+		    });
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
 function openModalInvite()
 {
-
+	showMemberRole();
 	$("#modalinvite").openModal();
+}
+
+function changeMember(role,userId,boardId)
+{
+	var userId = userId;
+	var boardId = boardId;
+	var role = role;
+	$.ajax({
+		  type: "POST",
+		  url: "board/updateMemberRole",
+		  data: {boardId:boardId,userId:userId,role:role},
+		  success: function (response) {
+		  	//alert(response);
+			showMemberRole();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+}
+
+function changeMemberToCollaborator(userId)
+{
+	var userId = userId;
+	var boardId = $("#hiddenBoardId").val();
+	var role = "Collaborator";
+	changeMember(role,userId,boardId);
+}
+
+function changeMemberToClient(userId)
+{
+	var userId = userId;
+	var boardId = $("#hiddenBoardId").val();
+	var role = "Client";
+	changeMember(role,userId,boardId);
+}
+
+function removeMember(userId)
+{
+	var userId = userId;
+	var boardId = $("#hiddenBoardId").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/removeMember",
+		  data: {boardId:boardId,userId:userId},
+		  success: function (response) {
+		  	//alert(response);
+			showMemberRole();
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+
+}
+
+
+function sendInvite()
+{
+	var boardId = $("#hiddenBoardId").val();
+	var email = $("#inviteEmail").val();
+	var role = $("#inviteRoleMember").val();
+	$.ajax({
+		  type: "POST",
+		  url: "board/createInvite",
+		  data: {boardId:boardId,email:email,role:role},
+		  success: function (response) {
+		  	alert(response);
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
+	$("#inviteEmail").val();
+
 }
 
 function createInvite()
@@ -4777,25 +4394,47 @@ function createInvite()
 		});
 }
 
+function createChat(name,directory,text)
+{
+	var gabung = "";
+	gabung += '<div class="favorite-associate-list chat-out-list row">';
+    gabung +=     '<div class="col s4"><img src="'+directory+'" alt="" class="circle responsive-img online-user valign profile-image">';
+    gabung +=     '</div>';
+    gabung +=     '<div class="col s8">';
+    gabung +=         '<p>'+name+'</p>';
+    gabung +=        '<p class="place black-text">'+text+'</p>';
+    gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
+    gabung +=     '</div>';
+    gabung += '</div>';
+    $("#ajaxChat").append(gabung);
+	$("#chatText").val("");
+
+}
+
 $(document).ready(function() {
-    checkRole();
-    $(document).keypress(function(e) {
-	    if(e.which == 13) {
-	    	if($("#txtFindBoards").is(":focus"))
-	        {
-	        	findBoards();
-	        }
-	        if($("#chatText").is(":focus"))
-	        {
-	        	createChat();
-	        }
-	    }
-	});
-});
-
-
-function myTimer() {
 	var boardId = $("#hiddenBoardId").val();
+	var conn = new WebSocket('ws://localhost:8080');
+	conn.onopen = function(e) {
+		console.log("Connection established!");
+	};
+
+	conn.onmessage = function(e) {
+		console.log(e.data);
+		var response = JSON.parse(e.data);
+		var gabung = "";
+  		var name = response.name;
+  		var directory = response.directory;
+  		gabung += '<div class="favorite-associate-list chat-out-list row">';
+        gabung +=     '<div class="col s4"><img src="'+directory+'" alt="" class="circle responsive-img online-user valign profile-image">';
+        gabung +=     '</div>';
+        gabung +=     '<div class="col s8">';
+        gabung +=         '<p>'+name+'</p>';
+        gabung +=        '<p class="place black-text">'+response.text+'</p>';
+        gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
+        gabung +=     '</div>';
+        gabung += '</div>';
+        $("#ajaxChat").append(gabung);
+	};
 	$.ajax({
 		  type: "POST",
 		  url: "board/getChat",
@@ -4827,6 +4466,97 @@ function myTimer() {
 			alert("Chat");
 		  }
 		});
+	$( "#sendChat" ).click(function() {
+		  	var boardId = $("#hiddenBoardId").val();
+				var chatText = $("#chatText").val();
+				var rules = true;
+				if(chatText == "")
+				{
+					rules = false;
+				}
+				if(rules == true)
+				{
+					$.ajax({
+					  type: "POST",
+					  url: "board/createChat",
+					  data: {boardId:boardId,chatText:chatText},
+					  dataType:"json",
+					  success: function (response) {
+						//alert(response);
+						var gabung = "";
+				  		var name = response.userName;
+				  		var directory = response.userImage;
+				  		createChat(name,directory,chatText);
+			            var obj = { "name":name, 
+							        "directory":directory, 
+							        "text":chatText
+							      };
+			            var myJSON = JSON.stringify(obj);
+			            conn.send(myJSON);
+
+					  },
+					  error: function (xhr, ajaxOptions, thrownError) {
+						alert(xhr.status);
+						alert(thrownError);
+						alert(xhr.responseText);
+					  }
+					});
+					$("#chatText").val("");
+				}
+		});
+    $(document).keypress(function(e) {
+	    if(e.which == 13) {
+	    	if($("#txtFindBoards").is(":focus"))
+	        {
+	        	findBoards();
+	        }
+	        if($("#chatText").is(":focus"))
+	        {
+	        	var boardId = $("#hiddenBoardId").val();
+				var chatText = $("#chatText").val();
+				var rules = true;
+				if(chatText == "")
+				{
+					rules = false;
+				}
+				if(rules == true)
+				{
+					$.ajax({
+					  type: "POST",
+					  url: "board/createChat",
+					  data: {boardId:boardId,chatText:chatText},
+					  dataType:"json",
+					  success: function (response) {
+						//alert(response);
+						var gabung = "";
+				  		var name = response.userName;
+				  		var directory = response.userImage;
+				  		createChat(name,directory,chatText);
+			            var obj = { "name":name, 
+							        "directory":directory, 
+							        "text":chatText
+							      };
+			            var myJSON = JSON.stringify(obj);
+			            conn.send(myJSON);
+
+					  },
+					  error: function (xhr, ajaxOptions, thrownError) {
+						alert(xhr.status);
+						alert(thrownError);
+						alert(xhr.responseText);
+					  }
+					});
+					$("#chatText").val("");
+				}
+	        }
+	    }
+	});
+});
+
+
+function myTimer() {
+	var boardId = $("#hiddenBoardId").val();
+	
 }
 
 function cekLogout()

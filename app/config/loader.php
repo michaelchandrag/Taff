@@ -16,6 +16,14 @@ $loader->registerDirs(
         $config->application->controllersDir,
         $config->application->modelsDir
     ]
-)->register();
+);
+
+$loader->registerFiles(
+    [
+        BASE_PATH.'/vendor/autoload.php'
+    ]
+);
+
+$loader->register();
 
 

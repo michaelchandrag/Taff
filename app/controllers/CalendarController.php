@@ -15,6 +15,10 @@ class CalendarController extends \Phalcon\Mvc\Controller
         {
             $boardId = $_GET["id"];
         }
+        if($userId == null || $boardId == "")
+        {
+            $this->response->redirect("home");
+        }
         $profile = Userprofile::findFirst(
             [
                 "userId='".$userId."'"
