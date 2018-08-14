@@ -112,11 +112,17 @@ final class TcpConnector implements ConnectorInterface
                     $resolve(new Connection($stream, $loop));
                 }
             });
-        }, function ($resolve, $reject, $progress) use ($loop, $stream) {
+        }, function () use ($loop, $stream) {
             $loop->removeWriteStream($stream);
             fclose($stream);
 
-            $resolve = $reject = $progress = null;
+            // @codeCoverageIgnoreStart
+            // legacy PHP 5.3 sometimes requires a second close call (see tests)
+            if (PHP_VERSION_ID < 50400 && is_resource($stream)) {
+                fclose($stream);
+            }
+            // @codeCoverageIgnoreEnd
+
             throw new RuntimeException('Cancelled while waiting for TCP/IP connection to be established');
         });
     }

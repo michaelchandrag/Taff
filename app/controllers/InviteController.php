@@ -63,7 +63,9 @@ class InviteController extends \Phalcon\Mvc\Controller
         }
         if($userId == null || $userId == "")
         {
-            $this->session->set("inviteGroupId",$boardId);
+            $this->session->set("inviteGroupId",$groupId);
+            $this->session->set("kumparan",$groupId);
+            //echo $this->session->get("inviteGroupId");
             $this->response->redirect("login");
         }
         else
@@ -84,11 +86,10 @@ class InviteController extends \Phalcon\Mvc\Controller
             }
             else
             {
-                /*
+                
                 $match->memberStatus = '1';
                 $match->save();
-                $this->response->redirect("home");*/
-                echo "ONOK";
+                $this->response->redirect("home");
             }
         }
     }

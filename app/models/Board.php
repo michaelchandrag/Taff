@@ -165,4 +165,17 @@ class Board extends \Phalcon\Mvc\Model
         $board->boardTitle = $title;
         $board->save();
     }
+
+    public function setAll($boardOwner,$boardTitle,$boardGroup,$boardClosed,$boardStatus,$boardBackground)
+    {
+        $this->boardOwner = $boardOwner;
+        $this->boardTitle = $boardTitle;
+        //$board->boardCreated = date("Y-m-d H:i:sa");
+        //$board->boardPublic = $public;
+        $this->boardGroup = $boardGroup;
+        $this->boardClosed = $boardClosed;
+        $this->boardStatus = $boardStatus;
+        $this->boardBackground = $boardBackground;
+        $this->save();
+    }
 }

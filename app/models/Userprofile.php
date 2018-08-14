@@ -153,4 +153,19 @@ class Userprofile extends \Phalcon\Mvc\Model
         $profile->save();
     }
 
+    public function changeDataAdmin($userId,$userName,$userBio,$userLocation,$userGender,$userStatus)
+    {
+        $profile = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $profile->userName = $userName;
+        $profile->userBio = $userBio;
+        $profile->userLocation = $userLocation;
+        $profile->userGender = $userGender;
+        $profile->userStatus = $userStatus;
+        $profile->save();
+    }
+
 }

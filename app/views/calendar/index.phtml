@@ -1,103 +1,94 @@
-<!-- START HEADER -->
 <header id="header" class="page-topbar">
-	<!-- start header nav-->
-	<div class="navbar-fixed">
-		<nav class="navbar-color">
-			<div class="nav-wrapper">
-				<ul class="left">                      
-				  <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
-				</ul>
-				<div class="header-search-wrapper hide-on-med-and-down">
-					<i class="mdi-action-search"></i>
-					<input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
-				</div>
-				<ul class="right hide-on-med-and-down">
-					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
-					</li>
-					<li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">                      
+                  <li><h1 class="logo-wrapper"><a href="home" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
+                </ul>
+                <div class="header-search-wrapper hide-on-med-and-down">
+                    <i class="mdi-action-search"></i>
+                    <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Find Boards"/>
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src="<?php 
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
 
-		                    ?>" width="32px" height="32px" style="border-radius:50%" /></a>
-					</li>
-				</ul>
-				<!-- translation-button -->
-				<ul id="translation-dropdown" class="dropdown-content">
-				  <li>
-					<a href="userProfile?userId=<?php echo $userProfile->userId ?>"><img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
+                            ?>" width="32px" height="32px" style="border-radius:50%" /></a>
+                    </li>
+                </ul>
+                <ul id="translation-dropdown" class="dropdown-content">
+                  <li>
+                    <a href="userProfile?userId=<?php echo $userProfile->userId ?>"><img src="<?php 
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
 
-		                    ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
-				  </li>
-				  <li>
-					<a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
-				  </li>
-				  
-				</ul>
-			</div>
-		</nav>
-
-		<!-- HORIZONTL NAV START-->
-		 <nav id="horizontal-nav" class="white hide-on-med-and-down">
-			<div class="nav-wrapper">                  
-			  <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
-				<li>
-					<a href="<?php echo "board?id=".$boardId ?>" class="cyan-text">
-						<i class="mdi-action-dashboard"></i>
-						<span>Board</span>
-					</a>
-				</li> 
-			  </ul>
-			</div>
-		  </nav>
-		<!-- HORIZONTL NAV END-->
-	</div>
-	<!-- end header nav-->
+                            ?>" width="32px" height="32px" alt="Profile" />  <span class="language-select">Profile</span></a>
+                  </li>
+                  <li>
+                    <a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+                  </li>
+                  
+                </ul>
+            </div>
+        </nav>
+         <nav id="horizontal-nav" class="white hide-on-med-and-down">
+            <div class="nav-wrapper">                  
+              <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+                <li>
+                    <a href="<?php echo "board?id=".$boardId ?>" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Board</span>
+                    </a>
+                </li> 
+              </ul>
+            </div>
+          </nav>
+    </div>
 </header>
-<!-- END HEADER -->
 
-<!-- START LEFT SIDEBAR NAV-->
 <aside id="left-sidebar-nav hide-on-large-only">
     <ul id="slide-out" class="side-nav leftside-navigation ">
         <li class="user-details cyan darken-2">
             <div class="row">
                 <div class="col col s4 m4 l4">
                     <img src="<?php 
-		                    if(strpos($userProfile->userImage,"userImage") !== false)
-		                    {
-		                   		echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
-		                    }
-		                    else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $userProfile->userImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "userImage/user.jpg";
-		                    }
+                            if(strpos($userProfile->userImage,"userImage") !== false)
+                            {
+                                echo $userProfile->userImage."?".filemtime($userProfile->userImage); 
+                            }
+                            else if(strpos($userProfile->userImage,"googleusercontent.com") !== false)
+                            {
+                                echo $userProfile->userImage;
+                            }
+                            else
+                            {
+                                echo "userImage/user.jpg";
+                            }
 
-		                    ?>" alt="" class="circle responsive-img valign profile-image">
+                            ?>" alt="" class="circle responsive-img valign profile-image">
                 </div>
                 <div class="col col s8 m8 l8">
                     <a class="dropdown-button waves-effect waves-light profile-btn white-text" href="#" disabled><?php echo $userProfile->userName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
@@ -114,64 +105,32 @@
     </ul>
     <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
 </aside>
-<!-- END LEFT SIDEBAR NAV-->
-
-<!-- //////////////////////////////////////////////////////////////////////////// -->
-
-<!-- START MAIN -->
 <div id="main">
-	<!-- START WRAPPER -->
-	<div class="wrapper">
-
-		<!-- START CONTENT -->
-		<section id="content">
-
-			<!--start container-->
-			<div class="container">
-				<!-- trello start here -->
-				
-				<div class="section">
-			        <div id="full-calendar">              
-			          <div class="row">
-			          	<div class="col s12 m4 l3">
-		                  <div id='external-events'>    
-		                    <h4 class="header">Note</h4>
-		                    <div class='fc-event center-align' style="background-color:green;">Start Date</div>
-		                    <div class='fc-event center-align' style="background-color:red;">Due Date</div>
-		                    <div class='fc-event center-align' style="background-color:blue;">Both Date</div>
-		                    <a id="authorize-button" href="javascript:void(0)" class="waves-effect waves-red btn left-align" style="font-weight:50%;">Sync with Google Calendar</a>
-		                  </div>
-		                </div>
-			            <div class="col s12 m8 l9">
-			            	<input type="hidden" id="hiddenBoardId" value="<?php echo $boardId?>">
-			              <div id='calendar'></div>
-			            </div>
-			          </div>
-			        </div>
-			    </div>
-
-
-
-
-				<!-- Floating Action Button -->
-				<div class="fixed-action-btn" style="bottom: 50px; right: 19px;">
-					<a class="btn-floating btn-large">
-					  <i class="mdi-action-stars"></i>
-					</a>
-					<ul>
-					  <li><a href="css-helpers.html" class="btn-floating red"><i class="large mdi-communication-live-help"></i></a></li>
-					  <li><a href="app-widget.html" class="btn-floating yellow darken-1"><i class="large mdi-device-now-widgets"></i></a></li>
-					  <li><a href="app-calendar.html" class="btn-floating green"><i class="large mdi-editor-insert-invitation"></i></a></li>
-					  <li><a href="app-email.html" class="btn-floating blue"><i class="large mdi-communication-email"></i></a></li>
-					</ul>
-				</div>
-				<!-- Floating Action Button -->
-			</div>
-			<!--end container-->
-		</section>
-		<!-- END CONTENT -->
-		      <!-- START RIGHT SIDEBAR NAV-->
-  	<aside id="right-sidebar-nav">
+    <div class="wrapper">
+        <section id="content">
+            <div class="container">
+                <div class="section">
+                    <div id="full-calendar">              
+                      <div class="row">
+                        <div class="col s12 m4 l3">
+                          <div id='external-events'>    
+                            <h4 class="header">Note</h4>
+                            <div class='fc-event center-align' style="background-color:green;">Start Date</div>
+                            <div class='fc-event center-align' style="background-color:red;">Due Date</div>
+                            <div class='fc-event center-align' style="background-color:blue;">Both Date</div>
+                            <a id="authorize-button" href="javascript:void(0)" class="waves-effect waves-red btn left-align" style="font-weight:50%;" onclick="sync()">Add to Google Calendar</a>
+                          </div>
+                        </div>
+                        <div class="col s12 m8 l9">
+                            <input type="hidden" id="hiddenBoardId" value="<?php echo $boardId?>">
+                          <div id='calendar'></div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <aside id="right-sidebar-nav">
         <ul id="chat-out" class="side-nav rightside-navigation">
             <li class="li-hover">
             <a href="#" data-activates="chat-out" class="chat-close-collapse right"><i class="mdi-navigation-close"></i></a>
@@ -216,11 +175,5 @@
         </ul>
     </aside>
 
-	</div>
-	<!-- END WRAPPER -->
+    </div>
 </div>
-<!-- END MAIN -->
-<script async defer src="https://apis.google.com/js/api.js"
-  onload="this.onload=function(){};handleClientLoad()"
-  onreadystatechange="if (this.readyState === 'complete') this.onload()">
-</script>

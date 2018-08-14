@@ -40,12 +40,12 @@ class ExtEvLoop implements LoopInterface
     /**
      * @var EvIo[]
      */
-    private $readStreams = [];
+    private $readStreams = array();
 
     /**
      * @var EvIo[]
      */
-    private $writeStreams = [];
+    private $writeStreams = array();
 
     /**
      * @var bool
@@ -60,7 +60,7 @@ class ExtEvLoop implements LoopInterface
     /**
      * @var \EvSignal[]
      */
-    private $signalEvents = [];
+    private $signalEvents = array();
 
     public function __construct()
     {
@@ -92,7 +92,7 @@ class ExtEvLoop implements LoopInterface
     private function getStreamListenerClosure($stream, $listener)
     {
         return function () use ($stream, $listener) {
-            call_user_func($listener, $stream);
+            \call_user_func($listener, $stream);
         };
     }
 
@@ -140,7 +140,7 @@ class ExtEvLoop implements LoopInterface
         $that = $this;
         $timers = $this->timers;
         $callback = function () use ($timer, $timers, $that) {
-            call_user_func($timer->getCallback(), $timer);
+            \call_user_func($timer->getCallback(), $timer);
 
             if ($timers->contains($timer)) {
                 $that->cancelTimer($timer);
@@ -158,7 +158,7 @@ class ExtEvLoop implements LoopInterface
         $timer = new Timer($interval, $callback, true);
 
         $callback = function () use ($timer) {
-            call_user_func($timer->getCallback(), $timer);
+            \call_user_func($timer->getCallback(), $timer);
         };
 
         $event = $this->loop->timer($interval, $interval, $callback);

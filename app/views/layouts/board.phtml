@@ -12,4 +12,22 @@
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="js/myjs/jsBoard.js"></script>
     <script type="text/javascript" src="js/myjs/jsDrive.js"></script>
+    <script type="text/javascript" src="js/pusher.min.js"></script>
+    <script>
+        var pusher = new Pusher('2f8c2f49f896f24ad17c', {
+          cluster: 'ap1',
+          encrypted: true
+        });
+
+        var channel = pusher.subscribe('my-channel');
+        channel.bind('my-event', function(data) {
+          var user = data.user;
+          var text = data.text;
+          var boardId = data.boardId;
+          var name = user.userName;
+          var directory = user.userImage;
+          if(boardId == $("#hiddenBoardId").val())
+            createChat(name,directory,text);
+        });
+    </script>
 </body>

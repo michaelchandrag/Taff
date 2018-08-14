@@ -5,7 +5,7 @@ class HomeController extends ControllerBase
 
     public function indexAction()
     {
-    	$userId = $this->session->get("userId");
+        $userId = $this->session->get("userId");
         $find  = null;
         if(isset($_GET["find"]))
         {
@@ -16,7 +16,7 @@ class HomeController extends ControllerBase
             $this->response->redirect("login");
         }
         $inviteBoardId = $this->session->get("inviteBoardId");
-        if($inviteBoardId != null || $inviteBoardId != "")
+        if($inviteBoardId != null)
         {
             $match = Boardmember::findFirst(
                 [
@@ -39,11 +39,11 @@ class HomeController extends ControllerBase
             $this->session->remove("inviteRoleMember");
         }
         $inviteGroupId = $this->session->get("inviteGroupId");
-        if($inviteGroupId != null || $inviteGroupId != "")
+        if($inviteGroupId != null)
         {
             $match = Groupmember::findFirst(
                 [
-                    "conditions" => "groupUserId='".$groupId."' AND userId='".$userId."'"
+                    "conditions" => "groupUserId='".$inviteGroupId."' AND userId='".$userId."'"
                 ]
             );
             if($match == null)
@@ -51,7 +51,7 @@ class HomeController extends ControllerBase
                 $gm = new Groupmember();
                 $role = "Member";
                 $status = "1";
-                $gm->insertGroupMember($userId,$groupId,$role,$status);
+                $gm->insertGroupMember($userId,$inviteGroupId,$role,$status);
                 $this->response->redirect("home");
             }
             else
@@ -62,7 +62,7 @@ class HomeController extends ControllerBase
             }
             $this->session->remove("inviteGroupId");
         }
-    	$board = Board::find(
+        $board = Board::find(
             [
                 "conditions" => "boardClosed='0' AND boardStatus ='1'"
             ]
@@ -75,14 +75,14 @@ class HomeController extends ControllerBase
                 ]
             );
         }
-    	$groupMember = new Groupmember();
-    	$groupMember = $groupMember->findGroup($userId);
-    	$groupUser = Groupuser::find(
+        $groupMember = new Groupmember();
+        $groupMember = $groupMember->findGroup($userId);
+        $groupUser = Groupuser::find(
             [
                 "groupStatus='1'"
             ]
         );
-    	$boardGroup = Boardgroup::find();
+        $boardGroup = Boardgroup::find();
         $profile = Userprofile::findFirst(
             [
                 "userId='".$userId."'"
@@ -100,23 +100,23 @@ class HomeController extends ControllerBase
         );
         $this->view->boardMember       = $boardMember;
         $this->view->userProfile       = $profile;
-    	$this->view->board             = $board;
-    	$this->view->userId            = $userId;
-    	$this->view->groupMember       = $groupMember;
-    	$this->view->groupUser         = $groupUser;
-    	$this->view->boardGroup        = $boardGroup;
+        $this->view->board             = $board;
+        $this->view->userId            = $userId;
+        $this->view->groupMember       = $groupMember;
+        $this->view->groupUser         = $groupUser;
+        $this->view->boardGroup        = $boardGroup;
         $this->view->boardFavorite     = $favorite;
     }
 
     public function createBoardAction()
     {
-    	$title = $_POST["title"];
-    	$owner = $_POST["owner"];
-    	$public = "1";
-    	$status = '1';
-    	$background = "blue";
+        $title = $_POST["title"];
+        $owner = $_POST["owner"];
+        $public = "1";
+        $status = '1';
+        $background = "blue";
         $group = "0";
-    	$userId = $this->session->get("userId");
+        $userId = $this->session->get("userId");
         if(substr($owner,0,1) == "B")
         {
             $group = "0";
@@ -153,21 +153,21 @@ class HomeController extends ControllerBase
                 $boardMember->insertBoardMember($g->userId,$id,$role,$status);
             }
             //role collaborator dan client
-            $listCreate = "1";
-            $listEdit = "1";
-            $listDelete = "1";
-            $cardCreate = "1";
-            $cardEdit = "1";
-            $cardDelete = "1";
-            $activityAM = "1";
-            $activityLabel = "1";
-            $activityChecklist = "1";
-            $activityStartDate = "1";
-            $activityDueDate = "1";
-            $activityAttachment = "1";
-            $roleStatus = "1";
+            $listCreate = "0";
+            $listEdit = "0";
+            $listDelete = "0";
+            $cardCreate = "0";
+            $cardEdit = "0";
+            $cardDelete = "0";
+            $activityAM = "0";
+            $activityLabel = "0";
+            $activityChecklist = "0";
+            $activityStartDate = "0";
+            $activityDueDate = "0";
+            $activityAttachment = "0";
+            $roleStatus = "0";
             $coll = new Boardrolecollaborator();
-            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
+            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,"1","1","1","1","1","1","1");
 
             $client = new Boardroleclient();
             $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
@@ -178,45 +178,45 @@ class HomeController extends ControllerBase
             $boardMember = new Boardmember();
             $boardMember->insertBoardMember($userId,$id,$role,$status);
             //role collaborator dan client
-            $listCreate = "1";
-            $listEdit = "1";
-            $listDelete = "1";
-            $cardCreate = "1";
-            $cardEdit = "1";
-            $cardDelete = "1";
-            $activityAM = "1";
-            $activityLabel = "1";
-            $activityChecklist = "1";
-            $activityStartDate = "1";
-            $activityDueDate = "1";
-            $activityAttachment = "1";
-            $roleStatus = "1";
+            $listCreate = "0";
+            $listEdit = "0";
+            $listDelete = "0";
+            $cardCreate = "0";
+            $cardEdit = "0";
+            $cardDelete = "0";
+            $activityAM = "0";
+            $activityLabel = "0";
+            $activityChecklist = "0";
+            $activityStartDate = "0";
+            $activityDueDate = "0";
+            $activityAttachment = "0";
+            $roleStatus = "0";
             $coll = new Boardrolecollaborator();
-            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
+            $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,"1","1","1","1","1","1","1");
 
             $client = new Boardroleclient();
             $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         }
-    	$this->view->disable();
-    	echo $id;
+        $this->view->disable();
+        echo $id;
     }
 
     public function createGroupAction()
     {
-    	$name = $_POST["name"];
-    	$status = "1";
-    	$userId = $this->session->get("userId");
-    	$groupUser = new Groupuser();
-    	$index = $groupUser->countGroup();
+        $name = $_POST["name"];
+        $status = "1";
+        $userId = $this->session->get("userId");
+        $groupUser = new Groupuser();
+        $index = $groupUser->countGroup();
         $groupId = "GU".str_pad($index,5,'0',STR_PAD_LEFT);
-    	$groupUser->insertGroupUser($name,$status);
+        $groupUser->insertGroupUser($name,$status);
 
-    	$groupMember = new Groupmember();
-    	$role = "Admin";
-    	$groupMember->insertGroupMember($userId,$groupId,$role,$status);
-    	$this->view->disable();
+        $groupMember = new Groupmember();
+        $role = "Admin";
+        $groupMember->insertGroupMember($userId,$groupId,$role,$status);
+        $this->view->disable();
 
-    	echo $groupId;
+        echo $groupId;
     }
 
     public function getClosedBoardAction()

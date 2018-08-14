@@ -167,7 +167,6 @@ function cekLogout()
 		  type: "POST",
 		  url: "login/logout",
 		  success: function (response) {
-			  alert(response);
 			  if(response == "Berhasil")
 			  {
 			  	/*var auth2 = gapi.auth2.getAuthInstance();
@@ -261,7 +260,7 @@ function deleteBoard(id)
 
 function setFilter()
 {
-	if($("#filterred").is(":checked") == false && $("#filteryellow").is(":checked") == false && $("#filtergreen").is(":checked") == false && $("#filterblue").is(":checked") == false)
+	if($("#filterred").is(":checked") == false && $("#filteryellow").is(":checked") == false && $("#filtergreen").is(":checked") == false && $("#filterblue").is(":checked") == false && $("#filterview1").is(":checked") == false && $("#filterview2").is(":checked") == false)
 	{
 		var jumlahBoard = $(".boardUser").length;
 		for(var i=0;i<jumlahBoard;i++)
@@ -306,6 +305,24 @@ function setFilter()
 		{
 			setDisplayBoard("blue","hide");
 		}
+		if($("#filterview1").is(":checked"))
+		{
+			setDisplayBoard("view1","show");
+			
+		}
+		else
+		{
+			setDisplayBoard("view1","hide");
+		}
+		if($("#filterview2").is(":checked"))
+		{
+			setDisplayBoard("view2","show");
+			
+		}
+		else
+		{
+			setDisplayBoard("view2","hide");
+		}
 	}
 	
 }
@@ -339,6 +356,8 @@ function findBoards()
 }
 
 $(document).ready(function() {
+    Materialize.toast('<span>New to taff.top?<br>Go create board for one of your project !</span>', 6000);
+    Materialize.toast('<span>Do you want to make a team? <br>Create a group board, then start to create your board! </span>', 8000);
     $(document).keypress(function(e) {
 	    if(e.which == 13) {
 	        if($("#txtFindBoards").is(":focus"))

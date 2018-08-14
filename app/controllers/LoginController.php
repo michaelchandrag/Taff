@@ -5,35 +5,35 @@ class LoginController extends \Phalcon\Mvc\Controller
 
     public function indexAction()
     {
-    	$this->view->sessUser = true;
+        $this->view->sessUser = true;
     }
 
     public function loginAction()
     {
-    	$email = $_POST["email"];
-    	$password = $_POST["password"];
+        $email = $_POST["email"];
+        $password = $_POST["password"];
         $password = md5($password);
-    	$remember = $_POST["remember"];
-    	$user = new User();
-    	$id = $user->doLogin($email,$password);
-    	$this->view->disable();
-    	if($id != null)
-    	{
-    		if($remember == "true")
-    		{
-    			$this->cookies->set(
-		            "userId",
-		            $id,
-		            time() + 15 * 86400
-		        );
-    		}
-	        $this->session->set("userId", $id);
-    		echo "Berhasil";
-    	}
-    	else
-    	{
-    		echo "Error";
-    	}
+        $remember = $_POST["remember"];
+        $user = new User();
+        $id = $user->doLogin($email,$password);
+        $this->view->disable();
+        if($id != null)
+        {
+            if($remember == "true")
+            {
+                $this->cookies->set(
+                    "userId",
+                    $id,
+                    time() + 15 * 86400
+                );
+            }
+            $this->session->set("userId", $id);
+            echo "Berhasil";
+        }
+        else
+        {
+            echo "Error";
+        }
     }
 
     public function logoutAction()

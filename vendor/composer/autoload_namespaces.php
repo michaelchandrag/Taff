@@ -7,5 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
+    'Google_Service_' => array($vendorDir . '/google/apiclient-services/src'),
+    'Google_' => array($vendorDir . '/google/apiclient/src'),
     'Evenement' => array($vendorDir . '/evenement/evenement/src'),
 );

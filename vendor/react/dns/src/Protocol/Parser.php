@@ -164,12 +164,56 @@ class Parser
             $consumed += $rdLength;
 
             $rdata = inet_ntop($ip);
-        }
-
-        if (Message::TYPE_CNAME === $type || Message::TYPE_PTR === $type) {
+        } elseif (Message::TYPE_CNAME === $type || Message::TYPE_PTR === $type || Message::TYPE_NS === $type) {
             list($bodyLabels, $consumed) = $this->readLabels($message->data, $consumed);
 
             $rdata = implode('.', $bodyLabels);
+        } elseif (Message::TYPE_TXT === $type) {
+            $rdata = array();
+            $remaining = $rdLength;
+            while ($remaining) {
+                $len = ord($message->data[$consumed]);
+                $rdata[] = substr($message->data, $consumed + 1, $len);
+                $consumed += $len + 1;
+                $remaining -= $len + 1;
+            }
+        } elseif (Message::TYPE_MX === $type) {
+            list($priority) = array_values(unpack('n', substr($message->data, $consumed, 2)));
+            list($bodyLabels, $consumed) = $this->readLabels($message->data, $consumed + 2);
+
+            $rdata = array(
+                'priority' => $priority,
+                'target' => implode('.', $bodyLabels)
+            );
+        } elseif (Message::TYPE_SRV === $type) {
+            list($priority, $weight, $port) = array_values(unpack('n*', substr($message->data, $consumed, 6)));
+            list($bodyLabels, $consumed) = $this->readLabels($message->data, $consumed + 6);
+
+            $rdata = array(
+                'priority' => $priority,
+                'weight' => $weight,
+                'port' => $port,
+                'target' => implode('.', $bodyLabels)
+            );
+        } elseif (Message::TYPE_SOA === $type) {
+            list($primaryLabels, $consumed) = $this->readLabels($message->data, $consumed);
+            list($mailLabels, $consumed) = $this->readLabels($message->data, $consumed);
+            list($serial, $refresh, $retry, $expire, $minimum) = array_values(unpack('N*', substr($message->data, $consumed, 20)));
+            $consumed += 20;
+
+            $rdata = array(
+                'mname' => implode('.', $primaryLabels),
+                'rname' => implode('.', $mailLabels),
+                'serial' => $serial,
+                'refresh' => $refresh,
+                'retry' => $retry,
+                'expire' => $expire,
+                'minimum' => $minimum
+            );
+        } else {
+            // unknown types simply parse rdata as an opaque binary string
+            $rdata = substr($message->data, $consumed, $rdLength);
+            $consumed += $rdLength;
         }
 
         $message->consumed = $consumed;

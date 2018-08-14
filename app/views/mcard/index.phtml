@@ -1,0 +1,290 @@
+<!-- START HEADER -->
+<header id="header" class="page-topbar">
+    <!-- start header nav-->
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">                      
+                </ul>
+                <div class="header-search-wrapper hide-on-med-and-down">
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src= "userImage/user.jpg" width="32px" height="32px" style="border-radius:50%" /></a>
+                    </li>
+                </ul>
+                <!-- translation-button -->
+                <ul id="translation-dropdown" class="dropdown-content">
+                  <li>
+                    <a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+                  </li>
+                  
+                </ul>
+            </div>
+        </nav>
+
+        <!-- HORIZONTL NAV START-->
+         <nav id="horizontal-nav" class="white hide-on-med-and-down">
+            <div class="nav-wrapper">                  
+              <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+                <li>
+                    <a href="muser" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master User</span>
+                    </a>
+                </li> 
+                <li>
+                    <a href="mgroup" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Group</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mboard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Board</span>
+                    </a>
+                </li>  
+                <li>
+                    <a href="mlist" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master List</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mcard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Card</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="repadmin" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Report</span>
+                    </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        <!-- HORIZONTL NAV END-->
+    </div>
+    <!-- end header nav-->
+</header>
+<!-- END HEADER -->
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="bold active"><a href="muser" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master User</a>
+        </li>
+        <li class="bold active"><a href="mgroup" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Group</a>
+        </li>
+        <li class="bold active"><a href="mboard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Board</a>
+        </li>
+        <li class="bold active"><a href="mlist" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master List</a>
+        </li>
+        <li class="bold active"><a href="mcard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Card</a>
+        </li>
+        <li class="bold active"><a href="repadmin" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Report</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a onclick="cekLogout()" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START MAIN -->
+<div id="main">
+    <!-- START WRAPPER -->
+    <div class="wrapper">
+
+        <!-- START CONTENT -->
+        <section id="content">
+
+            <!--start container-->
+            <div class="container">
+                <!-- trello start here -->
+                
+                <div class="section">
+                    <div class="row">
+                        <div class="col s12 m7 l9">
+                          <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Card ID</th>
+                                    <th>List ID</th>
+                                    <th>Board ID</th>
+                                    <th>User ID</th>
+                                    <th>Card Title</th>
+                                    <th>Card Description</th>
+                                    <th>Card Position</th>
+                                    <th>Card Created</th>
+                                    <th>Card Archive</th>
+                                    <th>Card Status</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Card ID</th>
+                                    <th>List ID</th>
+                                    <th>Board ID</th>
+                                    <th>User ID</th>
+                                    <th>Card Title</th>
+                                    <th>Card Description</th>
+                                    <th>Card Position</th>
+                                    <th>Card Created</th>
+                                    <th>Card Archive</th>
+                                    <th>Card Status</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                <?php
+                                    foreach($card as $c)
+                                    {
+                                        echo "<tr>";
+                                        echo "<td>".$c->cardId."</td>";
+                                        echo "<td>".$c->cardListId."</td>";
+                                        echo "<td>".$c->cardBoardId."</td>";
+                                        echo "<td>".$c->cardOwner."</td>";
+                                        echo "<td>".$c->cardTitle."</td>";
+                                        echo "<td>".$c->cardDescription."</td>";
+                                        echo "<td>".$c->cardPosition."</td>";
+                                        echo "<td>".date_format(new DateTime($c->cardCreated),"d M Y")."</td>";
+                                        echo "<td>".$c->cardArchive."</td>";
+                                        echo "<td>".$c->cardStatus."</td>";
+                                        echo "<td><a onclick='detailList(\"".$c->cardId."\")'>Detail</a></td>";
+                                        echo "</tr>";
+                                    }
+                                ?>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col s12 m5 l3">
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  <input id="searchCardId" type="text" class="">
+                                  <label for="searchCardId">Card ID</label>
+                                </div>
+                                <div class="input-field col s6">
+                                <a onclick="searchCard()" class="waves-effect waves-light  btn">Search</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card ID <input id="detailCardId" type="text" class="" placeholder="Card ID" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  List ID <input id="detailCardListId" type="text" class="" placeholder="List ID" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Board ID <input id="detailCardBoardId" type="text" class="" placeholder="Board ID" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  User ID<input id="detailCardOwner" type="text" placeholder="User ID" class="" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Title<input id="detailCardTitle" type="text" placeholder="Card Title" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Description <input id="detailCardDescription" type="text" placeholder="Card Description" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Position <input id="detailCardPosition" type="text" placeholder="Card Position" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Created <input id="detailCardCreated" type="text" placeholder="Card Created" class="" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Archive<input id="detailCardArchive" type="text" placeholder="Card Archive" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Status<input id="detailCardStatus" type="text" placeholder="Card Status" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveCard()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                                <div class="input-field col s6">
+                                <a onclick="checkCard()" class="waves-effect waves-light blue btn">Check</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                        <div class="divider" style="margin:5px;"></div>
+                        
+                        <div class="row">
+                            <h1>Insert Card</h1>
+                            <div class="col s12 m12 l12">
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                      Card Title<input id="insertCardTitle" type="text" placeholder="Card Title" class="">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                      <select id="insertListId">
+                                        <?php
+                                            foreach($list as $l)
+                                            {
+                                                echo "<option value='".$l->listId."'>".$l->listId."</option>";
+                                            }
+                                        ?>
+                                      </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                      <select id="insertUserId">
+                                        <?php
+                                            foreach($user as $u)
+                                            {
+                                                echo "<option value='".$u->userId."'>".$u->userId."</option>";
+                                            }
+                                        ?>
+                                      </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                    <a onclick="insertCard()" class="waves-effect waves-light  green btn">Insert</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end container-->
+        </section>
+        <!-- END CONTENT -->
+
+    </div>
+    <!-- END WRAPPER -->
+</div>

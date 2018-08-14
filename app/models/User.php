@@ -138,6 +138,18 @@ class User extends \Phalcon\Mvc\Model
         $user->save();
     }
 
+    public function setNameAdmin($id,$name,$status)
+    {
+        $user = User::findFirst(
+            [
+                "userId='".$id."'"
+            ]
+        );
+        $user->userName = $name;
+        $user->userStatus = $status;
+        $user->save();
+    }
+
     public function setPassword($userId,$userPassword)
     {
         $user = User::findFirst(

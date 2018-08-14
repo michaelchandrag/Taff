@@ -29,7 +29,6 @@ function changeProfile()
 			  success: function (response) {
 			  	var d = new Date();
 				  $("#userImage").attr("src",response+"?"+d.getTime());
-				  $("#visitUserImage").attr("src",response+"?"+d.getTime());
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
 				alert(xhr.status);
@@ -108,6 +107,7 @@ function changeData()
 	$("#errorName").hide();
 	var userId = $("#hiddenUserId").val();
 	var userName = $("#userName").val();
+	var userEmail =$("#userEmail").val();
 	var userBio = $("#userBio").val();
 	var userLocation = $("#userLocation").val();
 	var userMale = $("#rmale").is(":checked");
@@ -128,13 +128,16 @@ function changeData()
 			  data:{userId:userId,userName:userName,userBio:userBio,userLocation:userLocation,userGender:userGender},
 			  success: function (response) {
 			  	$("#visitUserBio").empty();
+			  	$("#visitUserBio").append("<b><u>Name</u></b></br>");
+				  $("#visitUserBio").append(userName+"</br></br>");
+				  $("#visitUserBio").append("<b><u>Email</u></b></br>");
+				  $("#visitUserBio").append(userEmail+"</br></br>");
 				  $("#visitUserBio").append("<b><u>Bio</u></b></br>");
 				  $("#visitUserBio").append(userBio+"</br></br>");
 				  $("#visitUserBio").append("<b><u>Location</u></b></br>");
 				  $("#visitUserBio").append(userLocation+"<br></br>");
 				  $("#visitUserBio").append("<b><u>Gender</u></b></br>");
 				  $("#visitUserBio").append(userGender+"</br></br>");
-				  $("#visitUserName").text(userName);
 
 			  },
 			  error: function (xhr, ajaxOptions, thrownError) {
@@ -155,6 +158,30 @@ function findBoards()
 	{
 		window.location.href="home?find="+text;
 	}
+}
+function cekLogout()
+{
+	$.ajax({
+		  type: "POST",
+		  url: "login/logout",
+		  success: function (response) {
+			  //alert(response);
+			  if(response == "Berhasil")
+			  {
+			  	/*var auth2 = gapi.auth2.getAuthInstance();
+			    auth2.signOut().then(function () {
+			      console.log('User signed out.');
+			    });*/
+			  	window.location.href = "login";
+
+			  }
+		  },
+		  error: function (xhr, ajaxOptions, thrownError) {
+			alert(xhr.status);
+			alert(thrownError);
+			alert(xhr.responseText);
+		  }
+		});
 }
 
 

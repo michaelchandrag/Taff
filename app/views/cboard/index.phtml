@@ -1,0 +1,399 @@
+<!-- START HEADER -->
+<header id="header" class="page-topbar">
+    <!-- start header nav-->
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">                      
+                </ul>
+                <div class="header-search-wrapper hide-on-med-and-down">
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src= "userImage/user.jpg" width="32px" height="32px" style="border-radius:50%" /></a>
+                    </li>
+                </ul>
+                <!-- translation-button -->
+                <ul id="translation-dropdown" class="dropdown-content">
+                  <li>
+                    <a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+                  </li>
+                  
+                </ul>
+            </div>
+        </nav>
+
+        <!-- HORIZONTL NAV START-->
+         <nav id="horizontal-nav" class="white hide-on-med-and-down">
+            <div class="nav-wrapper">                  
+              <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+                <li>
+                    <a href="muser" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master User</span>
+                    </a>
+                </li> 
+                <li>
+                    <a href="mgroup" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Group</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mboard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Board</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mlist" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master List</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mcard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Card</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="repadmin" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Report</span>
+                    </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        <!-- HORIZONTL NAV END-->
+    </div>
+    <!-- end header nav-->
+</header>
+<!-- END HEADER -->
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="bold active"><a href="muser" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master User</a>
+        </li>
+        <li class="bold active"><a href="mgroup" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Group</a>
+        </li>
+        <li class="bold active"><a href="mboard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Board</a>
+        </li>
+        <li class="bold active"><a href="mlist" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master List</a>
+        </li>
+        <li class="bold active"><a href="mcard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Card</a>
+        </li>
+        <li class="bold active"><a href="repadmin" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Report</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a onclick="cekLogout()" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START MAIN -->
+<div id="main">
+    <!-- START WRAPPER -->
+    <div class="wrapper">
+
+        <!-- START CONTENT -->
+        <section id="content">
+
+            <!--start container-->
+            <div class="container">
+                <!-- trello start here -->
+                
+                <div class="section">
+                    <div class="row">
+                        <input type="hidden" value="<?php echo $boardId ?>" id="hiddenBoardId">
+                        <div class="col s12 m6 l6">
+                            Board member
+                            <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Member ID</th>
+                                    <th>User ID</th>
+                                    <th>Member Created</th>
+                                    <th>Member Role</th>
+                                    <th>Member Status</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Member ID</th>
+                                    <th>User ID</th>
+                                    <th>Member Created</th>
+                                    <th>Member Role</th>
+                                    <th>Member Status</th>
+                                    <th>Detail</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                <?php
+                                    foreach($member as $m)
+                                    {
+                                        echo "<tr>";
+                                        echo "<td>".$m->memberId."</td>";
+                                        echo "<td>".$m->userId."</td>";
+                                        echo "<td>".date_format(new DateTime($m->memberCreated),"d M Y")."</td>";
+                                        echo "<td>".$m->memberRole."</td>";
+                                        echo "<td>".$m->memberStatus."</td>";
+                                        echo "<td><a onclick='detailMember(\"".$m->memberId."\")'>Detail</a></td>";
+                                        echo "</tr>";
+                                    }
+                                ?>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col s12 m6 l4">
+                            Detail Member
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  <input id="searchMemberId" type="text" class="">
+                                  <label for="searchMemberId">Board ID</label>
+                                </div>
+                                <div class="input-field col s6">
+                                <a onclick="searchMember()" class="waves-effect waves-light  btn">Search</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Member ID <input id="detailMemberId" type="text" class="" placeholder="Member ID" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  User ID <input id="detailUserId" type="text" class="" placeholder="User ID" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Member Created<input id="detailMemberCreated" type="text" placeholder="Member Created" class="" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Member Role<input id="detailMemberRole" type="text" placeholder="Member Role" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Member Status <input id="detailMemberStatus" type="text" placeholder="Member Status" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveMember()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l2">
+                            Invite Member
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  User ID
+                                  <select id="inviteUserId">
+                                    <?php
+                                    foreach($user as $u)
+                                    {
+                                        echo "<option value='".$u->userId."'>".$u->userId."</option>";
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="inviteUser()" class="waves-effect waves-light  btn">Invite</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            <h1>Board role collaborator</h1>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  List Create <input id="collListCreate" type="text" value="<?php echo $coll->listCreate; ?>" placeholder="List Create">
+                                </div>
+                                <div class="input-field col s6">
+                                  List Edit <input id="collListEdit" type="text" value="<?php echo $coll->listEdit; ?>" placeholder="List Edit">
+                                </div><div class="input-field col s6">
+                                  List Delete <input id="collListDelete" type="text" value="<?php echo $coll->listDelete; ?>" placeholder="List Delete">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Create <input id="collCardCreate" type="text" value="<?php echo $coll->cardCreate; ?>" placeholder="Card Create">
+                                </div>
+                                <div class="input-field col s6">
+                                  Card Edit <input id="collCardEdit" type="text" value="<?php echo $coll->cardEdit; ?>" placeholder="Card Edit">
+                                </div>
+                                <div class="input-field col s6">
+                                  Card Delete <input id="collCardDelete" type="text" value="<?php echo $coll->cardDelete; ?>" placeholder="Card Delete">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Assign Member <input id="collActAM" type="text" value="<?php echo $coll->activityAM; ?>" placeholder="Assign Member">
+                                </div>
+                                <div class="input-field col s6">
+                                  Label Card <input id="collActLabel" type="text" value="<?php echo $coll->activityLabel; ?>" placeholder="Label Card">
+                                </div>
+                                <div class="input-field col s6">
+                                  Checklist <input id="collActChecklist" type="text" value="<?php echo $coll->activityChecklist; ?>" placeholder="Checklist">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Start Date <input id="collActStart" type="text" value="<?php echo $coll->activityStartDate; ?>" placeholder="Start Date">
+                                </div>
+                                <div class="input-field col s6">
+                                  Due Date <input id="collActDue" type="text" value="<?php echo $coll->activityDueDate; ?>" placeholder="Due Date">
+                                </div>
+                                <div class="input-field col s6">
+                                  Attachment <input id="collActAttachment" type="text" value="<?php echo $coll->activityAttachment; ?>" placeholder="Attachment">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Status <input id="collStatus" type="text" value="<?php echo $coll->roleStatus; ?>" placeholder="Status">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <a onclick="saveCollaborator()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l5">
+                            <h1>Board role client</h1>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  List Create <input id="cliListCreate" type="text" value="<?php echo $cli->listCreate; ?>" placeholder="List Create">
+                                </div>
+                                <div class="input-field col s6">
+                                  List Edit <input id="cliListEdit" type="text" value="<?php echo $cli->listEdit; ?>" placeholder="List Edit">
+                                </div><div class="input-field col s6">
+                                  List Delete <input id="cliListDelete" type="text" value="<?php echo $cli->listDelete; ?>" placeholder="List Delete">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card Create <input id="cliCardCreate" type="text" value="<?php echo $cli->cardCreate; ?>" placeholder="Card Create">
+                                </div>
+                                <div class="input-field col s6">
+                                  Card Edit <input id="cliCardEdit" type="text" value="<?php echo $cli->cardEdit; ?>" placeholder="Card Edit">
+                                </div>
+                                <div class="input-field col s6">
+                                  Card Delete <input id="cliCardDelete" type="text" value="<?php echo $cli->cardDelete; ?>" placeholder="Card Delete">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Assign Member <input id="cliActAM" type="text" value="<?php echo $cli->activityAM; ?>" placeholder="Assign Member">
+                                </div>
+                                <div class="input-field col s6">
+                                  Label Card <input id="cliActLabel" type="text" value="<?php echo $cli->activityLabel; ?>" placeholder="Label Card">
+                                </div>
+                                <div class="input-field col s6">
+                                  Checklist <input id="cliActChecklist" type="text" value="<?php echo $cli->activityChecklist; ?>" placeholder="Checklist">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Start Date <input id="cliActStart" type="text" value="<?php echo $cli->activityStartDate; ?>" placeholder="Start Date">
+                                </div>
+                                <div class="input-field col s6">
+                                  Due Date <input id="cliActDue" type="text" value="<?php echo $cli->activityDueDate; ?>" placeholder="Due Date">
+                                </div>
+                                <div class="input-field col s6">
+                                  Attachment <input id="cliActAttachment" type="text" value="<?php echo $cli->activityAttachment; ?>" placeholder="Attachment">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Status <input id="cliStatus" type="text" value="<?php echo $cli->roleStatus; ?>" placeholder="Status">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <a onclick="saveClient()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l3">
+                            <h1>Board progress deadline</h1>
+                            <input type="date" value="<?php if($pdate!=null)echo date_format(new DateTime($pdate->date),"Y-m-d");?>" id="progressDate" class="datepicker">
+                            <a href="javascript:void(0);" onclick="savePdate()" class="waves-effect waves-light  btn">Save</a>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <h1>Board progress checklist</h1>
+                            <select id="progressItem" onchange="detailItem()">
+                                <option value=""  checked>Choose one</option>
+                                <?php
+                                    foreach($pitem as $p)
+                                    {
+                                        echo "<option value='".$p->progressItemId."'>".$p->itemTitle."</option>";
+                                    }
+                                ?>
+                            </select>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Progress Item ID <input id="progressItemId" type="text" value="" placeholder="Progress Item ID">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Progress Item Title <input id="progressItemTitle" type="text" value="" placeholder="Progress Item Title">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Progress Item Checked <input id="progressItemChecked" type="text" value="" placeholder="Progress Item Checked">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Progress Item Status <input id="progressItemStatus" type="text" value="" placeholder="Progress Item Status">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  <a href="javascript:void(0);" onclick="saveItem()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col s12 m6 l3">
+                            <h1>Insert progress item</h1>
+                            Progress Item Title <input id="insertProgressItemTitle" type="text" value="" placeholder="Progress Item Title">
+                            <a href="javascript:void(0);" onclick="insertPitem()" class="waves-effect waves-light  btn">Save</a>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row">
+                        <h1>Board Chat</h1>
+                        <a href="javascript:void(0);" onclick="deleteChat()" class="waves-effect waves-light red btn">Delete Chat</a>
+                    </div>
+                </div>
+            </div>
+            <!--end container-->
+        </section>
+        <!-- END CONTENT -->
+
+    </div>
+    <!-- END WRAPPER -->
+</div>

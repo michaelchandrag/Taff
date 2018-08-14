@@ -13,7 +13,11 @@ easily be used to create a DNS server.
 * [Basic usage](#basic-usage)
 * [Caching](#caching)
   * [Custom cache adapter](#custom-cache-adapter)
+* [Resolver](#resolver)
+  * [resolve()](#resolve)
+  * [resolveAll()](#resolveall)
 * [Advanced usage](#advanced-usage)
+  * [UdpTransportExecutor](#udptransportexecutor)
   * [HostsFileExecutor](#hostsfileexecutor)
 * [Install](#install)
 * [Tests](#tests)
@@ -56,14 +60,6 @@ as above if none can be found.
   creating the resolver instance.
   Ideally, this method should thus be executed only once before the loop starts
   and not repeatedly while it is running.
-
-Pending DNS queries can be cancelled by cancelling its pending promise like so:
-
-```php
-$promise = $resolver->resolve('reactphp.org');
-
-$promise->cancel();
-```
 
 But there's more.
 
@@ -115,46 +111,165 @@ $dns = $factory->createCached('8.8.8.8', $loop, $cache);
 
 See also the wiki for possible [cache implementations](https://github.com/reactphp/react/wiki/Users#cache-implementations).
 
+## Resolver
+
+### resolve()
+
+The `resolve(string $domain): PromiseInterface<string,Exception>` method can be used to
+resolve the given $domain name to a single IPv4 address (type `A` query).
+
+```php
+$resolver->resolve('reactphp.org')->then(function ($ip) {
+    echo 'IP for reactphp.org is ' . $ip . PHP_EOL;
+});
+```
+
+This is one of the main methods in this package. It sends a DNS query
+for the given $domain name to your DNS server and returns a single IP
+address on success.
+
+If the DNS server sends a DNS response message that contains more than
+one IP address for this query, it will randomly pick one of the IP
+addresses from the response. If you want the full list of IP addresses
+or want to send a different type of query, you should use the
+[`resolveAll()`](#resolveall) method instead.
+
+If the DNS server sends a DNS response message that indicates an error
+code, this method will reject with a `RecordNotFoundException`. Its
+message and code can be used to check for the response code.
+
+If the DNS communication fails and the server does not respond with a
+valid response message, this message will reject with an `Exception`.
+
+Pending DNS queries can be cancelled by cancelling its pending promise like so:
+
+```php
+$promise = $resolver->resolve('reactphp.org');
+
+$promise->cancel();
+```
+
+### resolveAll()
+
+The `resolveAll(string $host, int $type): PromiseInterface<array,Exception>` method can be used to
+resolve all record values for the given $domain name and query $type.
+
+```php
+$resolver->resolveAll('reactphp.org', Message::TYPE_A)->then(function ($ips) {
+    echo 'IPv4 addresses for reactphp.org ' . implode(', ', $ips) . PHP_EOL;
+});
+
+$resolver->resolveAll('reactphp.org', Message::TYPE_AAAA)->then(function ($ips) {
+    echo 'IPv6 addresses for reactphp.org ' . implode(', ', $ips) . PHP_EOL;
+});
+```
+
+This is one of the main methods in this package. It sends a DNS query
+for the given $domain name to your DNS server and returns a list with all
+record values on success.
+
+If the DNS server sends a DNS response message that contains one or more
+records for this query, it will return a list with all record values
+from the response. You can use the `Message::TYPE_*` constants to control
+which type of query will be sent. Note that this method always returns a
+list of record values, but each record value type depends on the query
+type. For example, it returns the IPv4 addresses for type `A` queries,
+the IPv6 addresses for type `AAAA` queries, the hostname for type `NS`,
+`CNAME` and `PTR` queries and structured data for other queries. See also
+the `Record` documentation for more details.
+
+If the DNS server sends a DNS response message that indicates an error
+code, this method will reject with a `RecordNotFoundException`. Its
+message and code can be used to check for the response code.
+
+If the DNS communication fails and the server does not respond with a
+valid response message, this message will reject with an `Exception`.
+
+Pending DNS queries can be cancelled by cancelling its pending promise like so:
+
+```php
+$promise = $resolver->resolveAll('reactphp.org', Message::TYPE_AAAA);
+
+$promise->cancel();
+```
+
 ## Advanced Usage
 
-For more advanced usages one can utilize the `React\Dns\Query\Executor` directly.
+### UdpTransportExecutor
+
+The `UdpTransportExecutor` can be used to
+send DNS queries over a UDP transport.
+
+This is the main class that sends a DNS query to your DNS server and is used
+internally by the `Resolver` for the actual message transport.
+
+For more advanced usages one can utilize this class directly.
 The following example looks up the `IPv6` address for `igor.io`.
 
 ```php
 $loop = Factory::create();
-
-$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new UdpTransportExecutor($loop);
 
 $executor->query(
     '8.8.8.8:53', 
-    new Query($name, Message::TYPE_AAAA, Message::CLASS_IN, time())
-)->done(function (Message $message) {
+    new Query($name, Message::TYPE_AAAA, Message::CLASS_IN)
+)->then(function (Message $message) {
     foreach ($message->answers as $answer) {
         echo 'IPv6: ' . $answer->data . PHP_EOL;
     }
 }, 'printf');
 
 $loop->run();
-
 ```
 
 See also the [fourth example](examples).
 
+Note that this executor does not implement a timeout, so you will very likely
+want to use this in combination with a `TimeoutExecutor` like this:
+
+```php
+$executor = new TimeoutExecutor(
+    new UdpTransportExecutor($loop),
+    3.0,
+    $loop
+);
+```
+
+Also note that this executor uses an unreliable UDP transport and that it
+does not implement any retry logic, so you will likely want to use this in
+combination with a `RetryExecutor` like this:
+
+```php
+$executor = new RetryExecutor(
+    new TimeoutExecutor(
+        new UdpTransportExecutor($loop),
+        3.0,
+        $loop
+    )
+);
+```
+
+> Internally, this class uses PHP's UDP sockets and does not take advantage
+  of [react/datagram](https://github.com/reactphp/datagram) purely for
+  organizational reasons to avoid a cyclic dependency between the two
+  packages. Higher-level components should take advantage of the Datagram
+  component instead of reimplementing this socket logic from scratch.
+
 ### HostsFileExecutor
 
-Note that the above `Executor` class always performs an actual DNS query.
+Note that the above `UdpTransportExecutor` class always performs an actual DNS query.
 If you also want to take entries from your hosts file into account, you may
 use this code:
 
 ```php
 $hosts = \React\Dns\Config\HostsFile::loadFromPathBlocking();
 
-$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new UdpTransportExecutor($loop);
 $executor = new HostsFileExecutor($hosts, $executor);
 
 $executor->query(
     '8.8.8.8:53', 
-    new Query('localhost', Message::TYPE_A, Message::CLASS_IN, time())
+    new Query('localhost', Message::TYPE_A, Message::CLASS_IN)
 );
 ```
 
@@ -166,7 +281,7 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require react/dns:^0.4.13
+$ composer require react/dns:^0.4.15
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

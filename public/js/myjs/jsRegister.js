@@ -9,13 +9,9 @@ function cekRegister()
 	$("#errorEmail").hide();
 	$("#errorPass").hide();
 	$("#errorcPass").hide();
-	if(name.length < 3 || isEmail(email) == false || password < 6 || confpassword < 6)
+	if(name.length < 3 || isEmail(email) == false || password < 6 || confpassword < 6 || (password != confpassword))
 	{
 		rules = false;
-		if(password != confpassword)
-		{
-			rules = false;
-		}
 	}
 	if(rules)
 	{

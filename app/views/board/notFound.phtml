@@ -6,7 +6,7 @@
         <nav class="navbar-color">
             <div class="nav-wrapper">
                 <ul class="left">                      
-                  <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
+                  <li><h1 class="logo-wrapper"><a href="home" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
                 </ul>
                 <div class="header-search-wrapper hide-on-med-and-down">
                     <i class="mdi-action-search"></i>
@@ -108,9 +108,9 @@
         <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
         </li>
         <div class="divider"></div>
-        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Profile</a>
+        <li class="bold active"><a href="userProfile?userId=<?php echo $userId ?>" class="waves-effect waves-cyan">Profile</a>
         </li>
-        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Log Out</a>
+        <li class="bold active"><a onclick="cekLogout()" class="waves-effect waves-cyan">Log Out</a>
         </li>
     </ul>
     <a href="javascript:void(0);" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
@@ -135,7 +135,7 @@
                         <div class="col s6 m4 l4">
                             <p>
                                 <h1>Board not found.</h1><br>
-
+                                <a href="home">Back to home.</a>
                             </p>
                         </div>
                         <div class="col s6 m4 l8">

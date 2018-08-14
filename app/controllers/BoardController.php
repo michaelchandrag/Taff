@@ -23,9 +23,9 @@ class BoardController extends \Phalcon\Mvc\Controller
         {
             $this->response->redirect("home");
         }
-    	$board = "";
-    	$boardList = "";
-    	$boardCard = "";
+        $board = "";
+        $boardList = "";
+        $boardCard = "";
         $board = Board::find(
             [
                 "boardId='".$boardId."'"
@@ -67,13 +67,13 @@ class BoardController extends \Phalcon\Mvc\Controller
         }
         $boardList = Boardlist::find(
             [
-                "listBoardId='".$boardId."'",
+                "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'",
                 "order"=>"listPosition ASC"
             ]
         );
         $boardCard = Boardcard::find(
             [
-                "cardBoardId='".$boardId."'",
+                "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='0' AND cardStatus='1'",
                 "order" => "cardPosition ASC"
             ]
         );
@@ -97,7 +97,7 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "boardId='".$boardId."'"
             ]
         );
-        $roleCli = Boardroleclient::findFirst(
+        $roleClient = Boardroleclient::findFirst(
             [
                 "boardId='".$boardId."'"
             ]
@@ -105,10 +105,10 @@ class BoardController extends \Phalcon\Mvc\Controller
         $this->assets->addCss("css/cssku.css");
         $this->view->userId            = $userId;
         $this->view->userProfile       = $profile;
-    	$this->view->board             = $board;
+        $this->view->board             = $board;
         $this->view->boardLabelCard    = $boardLabelCard;
-    	$this->view->boardList         = $boardList;
-    	$this->view->boardCard         = $boardCard;
+        $this->view->boardList         = $boardList;
+        $this->view->boardCard         = $boardCard;
         $this->view->role              = $role->memberRole; //Creator - Collaborator - Client
         $this->view->roleCollaborator  = $roleColl;
         $this->view->roleClient        = $roleClient;
@@ -116,31 +116,39 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createListAction()
     {
-    	$title = $_POST["title"];
-    	$owner = $_POST["owner"];
-    	$archive = "0";
-    	$status = "1";
+        $title = $_POST["title"];
+        $owner = $_POST["owner"];
+        $archive = "0";
+        $status = "1";
         $list = new Boardlist();
         $index = $list->countList();
         $id = "BL".str_pad($index,5,'0',STR_PAD_LEFT);
         $list->insertBoardList($owner,$title,$archive,$status);
-    	$this->view->disable();
-    	echo $id;
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." created a list called ".$title;
+        $status = "1";
+        $notification->insertBoardNotification($owner,$userId,$message,$status);
+        $this->view->disable();
+        echo $id;
     }
 
     public function createCardAction()
     {
-    	$title         = $_POST["title"];
-    	$listId        = $_POST["owner"];
-        $boardId       = "";
-        if(isset($_GET["id"]))
-        {
-            $boardId   = $_GET["id"];
-        }
-    	$owner = $this->session->get("userId");
-    	$description   = "";
-    	$archive       = "0";
-    	$status        = "1";
+        $title         = $_POST["title"];
+        $listId        = $_POST["owner"];
+        $description    = $_POST["description"];
+        $boardId       = $_POST["boardId"];
+        $owner = $this->session->get("userId");
+        $archive       = "0";
+        $status        = "1";
         $checked       = "1";
 
         //cardId
@@ -162,7 +170,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         //create assign members
         $member = Boardmember::find(
             [
-                "boardId='".$boardId."'"
+                "conditions"=>"boardId='".$boardId."' AND memberStatus='1'"
             ]
         );
         foreach($member as $r)
@@ -177,8 +185,20 @@ class BoardController extends \Phalcon\Mvc\Controller
             $assign = new Boardassignmembers();
             $assign->insertBoardAssignMembers($cardId,$userId,$userName,$checked,$status);
         }
-    	$this->view->disable();
-		echo $cardId;
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." created a card called ".$title;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
+        $this->view->disable();
+        echo $cardId;
 
     }
 
@@ -341,6 +361,18 @@ class BoardController extends \Phalcon\Mvc\Controller
             'listId'=>$listTujuan,
             'card'=>$arrCard
         );
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." copied a list called ".$title;
+        $status = "1";
+        $notification->insertBoardNotification($id,$userId,$message,$status);
         $this->view->disable();
         echo json_encode($datas);
     }
@@ -551,6 +583,18 @@ class BoardController extends \Phalcon\Mvc\Controller
         $archive = "1";
         $list2->setPosition($listId,$posAkhir);
         $list2->setArchive($listId,$archive);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." archived a list called ".$list2->listTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -948,11 +992,11 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function getBoardCardAction()
     {
-    	$cardId = $_POST["id"];
-    	$cardTitle = "";
-    	$cardDescription = "";
-    	$listTitle = "";
-    	$data = array();
+        $cardId = $_POST["id"];
+        $cardTitle = "";
+        $cardDescription = "";
+        $listTitle = "";
+        $data = array();
         $card = Boardcard::findFirst(
             [
                 "cardId='".$cardId."'"
@@ -974,22 +1018,22 @@ class BoardController extends \Phalcon\Mvc\Controller
             'cardListId'        => $cardListId,
             'listTitle'         => $listTitle
         );
-    	$datas[] = $data;
-    	$this->view->disable();
-    	echo json_encode($datas);
+        $datas[] = $data;
+        $this->view->disable();
+        echo json_encode($datas);
     }
 
     public function getBoardMemberAction()
     {
-    	$boardId = $_POST["boardId"];
-    	$assign = array();
+        $boardId = $_POST["boardId"];
+        $assign = array();
         $assign = Boardmember::find(
             [
                 "conditions" => "boardId='".$boardId."' AND memberStatus='1'"
             ]
         );
-    	$this->view->disable();	
-    	echo json_encode($assign);
+        $this->view->disable(); 
+        echo json_encode($assign);
     }
 
     public function getBoardAssignCheckedAction()
@@ -1021,7 +1065,12 @@ class BoardController extends \Phalcon\Mvc\Controller
         $cardId = $_POST["cardId"];
         $userId = $_POST["userId"];
         $check = $_POST["check"];
-        $name = $_POST["name"];
+        $user = User::findFirst(
+            [
+                "userId='".$userId."'"    
+            ]  
+        );
+        $name = $user->userName;
         $match = false;
         $status = "1";
         $assignId = "";
@@ -1061,65 +1110,67 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function setStartDateAction()
     {
-    	$cardId = $_POST["id"];
+        $boardId = $_POST["boardId"];
+        $cardId = $_POST["id"];
         $checked = "0";
-    	$status = "1";
-    	$date = $_POST["date"]; // 7 March, 2018
-    	$pecah = explode(" ",$date);
-    	$tgl = $pecah[0];
-    	$bln = substr($pecah[1],0,strlen($pecah[1])-1);
-    	if($bln == "January")
-    	{
-    		$bln = "1";
-    	}
-    	else if($bln == "February")
-    	{
-    		$bln = "2";
-    	}
-    	else if($bln == "March")
-    	{
-    		$bln = "3";
-    	}
-    	else if($bln == "April")
-    	{
-    		$bln = "4";
-    	}
-    	else if($bln == "May")
-    	{
-    		$bln = "5";
-    	}
-    	else if($bln == "June")
-    	{
-    		$bln = "6";
-    	}
-    	else if($bln == "July")
-    	{
-    		$bln = "7";
-    	}
-    	else if($bln == "August")
-    	{
-    		$bln = "8";
-    	}
-    	else if($bln == "September")
-    	{
-    		$bln = "9";
-    	}
-    	else if($bln == "October")
-    	{
-    		$bln = "10";
-    	}
-    	else if($bln == "November")
-    	{
-    		$bln = "11";
-    	}
-    	else if($bln == "December")
-    	{
-    		$bln = "12";
-    	}
-    	$thn = substr($pecah[2],2,2);
+        $status = "1";
+        $date = $_POST["date"]; // 7 March, 2018
+        $date2 = $date;
+        $pecah = explode(" ",$date);
+        $tgl = $pecah[0];
+        $bln = substr($pecah[1],0,strlen($pecah[1])-1);
+        if($bln == "January")
+        {
+            $bln = "1";
+        }
+        else if($bln == "February")
+        {
+            $bln = "2";
+        }
+        else if($bln == "March")
+        {
+            $bln = "3";
+        }
+        else if($bln == "April")
+        {
+            $bln = "4";
+        }
+        else if($bln == "May")
+        {
+            $bln = "5";
+        }
+        else if($bln == "June")
+        {
+            $bln = "6";
+        }
+        else if($bln == "July")
+        {
+            $bln = "7";
+        }
+        else if($bln == "August")
+        {
+            $bln = "8";
+        }
+        else if($bln == "September")
+        {
+            $bln = "9";
+        }
+        else if($bln == "October")
+        {
+            $bln = "10";
+        }
+        else if($bln == "November")
+        {
+            $bln = "11";
+        }
+        else if($bln == "December")
+        {
+            $bln = "12";
+        }
+        $thn = substr($pecah[2],2,2);
 
-    	$time = $_POST["time"];
-    	$d=mktime($time, 00, 00, $bln, $tgl, $thn);
+        $time = $_POST["time"];
+        $d=mktime($time, 00, 00, $bln, $tgl, $thn);
         $match = Boardstartdate::findFirst(
             [
                 "cardId='".$cardId."'"
@@ -1134,16 +1185,32 @@ class BoardController extends \Phalcon\Mvc\Controller
         {
             $match->changeStartDate($cardId,$d,$checked,$status);
         }
-
-    	$this->view->disable();
-    	echo "Berhasil";
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." created a start date on ".$cardNotif->cardTitle." at ".$date2;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
+        $this->view->disable();
+        echo "Berhasil";
 
     }
 
     public function getStartDateAction()
     {
-    	$cardId = $_POST["id"];
-    	$startDate = array();
+        $cardId = $_POST["id"];
+        $startDate = array();
         $startDate = Boardstartdate::find(
             [
                 "cardId='".$cardId."'"
@@ -1151,17 +1218,19 @@ class BoardController extends \Phalcon\Mvc\Controller
         );
 
 
-    	$this->view->disable();
-    	echo json_encode($startDate);
+        $this->view->disable();
+        echo json_encode($startDate);
 
     }
 
     public function setDueDateAction()
     {
+        $boardId = $_POST["boardId"];
         $cardId = $_POST["id"];
         $checked = "0";
         $status = "1";
         $date = $_POST["date"]; // 7 March, 2018
+        $date2 = $date;
         $pecah = explode(" ",$date);
         $tgl = $pecah[0];
         $bln = substr($pecah[1],0,strlen($pecah[1])-1);
@@ -1232,9 +1301,25 @@ class BoardController extends \Phalcon\Mvc\Controller
         {
             $match->changeDueDate($cardId,$d,$checked,$status);
         }
-
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." created a due date on ".$cardNotif->cardTitle." at ".$date2;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
-        echo "Berhasil";
+        echo $boardId;
 
     }
 
@@ -1255,6 +1340,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createChecklistAction()
     {
+        $boardId        = $_POST["boardId"];
         $cardId         = $_POST["id"];
         $title          = $_POST["title"];
         $status         = "1";
@@ -1262,6 +1348,23 @@ class BoardController extends \Phalcon\Mvc\Controller
         $index          = $checklist->countChecklist();
         $id             = "BCL".str_pad($index,5,'0',STR_PAD_LEFT);
         $checklist->insertBoardChecklist($cardId,$title,$status);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." created a checklist on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo $id;
     }
@@ -1316,6 +1419,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function setCardArchiveAction()
     {
+        $boardId = $_POST["boardId"];
         $id = $_POST["id"];
         $status = $_POST["status"];
         $listId = $_POST["listId"];
@@ -1346,12 +1450,30 @@ class BoardController extends \Phalcon\Mvc\Controller
                 $c->setPosition($listId,$cardId2,$position2);
             }
         }
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." archived a card called ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
 
     public function sendBackCardAction()
     {
+        $boardId = $_POST["boardId"];
         $cardId = $_POST["id"];
         $status = $_POST["status"];
         $listId = "";
@@ -1376,6 +1498,23 @@ class BoardController extends \Phalcon\Mvc\Controller
         }
         $posAkhir = $posAkhir+1;
         $card->setPosition($listId,$cardId,$posAkhir);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." send back a card from archive with title ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo $listId."%20".$title;
     }
@@ -1428,6 +1567,18 @@ class BoardController extends \Phalcon\Mvc\Controller
             'listTitle'=>$title,
             'cardList'=>$arrCard
         );
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." send back a list called ".$title;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo json_encode($datas);
     }
@@ -1522,9 +1673,15 @@ class BoardController extends \Phalcon\Mvc\Controller
         $index      = $reply->countReply();
         $id         = "BRC".str_pad($index,5,'0',STR_PAD_LEFT);
         $reply->insertBoardReplyComment($commentId,$cardId,$boardId,$userId,$text,$status);
-
         $this->view->disable();
-        echo $id;
+        $user = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"    
+            ]    
+        );
+        $data["user"] = $user;
+        $data["id"] = $id;
+        echo json_encode($data);
     }
 
     public function getReplyCommentAction()
@@ -1553,6 +1710,20 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]
         );
         $chat->insertBoardChat($boardId,$userId,$chatText,$status);
+        $options = array(
+            'cluster' => 'ap1',
+            'encrypted' => true
+          );
+        $pusher = new Pusher\Pusher(
+            '2f8c2f49f896f24ad17c',
+            'f3e9abf675e5f559db4c',
+            '551465',
+            $options
+          );
+        $data["user"] = $user;
+        $data["boardId"] = $boardId;
+        $data['text'] = $chatText;
+        $pusher->trigger('my-channel', 'my-event', $data);
         $this->view->disable();
         echo json_encode($user);
     }
@@ -1563,11 +1734,30 @@ class BoardController extends \Phalcon\Mvc\Controller
         $chat = array();
         $chat = Boardchat::find(
             [
-                "boardId='".$boardId."'"
+                "conditions"=>"boardId='".$boardId."' and chatStatus='1'",
+                "order"=>"chatCreated DESC"
             ]
         );
+        $datas = array();
+        foreach($chat as $c)
+        {
+            $userId = $c->userId;
+            $user = Userprofile::findFirst(
+                [
+                    "userId='".$userId."'"      
+                ]
+            );
+            $userName = $user->userName;
+            $userImage = $user->userImage;
+            $arr = array(
+                "userName"=>$userName,
+                "userImage"=>$userImage,
+                "chat"=>$c
+            );
+            array_push($datas,$arr);
+        }
         $this->view->disable();
-        echo json_encode($chat);
+        echo json_encode($datas);
     }
 
     public function createLabelCardAction()
@@ -1612,6 +1802,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createAttachmentAction()
     {
+
         $this->view->disable();
         $boardId    = $_POST["boardId"];
         $cardId     = $_POST["cardId"];
@@ -1631,6 +1822,23 @@ class BoardController extends \Phalcon\Mvc\Controller
           $temp = explode(".", $_FILES["file1"]["name"]);
           move_uploaded_file($_FILES['file1']['tmp_name'], $directory);
         }
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." created an attachment on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         echo $id;
     }
 
@@ -1651,6 +1859,23 @@ class BoardController extends \Phalcon\Mvc\Controller
         $status = "1";
         $attachment->insertBoardAttachment($boardId,$cardId,$title,$directory,$status);
         file_put_contents($directory, $url);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." created an attachment on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo $id;
     }
@@ -1678,16 +1903,13 @@ class BoardController extends \Phalcon\Mvc\Controller
                 "boardId='".$boardId."'"
             ]
         );
-        $favorite = Boardfavorite::findFirst(
+        $member = Boardmember::findFirst(
             [
                 "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
             ]
         );
-        $subscribe = Boardsubscribe::findFirst(
-            [
-                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
-            ]
-        );
+        $favorite = $member->favoriteChecked;
+        $subscribe = $member->subscribeChecked;
         $arr = array(
             "board" => $board,
             "favorite" => $favorite,
@@ -2049,6 +2271,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function deleteAttachmentAction()
     {
+        $boardId = $_POST["boardId"];
         $attachmentId = $_POST["id"];
         $attachment = Boardattachment::findFirst(
             [
@@ -2056,6 +2279,23 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]
         );
         $attachment->deleteAttachment($attachmentId);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$attachment->cardId."'"
+            ]
+        );
+        $message = $userNameNotification." removed an attachment on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2092,6 +2332,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function deleteChecklistAction()
     {
+        $boardId = $_POST["boardId"];
         $checklistId = $_POST["id"];
         $checklist = Boardchecklist::findFirst(
             [
@@ -2099,6 +2340,23 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]
         );
         $checklist->deleteChecklist($checklistId);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$checklist->cardId."'"
+            ]
+        );
+        $message = $userNameNotification." removed an checklist on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2132,6 +2390,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function deleteStartDateAction()
     {
+        $boardId = $_POST["boardId"];
         $cardId = $_POST["id"];
         $date = Boardstartdate::findFirst(
             [
@@ -2139,6 +2398,23 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]
         );
         $date->deleteStartDate($cardId);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." removed an start date on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2159,6 +2435,7 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function deleteDueDateAction()
     {
+        $boardId = $_POST["boardId"];
         $cardId = $_POST["id"];
         $date = Boardduedate::findFirst(
             [
@@ -2166,6 +2443,23 @@ class BoardController extends \Phalcon\Mvc\Controller
             ]
         );
         $date->deleteDueDate($cardId);
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $cardNotif = Boardcard::findFirst(
+            [
+                "cardId='".$cardId."'"
+            ]
+        );
+        $message = $userNameNotification." removed an due date on ".$cardNotif->cardTitle;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2268,37 +2562,13 @@ class BoardController extends \Phalcon\Mvc\Controller
         $userId = $_POST["userId"];
         $check = $_POST["check"];
         $match = false;
-        $favorite = Boardfavorite::find(
+        $member = Boardmember::findFirst(
             [
-                "userId='".$userId."'"
+                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
             ]
         );
-        $favoriteId2 = "";
-        foreach($favorite as $f)
-        {
-            if($f->boardId == $boardId)
-            {
-                $match = true;
-                $favoriteId2 = $f->favoriteId;
-            }
-        }
-        if($match == true)
-        {
-            //update
-            $favorite = Boardfavorite::findFirst(
-                [
-                    "favoriteId='".$favoriteId2."'"
-                ]
-            );
-            $favorite->setCheck($favoriteId2,$check);
-        }
-        else
-        {
-            //insert
-            $status = "1";
-            $favorite = new Boardfavorite();
-            $favorite->insertBoardFavorite($boardId,$userId,$check,$status);
-        }
+        $member->favoriteChecked = $check;
+        $member->save();
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2335,37 +2605,13 @@ class BoardController extends \Phalcon\Mvc\Controller
         $userId = $_POST["userId"];
         $check = $_POST["check"];
         $match = false;
-        $subscribe = Boardsubscribe::find(
+        $member = Boardmember::findFirst(
             [
-                "userId='".$userId."'"
+                "conditions"=>"boardId='".$boardId."' AND userId='".$userId."'"
             ]
         );
-        $subscribeId2 = "";
-        foreach($subscribe as $s)
-        {
-            if($s->boardId == $boardId)
-            {
-                $match = true;
-                $subscribeId2 = $s->subscribeId;
-            }
-        }
-        if($match == true)
-        {
-            //update
-            $subscribe = Boardsubscribe::findFirst(
-                [
-                    "subscribeId='".$subscribeId2."'"
-                ]
-            );
-            $subscribe->setCheck($subscribeId2,$check);
-        }
-        else
-        {
-            //insert
-            $status = "1";
-            $subscribe = new Boardsubscribe();
-            $subscribe->insertBoardSubscribe($boardId,$userId,$check,$status);
-        }
+        $member->subscribeChecked = $check;
+        $member->save();
         $this->view->disable();
         echo "Berhasil";
     }
@@ -2488,7 +2734,24 @@ class BoardController extends \Phalcon\Mvc\Controller
         $index = $board->countBoard();
         $id = "BO".str_pad($index,5,'0',STR_PAD_LEFT);
         $board->insertBoard($userId,$title,$public,$group,$status,$background);
+        $listCreate = "0";
+        $listEdit = "0";
+        $listDelete = "0";
+        $cardCreate = "0";
+        $cardEdit = "0";
+        $cardDelete = "0";
+        $activityAM = "0";
+        $activityLabel = "0";
+        $activityChecklist = "0";
+        $activityStartDate = "0";
+        $activityDueDate = "0";
+        $activityAttachment = "0";
+        $roleStatus = "0";
+        $coll = new Boardrolecollaborator();
+        $coll->insertBoardRoleCollaborator($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,"1","1","1","1","1","1","1");
 
+        $client = new Boardroleclient();
+        $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         $role="Creator";
         $boardMember = new Boardmember();
         $boardMember->insertBoardMember($userId,$id,$role,$status);
@@ -2775,6 +3038,18 @@ class BoardController extends \Phalcon\Mvc\Controller
             $new->insertBoardProgressDate($boardId,$d,$status);
 
         }
+        //notif
+        $notification = new Boardnotification();
+        $userId = $this->session->get("userId");
+        $userNotification = User::findFirst(
+            [
+                "userId='".$userId."'"
+            ]
+        );
+        $userNameNotification = $userNotification->userName;
+        $message = $userNameNotification." created a progress date on ".$date;
+        $status = "1";
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo "Berhasil";
     }
@@ -3470,23 +3745,32 @@ class BoardController extends \Phalcon\Mvc\Controller
             }
         }
 
-        $ctr+=2;
+        $ctr+=1;
         $ctrawal = $ctr;
-        $huruf2 = ["A","E","J","I","M","Q","U","Y","AC","AG","AK","AO","AS","AW","BA","BE","BI","BM","BQ","BU","BY","CC","CG","CK","CO","CS","CW","DA","DE","DI","DM","DQ","DU","DY","EC","EG","EK"];
+        $huruf2 = ["A","E","J","M","Q","U","Y","AC","AG","AK","AO","AS","AW","BA","BE","BI","BM","BQ","BU","BY","CC","CG","CK","CO","CS","CW","DA","DE","DI","DM","DQ","DU","DY","EC","EG","EK"];
         $list = getBoardList($boardId);
         $indeks = 0;
         $temp = $ctrawal;
+        $styleArray = array(
+            'borders' => array(
+                'outline' => array(
+                    'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                    'color' => array('argb' => 'FFFF0000'),
+                ),
+            ),
+        );
         foreach($list as $l)
         {
+            //$sheet ->getStyle('B2:G8')->applyFromArray($styleArray);
             $list_id = $l->listId;
             $list_title = $l->listTitle;
-            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($list_title);
             $card = getBoardCard($list_id);
             foreach($card as $card)
             {
+                $ctr++;
+                $start = $temp;
                 $cardId = $card->cardId;
-                $temp++;
-                $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($card->cardTitle);
+                $spreadsheet->setActiveSheetIndex(0)->getCell($huruf2[$indeks].$temp)->setValue($card->cardTitle." (in list ".$list_title.")");
                 if($card->cardDescription != null || $card->cardDescription != "")
                 {
                     $temp++;
@@ -3554,9 +3838,27 @@ class BoardController extends \Phalcon\Mvc\Controller
                         //$list_string .= $checklist_string; 
                     }
                 }
+                $akhir = $temp;
+                $styleArray = [
+                    'borders' => [
+                        'top' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                        'right' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                        'left' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ],
+                ];
+                //$spreadsheet->getStyle('A'.$start.':A'.$akhir)->applyFromArray($styleArray);
+                $spreadsheet->getActiveSheet()->getStyle('A'.$start.':E'.$akhir)->applyFromArray($styleArray);
+                $temp+=2;
             }
-            $indeks++;
-            $temp = $ctrawal;
         }
 
         // Rename worksheet
@@ -3601,21 +3903,20 @@ class BoardController extends \Phalcon\Mvc\Controller
         //$mail->SMTPDebug = 1;
         //$mail->SMTPDebug = 3;                               // Enable verbose debug output
 
-        $mail->Host     = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+        $mail->Host     = 'silver.hidden-server.net';  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'canzinzzide@gmail.com';                 // SMTP username
-        $mail->Password = 'cancan110796';                           // SMTP password
-        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-        $mail->Port     = 587;
+        $mail->Username = 'admin@taff.top';                 // SMTP username
+        $mail->Password = 'Cancan110796';                           // SMTP password
+        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port     = 465;
         
-        $mail->setFrom('canzinzzide@gmail.com', 'Michael Chandra');
-        $mail->addReplyTo('michaelchandrag114@yahoo.co.id', 'gg');
+        $mail->setFrom('admin@taff.top', 'Taff');
         $mail->addAddress($email);
         $mail->Subject = 'Invitation from Taff.top';
         $mail->isHTML(true);
         $mail->Body = 'You have been invited to a board in taff.top<br>
-                        to join the board click the link below<br>
-                        localhost/trello/invite/getInvite/'.$boardId.'/'.$role;
+                        to join the board click the link <a href="http://www.taff.top/invite/getInvite/'.$boardId.'/'.$role.'">here</a> or copy this link.<br>
+                        http://www.taff.top/invite/getInvite/'.$boardId.'/'.$role;
         if (!$mail->send()) {
             echo "Mailer Error: " . $mail->ErrorInfo;
         } else {

@@ -42,6 +42,20 @@ class Boardmember extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="subscribeChecked", type="string", length=1, nullable=false)
+     */
+    public $subscribeChecked;
+
+    /**
+     *
+     * @var string
+     * @Column(column="favoriteChecked", type="string", length=1, nullable=false)
+     */
+    public $favoriteChecked;
+
+    /**
+     *
+     * @var string
      * @Column(column="memberStatus", type="string", length=1, nullable=false)
      */
     public $memberStatus;
@@ -106,6 +120,8 @@ class Boardmember extends \Phalcon\Mvc\Model
         $boardMember->boardId = $boardId;
         $boardMember->memberCreated = date("Y-m-d H:i:sa");
         $boardMember->memberRole = $role;
+        $boardMember->subscribeChecked = "1";
+        $boardMember->favoriteChecked = "0";
         $boardMember->memberStatus = $status;
         $boardMember->save();
     }

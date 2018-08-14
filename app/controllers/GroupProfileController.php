@@ -59,6 +59,7 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
                 }
                 else if($gm->memberRole = "Member")
                 {
+                    $owner = "true";
                     $role = $gm->memberRole;
                 }
             }
@@ -79,10 +80,6 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
         $this->view->user = $user;
         $this->view->listUser = $listUser;
         $this->view->listUserProfile = $listUserProfile;
-        //$this->view->groupMember = $groupMember;
-        //$this->view->groupUser = $groupUser;
-        //$this->view->userProfile    = $profile;
-        //$this->view->userId         = $userId;
         $this->view->board          = $board;
         $this->view->boardGroup = $boardGroup;
         $this->view->groupMember = $groupMember;
@@ -173,21 +170,20 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
         //$mail->SMTPDebug = 1;
         //$mail->SMTPDebug = 3;                               // Enable verbose debug output
 
-        $mail->Host     = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+        $mail->Host     = 'silver.hidden-server.net';  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'canzinzzide@gmail.com';                 // SMTP username
-        $mail->Password = 'cancan110796';                           // SMTP password
-        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-        $mail->Port     = 587;
+        $mail->Username = 'admin@taff.top';                 // SMTP username
+        $mail->Password = 'Cancan110796';                           // SMTP password
+        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port     = 465;
         
-        $mail->setFrom('canzinzzide@gmail.com', 'Michael Chandra');
-        $mail->addReplyTo('michaelchandrag114@yahoo.co.id', 'gg');
+        $mail->setFrom('admin@taff.top', 'Taff');
         $mail->addAddress($email);
         $mail->Subject = 'Invitation from Taff.top';
         $mail->isHTML(true);
         $mail->Body = 'You have been invited to a group in taff.top<br>
-                        to join the group click the link below<br>
-                        localhost/trello/invite/getInviteGroup/'.$groupId;
+                        to join the group click <a href="http://www.taff.top/invite/getInviteGroup/'.$groupId.'">here</a> or the link below<br><br>
+                        http://www.taff.top/invite/getInviteGroup/'.$groupId;
         if (!$mail->send()) {
             echo "Mailer Error: " . $mail->ErrorInfo;
         } else {
@@ -220,8 +216,28 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
                 "conditions" => "groupUserId='".$groupId."' AND memberStatus='1'"
             ]
         );
+        $datas = array();
+        foreach($gm as $g)
+        {
+            $user = Userprofile::findFirst(
+                [
+                    "conditions"=>"userId='".$g->userId."'"        
+                ]
+            );
+            $userId = $user->userId;
+            $userName = $user->userName;
+            $userImage = $user->userImage;
+            $array = array(
+                "memberId"=>$g->memberId,
+                "memberRole"=>$g->memberRole,
+                "userId"=>$userId,
+                "userName"=>$userName,
+                "userImage"=>$userImage
+            );
+            array_push($datas,$array);
+        }
         $this->view->disable();
-        echo json_encode($gm);
+        echo json_encode($datas);
     }
 
     public function removeMemberAction()

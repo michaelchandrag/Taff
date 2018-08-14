@@ -157,6 +157,31 @@ class ParserTest extends TestCase
         $this->assertSame('178.79.169.131', $response->answers[0]->data);
     }
 
+    public function testParseAnswerWithUnknownType()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "23 28 00 01";                         // answer: type 9000, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 05";                               // answer: rdlength 5
+        $data .= "68 65 6c 6c 6f";                      // answer: rdata "hello"
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(9000, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame('hello', $response->answers[0]->data);
+    }
+
     public function testParseResponseWithCnameAndOffsetPointers()
     {
         $data = "";
@@ -231,6 +256,114 @@ class ParserTest extends TestCase
         $this->assertSame('2a00:1450:4009:809::200e', $response->answers[0]->data);
     }
 
+    public function testParseTXTResponse()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 10 00 01";                         // answer: type TXT, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 06";                               // answer: rdlength 6
+        $data .= "05 68 65 6c 6c 6f";                   // answer: rdata length 5: hello
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_TXT, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame(array('hello'), $response->answers[0]->data);
+    }
+
+    public function testParseTXTResponseMultiple()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 10 00 01";                         // answer: type TXT, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 0C";                               // answer: rdlength 12
+        $data .= "05 68 65 6c 6c 6f 05 77 6f 72 6c 64"; // answer: rdata length 5: hello, length 5: world
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_TXT, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame(array('hello', 'world'), $response->answers[0]->data);
+    }
+
+    public function testParseMXResponse()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 0f 00 01";                         // answer: type MX, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 09";                               // answer: rdlength 9
+        $data .= "00 0a 05 68 65 6c 6c 6f 00";          // answer: rdata priority 10: hello
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_MX, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame(array('priority' => 10, 'target' => 'hello'), $response->answers[0]->data);
+    }
+
+    public function testParseSRVResponse()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 21 00 01";                         // answer: type SRV, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 0C";                               // answer: rdlength 12
+        $data .= "00 0a 00 14 1F 90 04 74 65 73 74 00"; // answer: rdata priority 10, weight 20, port 8080 test
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_SRV, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame(
+            array(
+                'priority' => 10,
+                'weight' => 20,
+                'port' => 8080,
+                'target' => 'test'
+            ),
+            $response->answers[0]->data
+        );
+    }
+
     public function testParseResponseWithTwoAnswers()
     {
         $data = "";
@@ -271,6 +404,70 @@ class ParserTest extends TestCase
         $this->assertSame(Message::CLASS_IN, $response->answers[1]->class);
         $this->assertSame(3575, $response->answers[1]->ttl);
         $this->assertSame('193.223.78.152', $response->answers[1]->data);
+    }
+
+    public function testParseNSResponse()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 02 00 01";                         // answer: type NS, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 07";                               // answer: rdlength 7
+        $data .= "05 68 65 6c 6c 6f 00";                // answer: rdata hello
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_NS, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame('hello', $response->answers[0]->data);
+    }
+
+    public function testParseSOAResponse()
+    {
+        $data = "";
+        $data .= "04 69 67 6f 72 02 69 6f 00";          // answer: igor.io
+        $data .= "00 06 00 01";                         // answer: type SOA, class IN
+        $data .= "00 01 51 80";                         // answer: ttl 86400
+        $data .= "00 07";                               // answer: rdlength 7
+        $data .= "02 6e 73 05 68 65 6c 6c 6f 00";       // answer: rdata ns.hello (mname)
+        $data .= "01 65 05 68 65 6c 6c 6f 00";          // answer: rdata e.hello (rname)
+        $data .= "78 49 28 D5 00 00 2a 30 00 00 0e 10"; // answer: rdata 2018060501, 10800, 3600
+        $data .= "00 09 3a 80 00 00 0e 10";             // answer: 605800, 3600
+
+        $data = $this->convertTcpDumpToBinary($data);
+
+        $response = new Message();
+        $response->header->set('anCount', 1);
+        $response->data = $data;
+
+        $this->parser->parseAnswer($response);
+
+        $this->assertCount(1, $response->answers);
+        $this->assertSame('igor.io', $response->answers[0]->name);
+        $this->assertSame(Message::TYPE_SOA, $response->answers[0]->type);
+        $this->assertSame(Message::CLASS_IN, $response->answers[0]->class);
+        $this->assertSame(86400, $response->answers[0]->ttl);
+        $this->assertSame(
+            array(
+                'mname' => 'ns.hello',
+                'rname' => 'e.hello',
+                'serial' => 2018060501,
+                'refresh' => 10800,
+                'retry' => 3600,
+                'expire' => 604800,
+                'minimum' => 3600
+            ),
+            $response->answers[0]->data
+        );
     }
 
     public function testParsePTRResponse()

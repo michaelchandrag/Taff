@@ -1,0 +1,533 @@
+<!-- START HEADER -->
+<header id="header" class="page-topbar">
+    <!-- start header nav-->
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">                      
+                </ul>
+                <div class="header-search-wrapper hide-on-med-and-down">
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                    <li><a href="javascript:void(0);" class="waves-effect waves-block waves-light translation-button"  data-activates="translation-dropdown"><img src= "userImage/user.jpg" width="32px" height="32px" style="border-radius:50%" /></a>
+                    </li>
+                </ul>
+                <!-- translation-button -->
+                <ul id="translation-dropdown" class="dropdown-content">
+                  <li>
+                    <a onclick="cekLogout()"><img src="images/user/logout.png" width="32px" height="32px" alt="French" />  <span class="language-select">Log Out</span></a>
+                  </li>
+                  
+                </ul>
+            </div>
+        </nav>
+
+        <!-- HORIZONTL NAV START-->
+         <nav id="horizontal-nav" class="white hide-on-med-and-down">
+            <div class="nav-wrapper">                  
+              <ul id="ul-horizontal-nav" class="left hide-on-med-and-down">
+                <li>
+                    <a href="muser" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master User</span>
+                    </a>
+                </li> 
+                <li>
+                    <a href="mgroup" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Group</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mboard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Board</span>
+                    </a>
+                </li>  
+                <li>
+                    <a href="mlist" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master List</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mcard" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Master Card</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="repadmin" class="cyan-text">
+                        <i class="mdi-action-dashboard"></i>
+                        <span>Report</span>
+                    </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        <!-- HORIZONTL NAV END-->
+    </div>
+    <!-- end header nav-->
+</header>
+<!-- END HEADER -->
+
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav hide-on-large-only">
+    <ul id="slide-out" class="side-nav leftside-navigation ">
+        <li class="bold active"><a href="muser" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master User</a>
+        </li>
+        <li class="bold active"><a href="mgroup" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Group</a>
+        </li>
+        <li class="bold active"><a href="mboard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Board</a>
+        </li>
+        <li class="bold active"><a href="mlist" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master List</a>
+        </li>
+        <li class="bold active"><a href="mcard" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Master Card</a>
+        </li>
+        <li class="bold active"><a href="repadmin" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Report</a>
+        </li>
+        <div class="divider"></div>
+        <li class="bold active"><a onclick="cekLogout()" class="waves-effect waves-cyan">Log Out</a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START MAIN -->
+<div id="main">
+    <!-- START WRAPPER -->
+    <div class="wrapper">
+
+        <!-- START CONTENT -->
+        <section id="content">
+
+            <!--start container-->
+            <div class="container">
+                <!-- trello start here -->
+                
+                <div class="section">
+                    <input type="hidden" id="hiddenCardId" value="<?php echo $card->cardId?>">
+                    <input type="hidden" id="hiddenBoardId" value="<?php echo $card->cardBoardId?>">
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                        <b>Assign Members</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectAssignId" onchange="detailAssign()">
+                                        <?php
+                                            foreach($assign as $a)
+                                            {
+                                                echo "<option value='".$a->assignId."'>".$a->assignId."</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                            <b>Insert</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    User ID
+                                    <select id="selectAssignUserId">
+                                    <?php
+                                        foreach($user as $u)
+                                        {
+                                            echo "<option value='".$u->userId."'>".$u->userId."</option>";
+                                        }
+                                    ?>
+                                </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                   <a onclick="insertAssign()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <b>Detail</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Assign ID<input id="detailAssignId" type="text" placeholder="Assign ID" class="" disabled>
+                                </div>
+                                <div class="input-field col s6">
+                                  Card ID<input id="detailAssignCardId" type="text" placeholder="Card ID" class="" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  User ID<input id="detailAssignUserId" type="text" placeholder="User ID" class="" disabled>
+                                </div>
+                                <div class="input-field col s6">
+                                  User Name<input id="detailAssignUserName" type="text" placeholder="User Name" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Assign Checked<input id="detailAssignChecked" type="text" placeholder="Assign Checked" class="">
+                                </div>
+                                <div class="input-field col s6">
+                                  Assign Status<input id="detailAssignStatus" type="text" placeholder="Assign Status" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveAssign()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider" style="margin:5px;"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                        <b>Attachment</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectAttachmentId" onchange="detailAttachment()">
+                                        <?php
+                                            foreach($attachment as $a)
+                                            {
+                                                echo "<option value='".$a->attachmentId."'>".$a->attachmentId."</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                            <b>Insert</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <div class="file-field input-field">
+                                      <div class="btn">
+                                        <span>File</span>
+                                        <input type="file" id="fileAttachment">
+                                      </div>
+                                      <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                   <a onclick="insertAttachment()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <b>Detail</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Attachment ID<input id="detailAttachmentId" type="text" placeholder="Attachment ID" class="" disabled>
+                                </div>
+                                <div class="input-field col s6">
+                                  Board ID<input id="detailAttachmentBoardId" type="text" placeholder="Board ID" class="" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Card ID<input id="detailAttachmentCardId" type="text" placeholder="Card ID" class="" disabled>
+                                </div>
+                                <div class="input-field col s6">
+                                  Attachment Title<input id="detailAttachmentTitle" type="text" placeholder="Attachment Title" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Attachment Directory<input id="detailAttachmentDirectory" type="text" placeholder="Attachment Directory" class="" disabled>
+                                </div>
+                                <div class="input-field col s6">
+                                  Attachment Status<input id="detailAttachmentStatus" type="text" placeholder="Attachment Status" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveAttachment()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider" style="margin:5px;"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            <b>Label Card</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Label Red<input id="detailLabelRed" value="<?php if($label!=null)echo $label->labelRed; ?>" type="text" placeholder="Label Red" class="">
+                                </div>
+                                <div class="input-field col s6">
+                                  Label Yellow<input id="detailLabelYellow" value="<?php if($label!=null)echo $label->labelRed; ?>" type="text" placeholder="Label Yellow" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                  Label Green<input id="detailLabelGreen" value="<?php if($label!=null)echo $label->labelRed; ?>" type="text" placeholder="Label Green" class="">
+                                </div>
+                                <div class="input-field col s6">
+                                  Label Blue<input id="detailLabelBlue" value="<?php if($label!=null)echo $label->labelRed; ?>" type="text" placeholder="Label Blue" class="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveLabelCard()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider" style="margin:5px;"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            <b>Start Date</b>
+                            <div class="row">
+                                <div class="input-field col s8">
+                                    <p>Date</p>
+                                    <input type="date" class="datepicker" id="detailStartDate" value="<?php if($startDate!=null)echo date_format(new DateTime($startDate->startDate),"Y-m-d");?>">
+                                    <p>Time</p>
+                                    <select id="detailStartDateTime">
+                                      <option value="" disabled selected>Choose your time</option>
+                                      <option value="0">00:00</option>
+                                      <option value="1">01:00</option>
+                                      <option value="2">02:00</option>
+                                      <option value="3">03:00</option>
+                                      <option value="4">04:00</option>
+                                      <option value="5">05:00</option>
+                                      <option value="6">06:00</option>
+                                      <option value="7">07:00</option>
+                                      <option value="8">08:00</option>
+                                      <option value="9">09:00</option>
+                                      <option value="10">10:00</option>
+                                      <option value="11">11:00</option>
+                                      <option value="12" selected>12:00</option>
+                                      <option value="13">13:00</option>
+                                      <option value="14">14:00</option>
+                                      <option value="15">15:00</option>
+                                      <option value="16">16:00</option>
+                                      <option value="17">17:00</option>
+                                      <option value="18">18:00</option>
+                                      <option value="19">19:00</option>
+                                      <option value="20">20:00</option>
+                                      <option value="21">21:00</option>
+                                      <option value="22">22:00</option>
+                                      <option value="23">23:00</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveStartDate()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <b>Due Date</b>
+                            <div class="row">
+                                <div class="input-field col s8">
+                                    <p>Date</p>
+                                    <input type="date" class="datepicker" id="detailDueDate" value="<?php if($dueDate!=null)echo date_format(new DateTime($dueDate->dueDate),"Y-m-d");?>">
+                                    <p>Time</p>
+                                    <select id="detailDueDateTime">
+                                      <option value="" disabled selected>Choose your time</option>
+                                      <option value="0">00:00</option>
+                                      <option value="1">01:00</option>
+                                      <option value="2">02:00</option>
+                                      <option value="3">03:00</option>
+                                      <option value="4">04:00</option>
+                                      <option value="5">05:00</option>
+                                      <option value="6">06:00</option>
+                                      <option value="7">07:00</option>
+                                      <option value="8">08:00</option>
+                                      <option value="9">09:00</option>
+                                      <option value="10">10:00</option>
+                                      <option value="11">11:00</option>
+                                      <option value="12" selected>12:00</option>
+                                      <option value="13">13:00</option>
+                                      <option value="14">14:00</option>
+                                      <option value="15">15:00</option>
+                                      <option value="16">16:00</option>
+                                      <option value="17">17:00</option>
+                                      <option value="18">18:00</option>
+                                      <option value="19">19:00</option>
+                                      <option value="20">20:00</option>
+                                      <option value="21">21:00</option>
+                                      <option value="22">22:00</option>
+                                      <option value="23">23:00</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                <a onclick="saveDueDate()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider" style="margin:5px;"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            <b>Checklist Card</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectChecklistId" onchange="detailChecklist()">
+                                        <?php
+                                            foreach($checklist as $c)
+                                            {
+                                                echo "<option value='".$c->checklistId."'>".$c->checklistId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    Checklist Title<input id="insertChecklistTitle" value="" type="text" placeholder="Checklist Title" class=""><br>
+                                    <a onclick="insertChecklist()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                                <div class="input-field col s6">
+                                    Checklist ID<input id="detailChecklistId" value="" type="text" placeholder="Checklist ID" class="" disabled><br>
+                                    Card ID<input id="detailChecklistCardId" value="" type="text" placeholder="Card ID" class="" disabled><br>
+                                    Checklist Title<input id="detailChecklistTitle" value="" type="text" placeholder="Checklist Title" class=""><br>
+                                    Checklist Status<input id="detailChecklistStatus" value="" type="text" placeholder="Checklist Status" class=""><br>
+                                    <a onclick="saveChecklist()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <b>Checklist Item</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectItemId" onchange="detailItem()">
+                                        <?php
+                                            foreach($item as $i)
+                                            {
+                                                echo "<option value='".$i->itemId."'>".$i->itemId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    <b>Insert Item</b>
+                                    <div class="divider"></div>
+                                    <select id="selectInsertItemChecklistId">
+                                        <?php
+                                            foreach($checklist as $c)
+                                            {
+                                                echo "<option value='".$c->checklistId."'>".$c->checklistId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    Item Title<input id="insertItemTitle" value="" type="text" placeholder="Item Title" class=""><br>
+                                    <a onclick="insertItem()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                                <div class="input-field col s6">
+                                    Item ID<input id="detailItemId" value="" type="text" placeholder="Item ID" class="" disabled><br>
+                                    Checklist ID<input id="detailItemChecklistId" value="" type="text" placeholder="Checklist ID" class="" disabled><br>
+                                    Card ID<input id="detailItemCardId" value="" type="text" placeholder="Card ID" class="" disabled><br>
+                                    Item Title<input id="detailItemTitle" value="" type="text" placeholder="Item Title" class=""><br>
+                                    Item Checked<input id="detailItemChecked" value="" type="text" placeholder="Item Checked" class=""><br>
+                                    Item Status<input id="detailItemStatus" value="" type="text" placeholder="Item Status" class=""><br>
+                                    <a onclick="saveItem()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider" style="margin:5px;"></div>
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            <b>Comment</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectCommentId" onchange="detailComment()">
+                                        <?php
+                                            foreach($comment as $c)
+                                            {
+                                                echo "<option value='".$c->commentId."'>".$c->commentId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    <div class="divider"></div>
+                                    <b>Insert Comment</b><br>
+                                    User ID<select id="selectInsertCommentUserId">
+                                        <?php
+                                            foreach($user as $u)
+                                            {
+                                                echo "<option value='".$u->userId."'>".$u->userId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    Comment Text<input id="insertCommentText" value="" type="text" placeholder="Comment Text" class=""><br>
+                                    <a onclick="insertComment()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                                <div class="input-field col s6">
+                                    Comment ID<input id="detailCommentId" value="" type="text" placeholder="Comment ID" class="" disabled><br>
+                                    Card ID<input id="detailCommentCardId" value="" type="text" placeholder="Card ID" class="" disabled><br>
+                                    Board ID<input id="detailCommentBoardId" value="" type="text" placeholder="Board ID" class="" disabled><br>
+                                    User ID<input id="detailCommentUserId" value="" type="text" placeholder="User ID" class="" disabled><br>
+                                    Comment Text<input id="detailCommentText" value="" type="text" placeholder="Comment Text" class=""><br>
+                                    Comment Created<input id="detailCommentCreated" value="" type="text" placeholder="Comment Created" class="" disabled><br>
+                                    Comment Status<input id="detailCommentStatus" value="" type="text" placeholder="Comment Status" class=""><br>
+                                    <a onclick="saveComment()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <b>Reply Comment</b>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <select id="selectReplyId" onchange="detailReply()">
+                                        <?php
+                                            foreach($reply as $r)
+                                            {
+                                                echo "<option value='".$r->replyId."'>".$r->replyId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    <div class="divider"></div>
+                                    <b>Insert Reply</b><br>
+                                    Comment ID<select id="selectInsertReplyCommentId">
+                                        <?php
+                                            foreach($comment as $c)
+                                            {
+                                                echo "<option value='".$c->commentId."'>".$c->commentId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    User ID<select id="selectInsertReplyUserId">
+                                        <?php
+                                            foreach($user as $u)
+                                            {
+                                                echo "<option value='".$u->userId."'>".$u->userId."</option>";
+                                            }
+                                        ?>
+                                    </select><br>
+                                    Reply Text<input id="insertReplyText" value="" type="text" placeholder="Reply Text" class=""><br>
+                                    <a onclick="insertReply()" class="waves-effect waves-light green btn">Insert</a>
+                                </div>
+                                <div class="input-field col s6">
+                                    Reply ID<input id="detailReplyId" value="" type="text" placeholder="Reply ID" class="" disabled><br>
+                                    Comment ID<input id="detailReplyCommentId" value="" type="text" placeholder="Comment ID" class="" disabled><br>
+                                    Card ID<input id="detailReplyCardId" value="" type="text" placeholder="Card ID" class="" disabled><br>
+                                    Board ID<input id="detailReplyBoardId" value="" type="text" placeholder="Board ID" class="" disabled><br>
+                                    User ID<input id="detailReplyUserId" value="" type="text" placeholder="User ID" class="" disabled><br>
+                                    Reply Text<input id="detailReplyText" value="" type="text" placeholder="Reply Text" class=""><br>
+                                    Reply Created<input id="detailReplyCreated" value="" type="text" placeholder="Reply Created" class="" disabled><br>
+                                    Reply Status<input id="detailReplyStatus" value="" type="text" placeholder="Reply Status" class=""><br>
+                                    <a onclick="saveReply()" class="waves-effect waves-light  btn">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end container-->
+        </section>
+        <!-- END CONTENT -->
+
+    </div>
+    <!-- END WRAPPER -->
+</div>

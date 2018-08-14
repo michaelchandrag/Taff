@@ -1,136 +1,181 @@
-/*$("#section").sortable();
-
-$( ".listUserDrag" ).draggable({
-	containment:"#main"
-});
-*/
-
-function bindUiList()
-{
-
-	$( ".sortable" ).sortable({
-		appendTo:"body",
-		dropOnEmpty:"false",
-		stop : function (e,ui)
-		 {
-		 	//alert();
-		 },
-		 change : function(e,ui)
-		 {
-		 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
-		 }
-	});
-	$( "#card-stats" ).sortable({
-		appendTo:"body",
-		dropOnEmpty:"false",
-		cancel: "#listCreateList",
-		 update : function(e,ui)
-		 {
-		 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
-		 	var boardId = $("#hiddenBoardId").val();
-		 	var kids = $("#card-stats").children();
-		 	var listId = ui.item.attr("id").substr(7);
-		 	var posTujuan = 1;
-		 	var pojok = false;
-		 	for(var i=0;i<kids.length;i++)
-		 	{
-		 		if($(kids[i]).is(ui.item))
-		 		{
-		 			posTujuan = i+1;
-		 		}
-		 	}
-		 	if(posTujuan == kids.length)
-		 	{
-		 		posTujuan = kids.length-1;
-		 		pojok = true;
-		 	}
-		 	$.ajax({
-			  type: "POST",
-			  url: "board/sortListPosition",
-			  data: {boardId:boardId,listId:listId,posTujuan:posTujuan},
-			  success: function (response) {
-			  		if(pojok == true)
-			  		{
-			  			$(ui.item).insertBefore("#listCreateList");
-			  		}
-				  },
-				  error: function (xhr, ajaxOptions, thrownError) {
-					alert(xhr.status);
-					alert(thrownError);
-					alert(xhr.responseText);
-				  }
-				});
-
-		 }
-	});
-$("#card-stats").disableSelection();
-
-}
 
 function bindUiCard()
 {
-	$( ".dragable" ).draggable({
-		appendTo :"body",
-		helper:"clone",
-		grid: [1, 1],
-		revert:false,
-		connectToSortable:".sortable",
-		start: function(e, ui)
-		 {
-		  var draggableId = e.target.id;
-		  var width = $("#"+draggableId).css("width");
-		  var height = $("#"+draggableId).css("height");
-		 	$(ui.helper).css("width",width);
-		  $(ui.helper).css("height",height);
-		 },
-		 stop : function (e,ui)
-		 {
-		  var draggableId = e.target.id;
-		  //$("#"+draggableId+":eq(0)").remove();
-		  var asd = (ui.helper).parent();
-		  var id = asd.attr("id");
-		  var banyak = $(".listUser").length;
-		  var kids = $("#"+id).children();
-		  for(var i=0;i<kids.length;i++)
-		  {
-		  	if($(kids[i]).is(ui.helper))
-		  	{
-		  		var selectId = id.substr(4);
-		  		var cardId = draggableId.substr(5);
-		  		var pos = i+1;
-		  		if(pos >= kids.length)
-		  		{
-		  			pos = kids.length-1;
-		  		}
-		  		$.ajax({
-						  type: "POST",
-						  url: "board/updateCardPosition",
-						  data: {cardId:cardId,listSelect:selectId,position:pos},
-						  success: function (response) {
-								location.reload();
-					  		},
-					  error: function (xhr, ajaxOptions, thrownError) {
-						alert(xhr.status);
-						alert(thrownError);
-						alert(xhr.responseText);
-					  }
-					});
-		  	}
-		  }
-		 }
-	});
+	$( ".sortable" ).sortable({
+    	appendTo:"body",
+    	dropOnEmpty:"false",
+    	start : function (e,ui)
+    	 {
+    	 	ui.placeholder.width(172);
+    	 	ui.placeholder.height(42);
+    	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+    	 	//alert();
+    	 },
+    	 receive : function(e,ui)
+    	 {
+    	 	var draggableId = ui.item.attr("id");
+    	 	var ori = $("#"+draggableId).parent();
+    	  	var idListAwal = ori.attr("id").substr(4);
+    	  	//$("#"+draggableId+":eq(0)").remove();
+    	  	var asd = $(ui.helper).parent();
+    	  	var id = asd.attr("id");
+    	  	$(ui.helper).replaceWith($("#"+draggableId));
+    	  	var kids = $("#"+id).children();
+    	  	for(var i=0;i<kids.length;i++)
+    	  {
+    	  	if($(kids[i]).attr("id") == draggableId)
+    	  	{
+    	  		var selectId = id.substr(4);
+    	  		var cardId = draggableId.substr(5);
+    	  		var pos = i+1;
+    	  		if(pos > kids.length)
+    	  		{
+    	  			pos = kids.length-1;
+    	  		}
+    	  		$.ajax({
+    				  type: "POST",
+    				  url: "board/updateCardPosition",
+    				  data: {cardId:cardId,listSelect:selectId,position:pos},
+    				  success: function (response) {
+    			  		},
+    			  error: function (xhr, ajaxOptions, thrownError) {
+    				alert(xhr.status);
+    				alert(thrownError);
+    				alert(xhr.responseText);
+    			  }
+    			});
+    			if($("#"+draggableId).hasClass("cardUser"+selectId))
+    	  		{
+    	  		}
+    	  		else
+    	  		{
+    	  			//alert("beda");
+    	  			$("#"+draggableId).removeClass("cardUser"+idListAwal);
+    	  			$("#"+draggableId).addClass("cardUser"+selectId);
+    	  		}
+    	  	}
+    	  }
+    	 }
+    });
+    
+    $( "#card-stats" ).sortable({
+    	appendTo:"body",
+    	dropOnEmpty:"false",
+    	cancel: "#listCreateList",
+    	 update : function(e,ui)
+    	 {
+    	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+    	 	var boardId = $("#hiddenBoardId").val();
+    	 	var kids = $("#card-stats").children();
+    	 	var listId = ui.item.attr("id").substr(7);
+    	 	var posTujuan = 1;
+    	 	var pojok = false;
+    	 	for(var i=0;i<kids.length;i++)
+    	 	{
+    	 		if($(kids[i]).is(ui.item))
+    	 		{
+    	 			posTujuan = i+1;
+    	 		}
+    	 	}
+    	 	if(posTujuan == kids.length)
+    	 	{
+    	 		posTujuan = kids.length-1;
+    	 		pojok = true;
+    	 	}
+    	 	$.ajax({
+    		  type: "POST",
+    		  url: "board/sortListPosition",
+    		  data: {boardId:boardId,listId:listId,posTujuan:posTujuan},
+    		  success: function (response) {
+    		  		if(pojok == true)
+    		  		{
+    		  			$(ui.item).insertBefore("#listCreateList");
+    		  		}
+    			  },
+    			  error: function (xhr, ajaxOptions, thrownError) {
+    				alert(xhr.status);
+    				alert(thrownError);
+    				alert(xhr.responseText);
+    			  }
+    			});
+    
+    	 }
+    });
+    $("#card-stats").disableSelection();
+    $( ".dragable" ).draggable({
+    	appendTo :"body",
+    	helper:"clone",
+    	grid: [1, 1],
+    	revert:false,
+    	connectToSortable:".sortable",
+    	start: function(e, ui)
+    	 {
+    	  var draggableId = e.target.id;
+    	  var width = $("#"+draggableId).css("width");
+    	  var height = $("#"+draggableId).css("height");
+    	  $(ui.helper).css("width",172);
+    	  $(ui.helper).css("height",height);
+    	 },
+    	 stop : function (e,ui)
+    	 {
+    	 }
+    });
 }
 
 $( ".sortable" ).sortable({
 	appendTo:"body",
 	dropOnEmpty:"false",
-	stop : function (e,ui)
+	start : function (e,ui)
 	 {
+	 	ui.placeholder.width(172);
+	 	ui.placeholder.height(42);
+	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
 	 	//alert();
 	 },
-	 change : function(e,ui)
+	 receive : function(e,ui)
 	 {
-	 	ui.placeholder.css({visibility: 'visible', border : '1px solid black'});
+	 	var draggableId = ui.item.attr("id");
+	 	var ori = $("#"+draggableId).parent();
+	  	var idListAwal = ori.attr("id").substr(4);
+	  	//$("#"+draggableId+":eq(0)").remove();
+	  	var asd = $(ui.helper).parent();
+	  	var id = asd.attr("id");
+	  	$(ui.helper).replaceWith($("#"+draggableId));
+	  	var kids = $("#"+id).children();
+	  	for(var i=0;i<kids.length;i++)
+	  {
+	  	if($(kids[i]).attr("id") == draggableId)
+	  	{
+	  		var selectId = id.substr(4);
+	  		var cardId = draggableId.substr(5);
+	  		var pos = i+1;
+	  		if(pos > kids.length)
+	  		{
+	  			pos = kids.length-1;
+	  		}
+	  		$.ajax({
+				  type: "POST",
+				  url: "board/updateCardPosition",
+				  data: {cardId:cardId,listSelect:selectId,position:pos},
+				  success: function (response) {
+			  		},
+			  error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
+				alert(xhr.responseText);
+			  }
+			});
+			if($("#"+draggableId).hasClass("cardUser"+selectId))
+	  		{
+	  		}
+	  		else
+	  		{
+	  			//alert("beda");
+	  			$("#"+draggableId).removeClass("cardUser"+idListAwal);
+	  			$("#"+draggableId).addClass("cardUser"+selectId);
+	  		}
+	  	}
+	  }
 	 }
 });
 
@@ -181,6 +226,7 @@ $("#card-stats").disableSelection();
 $( ".dragable" ).draggable({
 	appendTo :"body",
 	helper:"clone",
+    containenment:"body",
 	grid: [1, 1],
 	revert:false,
 	connectToSortable:".sortable",
@@ -189,49 +235,14 @@ $( ".dragable" ).draggable({
 	  var draggableId = e.target.id;
 	  var width = $("#"+draggableId).css("width");
 	  var height = $("#"+draggableId).css("height");
-	 	$(ui.helper).css("width",width);
+	  $(ui.helper).css("width",172);
 	  $(ui.helper).css("height",height);
+      $(ui.item).css("opacity",0.5);
 	 },
 	 stop : function (e,ui)
 	 {
-
-	  var draggableId = e.target.id;
-	  //$("#"+draggableId+":eq(0)").remove();
-	  var asd = (ui.helper).parent();
-	  var id = asd.attr("id");
-	  var banyak = $(".listUser").length;
-	  var kids = $("#"+id).children();
-	  for(var i=0;i<kids.length;i++)
-	  {
-	  	if($(kids[i]).is(ui.helper))
-	  	{
-	  		var selectId = id.substr(4);
-	  		var cardId = draggableId.substr(5);
-	  		var pos = i+1;
-	  		if(pos >= kids.length)
-	  		{
-	  			pos = kids.length-1;
-	  		}
-	  		$.ajax({
-					  type: "POST",
-					  url: "board/updateCardPosition",
-					  data: {cardId:cardId,listSelect:selectId,position:pos},
-					  success: function (response) {
-
-							$(ui.helper).replaceWith($("#"+draggableId));
-							$(ui.helper).remove();
-				  		},
-				  error: function (xhr, ajaxOptions, thrownError) {
-					alert(xhr.status);
-					alert(thrownError);
-					alert(xhr.responseText);
-				  }
-				});
-	  	}
-	  }
 	 }
 });
-
 
 function createList()
 {
@@ -267,7 +278,6 @@ function createList()
 			gabung += '</div>';
 			gabung += '</div>';
 			$(gabung).insertBefore($("#listCreateList"));
-			bindUiList();
 			bindUiCard();
 			$('#listCreateList').prop('onclick',null).off('click');
 			$('#listCreateList').on('click', function() {
@@ -302,8 +312,10 @@ $('#listCreateList').on('click', function() {
 
 function createCard()
 {
+	var boardId = $("#hiddenBoardId").val();
 	var title = $("#titleCard").val();
 	var owner = $("#hiddenListId").val();
+	var description = $("#descriptionCard").val();
 	var rules = true;
 	if(title == "")
 	{
@@ -315,7 +327,7 @@ function createCard()
 		$.ajax({
 			  type: "POST",
 			  url: "board/createCard",
-			  data: {title:title,owner:owner},
+			  data: {title:title,owner:owner,description:description,boardId:boardId},
 			  success: function (response) {
 				cardId = response;
 				var gabung = '<div class="dragable cDrag'+cardId+' cardUser'+owner+'" id="cDrag'+cardId+'" style="width:100%;height:100%;">';
@@ -397,6 +409,8 @@ function createCardDua()
 {
 	var title = $("#titleCardManual").val();
 	var owner = $("#listCardManual").val();
+	var boardId = $("#hiddenBoardId").val();
+	var description = $("#descriptionCardManual").val();
 	var rules = true;
 	if(title == "")
 	{
@@ -408,7 +422,7 @@ function createCardDua()
 		$.ajax({
 			  type: "POST",
 			  url: "board/createCard",
-			  data: {title:title,owner:owner},
+			  data: {title:title,owner:owner,boardId:boardId,description:description},
 			  success: function (response) {
 				 cardId = response;
 				 var gabung = '<div class="dragable cDrag'+cardId+' cardUser'+owner+'" id="cDrag'+cardId+'" style="width:100%;height:100%;">';
@@ -519,9 +533,9 @@ function createCopyCard(id)
 					  	}
 				    });
 				  gabung 		= '<div class="dragable cDrag'+response+' cardUser'+listId+'" id="cDrag'+response+'" style="width:100%;height:100%;">'; 
-				  gabung		+= '<a id="card'+response+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+response+'\')">';
+				  gabung		+= '<a id="card'+response+'" href="javascript:void(0);" class="aCardUserLabel" onclick="ajaxModalCard(\''+response+'\')">';
 				  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-				  gabung 		+= '<div class="row" id="labelCard'+response+'" style="margin:auto;">';
+				  gabung 		+= '<div class="row cardUserLabel" id="labelCard'+response+'" style="margin:auto;">';
 				  if(labelRed)
 				  {
 				  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
@@ -547,9 +561,10 @@ function createCopyCard(id)
 				  	gabung+= "</div>";
 				  }
 				  gabung 		+= '</div>'
-				  gabung 		+= '<div class="left-align black-text" id="cardTitle'+listId+'">'+title+'</div>';
+				  gabung 		+= '<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'+response+'">'+title+'</div>';
 				  gabung 		+= '</div>';
 				  gabung 		+= '</a>';
+                  gabung        += '</div>';
 				  $("#list"+listId).append(gabung);
 				  bindUiCard();
 				  },
@@ -661,7 +676,6 @@ function createCopyList()
 			gabung += '</div>';
 			$(gabung).insertBefore("#listCreateList");
 			$('#listCreateList').prop('onclick',null).off('click');
-			bindUiList();
 			$('#listCreateList').on('click', function() {
 				//alert("klik + "+ cardId +" owner : "+owner);
 				//var href = $(this).attr("href");
@@ -676,7 +690,7 @@ function createCopyList()
 			  	var labelYellow = false;
 			  	var labelBlue = false;
 			 	var labelGreen = false;
-			 	if(label != false || label != null)
+			 	if(label != null)
 			 	{
 			 		if(label.labelRed == "true")
 				  	{
@@ -730,6 +744,7 @@ function createCopyList()
 				gabung 		+= '</div>';
 				//alert(gabung);
 				$("#list"+listTujuan).append(gabung);
+				bindUiCard();
 		    });
 		    
 		  },
@@ -910,21 +925,21 @@ function saveMoveAllCardList()
 			$(".cardUser"+listId+":eq(0)").appendTo("#list"+listTujuan).addClass("cardUser"+listTujuan).removeClass("cardUser"+listId);
 		}
 		$.ajax({
-			  async:false,
-			  type: "POST",
-			  url: "board/moveAllCard",
-			  data: {listId:listId,listTujuan:listTujuan},
-			  success: function (response) {
-			  	//alert(response);
-				  
-				  },
-				  error: function (xhr, ajaxOptions, thrownError) {
-					alert(xhr.status);
-					alert(thrownError);
-					alert(xhr.responseText);
-					alert("ASD");
-				  }
-				});
+		  async:false,
+		  type: "POST",
+		  url: "board/moveAllCard",
+		  data: {listId:listId,listTujuan:listTujuan},
+		  success: function (response) {
+		  	//alert(response);
+			  
+			  },
+			  error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status);
+				alert(thrownError);
+				alert(xhr.responseText);
+			  }
+			});
+		bindUiCard();
 	}
 	else
 	{
@@ -952,8 +967,11 @@ function ajaxModalCard(id)
 			  getComment(response["comment"]);
 			  getAttachment(response["attachment"]);
 			  getMoveCard(response["move"]);
-			  $("#changeArchive").show();
-			  $("#changeSend").hide();
+			  if($("#hiddenCardDelete").val() == "1")
+			  {
+			    $("#changeArchive").show();
+			    $("#changeSend").hide();
+			  }
 			  $("#modal3").openModal();
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
@@ -962,10 +980,6 @@ function ajaxModalCard(id)
 			alert(xhr.responseText);
 		  }
 		});
-
-	//$("#changeArchive").show();
-	//$("#changeSend").hide();
-	//$("#modal3").openModal();
 }
 
 
@@ -1180,11 +1194,10 @@ function createAssignMembers()
 		{
 			check = "0";
 		}
-		var name = getNameUser(userId);
 		$.ajax({
 		  type: "POST",
 		  url: "board/createAssignMembers",
-		  data: {cardId:cardId,userId:userId,check:check,name:name},
+		  data: {cardId:cardId,userId:userId,check:check},
 		  success: function (response) {
 		  	//alert(response);
 		  },
@@ -1308,15 +1321,39 @@ function getStartDate(response)
 	  	{
 	  		$("#ajaxStartDate").append("<h6><b>Start Date</b></h6>");
 	  		var gabung = "<p>";
+	  		var activityStartDate = $("#hiddenActivityStartDate").val();
 	  		if(response.startDateChecked == "1")
 	  		{
-	  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' checked='checked'/>";
+	  		    if(activityStartDate == "1")
+	  		    {
+	  			    gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' checked='checked'/>";
+	  		    }
+	  		    else
+	  		    {
+	  		        gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' checked='checked' disabled/>";
+	  		    }
 	  		}
 	  		else
 	  		{
-	  			gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' />";
+	  		    if(activityStartDate == "1")
+	  		    {
+	  			    gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' />";
+	  		    }
+	  		    else
+	  		    {
+	  			    gabung += "<input type='checkbox' id='sd' onchange='changeStartDateChecked(\""+response.cardId+"\")' disabled/>";
+	  		    }
 	  		}
+	  		if(activityStartDate == "1")
+	  		{
+	  		    
 	  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 </label><a class='roleActivityStartDate' href='javascript:void(0);' onclick='deleteStartDate(\""+response.cardId+"\")' > - Remove</a>";
+	  		}
+	  		else
+	  		{
+	  		    
+	  		gabung += "<label for='sd'>"+bln+" "+tgl+" at " +jam+":00 </label>";
+	  		}
 	  		gabung += "</p>";
 	  	}
 	  	$("#ajaxStartDate").append(gabung);
@@ -1386,19 +1423,44 @@ function getDueDate(response)
 	  		bln = "Dec";
 	  	}
 	  	var id = response.cardId;
+	  	var activityDueDate = $("#hiddenActivityDueDate").val();
 	  	if(response.dueDateStatus == "1")
 	  	{
 	  		$("#ajaxDueDate").append("<h6><b>Due Date</b></h6>");
 	  		var gabung = "<p>";
 	  		if(response.dueDateChecked == "1")
 	  		{
-	  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' checked='checked'/>";
+	  		    if(activityDueDate == "1")
+	  		    {
+	  			    gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' checked='checked'/>";
+	  		    }
+	  		    else
+	  		    {
+	  			    gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' checked='checked' disabled/>";
+	  		    }
 	  		}
 	  		else
 	  		{
-	  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' />";
+	  		    if(activityDueDate == "1")
+	  		    {
+	  			    gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' />";
+	  		    }
+	  		    else
+	  		    {
+	  		        
+	  			gabung += "<input type='checkbox' id='dd' onchange='changeDueDateChecked(\""+id+"\")' disabled/>";
+	  		    }
 	  		}
+	  		if(activityDueDate == "1")
+	  		{
+	  		    
 	  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 </label><a class='roleActivityDueDate' href='javascript:void(0);' onclick='deleteDueDate(\""+id+"\")' >Remove</a>";
+	  		}
+	  		else
+	  		{
+	  		    
+	  		gabung += "<label for='dd'>"+bln+" "+tgl+" at " +jam+":00 </label>";
+	  		}
 	  		gabung += "</p>";
 	  	}
 	  	$("#ajaxDueDate").append(gabung);
@@ -1418,11 +1480,29 @@ function getChecklist(response)
 	  		var progressbar = '<div class="progress"><div id="pb'+response.checklistId+'" class="determinate" style="width:0%"></div></div>';
 	  		var item ='<div id="checklistItem'+response.checklistId+'"></div>';
 	  		var addatas ='<div id="item'+response.checklistId+'">';
-	  		var add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
+	  		var add = "";
+	  		var activityChecklist = $("#hiddenActivityChecklist").val();
+	  		if(activityChecklist == "1")
+	  		{
+	  		    
+	  		 add = '<p><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
+	  		}
+	  		else
+	  		{
+	  		    add = '<p style="display:none;"><a href="javascript:void(0);" onclick="changeInput(\''+response.checklistId+'\')">Add an item</a></p>';
+	  		}
 	  		var addbawah ='</div>';
 	  		var luaratas2 = '</div>';
 	  		var luarbawah1 = '<div class="col s12 m6 l1 roleActivityChecklist" style="">';
-	  		var tengah = '<a href="javascript:void(0);" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
+	  		var tengah = "";
+	  		if(activityChecklist == "1")
+	  		{
+	  		tengah = '<a href="javascript:void(0);" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
+	  		}
+	  		else
+	  		{
+	  		tengah = '<a href="javascript:void(0);" style="display:none;" onclick="deleteChecklist(\''+response.checklistId+'\')">Delete</a>';
+	  		}
 	  		var luarbawah2 = '</div>';
 	  		var a = "</div>";
 	  		var gabung = atas+luaratas1+header+progressbar+item+addatas+add+addbawah+luaratas2+luarbawah1+tengah+luarbawah2+a;
@@ -1430,14 +1510,31 @@ function getChecklist(response)
 	  		$.each(response.item, function(index, res){
 			  	if(res.itemStatus == "1")
 			  	{
-
+                    var activityChecklistItem = $("#hiddenActivityChecklist").val();
 			  		if(res.itemChecked == "1")
 			  		{
+			  		    if(activityChecklistItem == "1")
+			  		    {
+			  		        
 			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" checked="checked" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+			  		    }
+			  		    else
+			  		    {
+			  		        
+			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" checked="checked" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" disabled/><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small"><a href="javascript:void(0);" style="display:none;" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+			  		    }
 			  		}
 			  		else
 			  		{
-			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;display:none;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+			  		    if(activityChecklistItem == "1")
+			  		    {
+			  		      
+			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" /><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');}
+			  		    else
+			  		    {
+			  		        
+			  			$("#checklistItem"+response.checklistId).append('<p id="item'+res.itemId+'"> <input type="checkbox" class="cb'+response.checklistId+'" id="test'+res.itemId+'" onchange="changeItem(\''+res.itemId+'\')" onclick="countPb(\''+response.checklistId+'\')" disabled/><label class="black-text" for="test'+res.itemId+'">'+res.itemTitle+'</label><span style="margin-left:7%;" class="ultra-small roleActivityChecklist"><a href="javascript:void(0);" style="display:none;" onclick="deleteChecklistItem(\''+res.itemId+'\')" class="right-align red-text">Delete</a></span></p>');
+			  		    }
 
 			  		}
 			  		countPb(response.checklistId);
@@ -1543,7 +1640,7 @@ function getComment(response)
 		gabung  += 				'</div>';
 		gabung  +=			'<p class="ultra-small grey-text darken-4" style="margin-top:-10px;">';
 		gabung  +=				'<a href="javascript:void(0);" onclick="changeReply(\''+response.commentId+'\')"><u>Reply</u></a>' ;
-		if($("#hiddenUserId").val == response.commentUserId)
+		if($("#hiddenUserId").val() == response.commentUserId)
 		{
 			$gabung += ' - <a href="javascript:void(0);" onclick="editComment(\''+response.commentId+'\')"><u>Edit</u></a> - <a href="javascript:void(0)" onclick="deleteComment(\''+response.commentId+'\')"><u>Delete</u></a>';
 		}
@@ -1606,10 +1703,11 @@ function createCardReply(id)
 	  type: "POST",
 	  url: "board/createReplyComment",
 	  data: {commentId:commentId,boardId:boardId,cardId:cardId,text:text},
+	  dataType:"json",
 	  success: function (response) {
 		//alert(response);
-		var name = getNameUser(userId);
-		var directory = getDirectoryUser(userId);
+		var name = response.user.userName;
+		var directory = response.user.userImage;
 		var gabung2 = "";
 		gabung2  += '<div id="replyUser'+response+'">';
 		gabung2  +=	'<div class="col s12 m4 l1">';
@@ -1737,6 +1835,7 @@ function deleteReply(id)
 
 function modalStartDate()
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id = $("#hiddenCardId").val();
 	var date = $("#startDate").val(); // 8 March, 2018 --> Mar 08 at  18:00
 	var time = $("#startDateTime").val();
@@ -1750,7 +1849,7 @@ function modalStartDate()
 		$.ajax({
 			  type: "POST",
 			  url: "board/setStartDate",
-			  data: {id:id,date:date,time:time},
+			  data: {id:id,date:date,time:time,boardId:boardId},
 			  success: function (response) {
 				  //alert(response);
 				  $("#ajaxStartDate").empty();
@@ -1784,6 +1883,7 @@ function modalDueDate()
 	var id = $("#hiddenCardId").val();
 	var date = $("#dueDate").val();
 	var time = $("#dueDateTime").val();
+	var boardId = $("#hiddenBoardId").val();
 	var rules = true;
 	if(date == "")
 	{
@@ -1794,9 +1894,9 @@ function modalDueDate()
 		$.ajax({
 			  type: "POST",
 			  url: "board/setDueDate",
-			  data: {id:id,date:date,time:time},
+			  data: {id:id,date:date,time:time,boardId:boardId},
 			  success: function (response) {
-				  alert(response);
+				  //alert(response);
 				  $("#ajaxDueDate").empty();
 				  $("#ajaxDueDate").append("<h6><b>Due Date</b></h6>");
 				  var pecah = date.split(" ");
@@ -1825,6 +1925,7 @@ function modalDueDate()
 
 function createChecklist()
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id = $("#hiddenCardId").val();
 	var title = $("#checklistTitle").val();
 	var rules = true;
@@ -1837,7 +1938,7 @@ function createChecklist()
 		$.ajax({
 			  type: "POST",
 			  url: "board/createChecklist",
-			  data: {id:id,title:title},
+			  data: {id:id,title:title,boardId:boardId},
 			  success: function (response) {
 				  //alert(response);
 				  var atas = "<div id='checklist"+response+"'>"
@@ -1956,13 +2057,14 @@ function createChecklistItem(index)
 
 function changeArchive()// hilang dari board
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id = $("#hiddenCardId").val();
 	var listId = $("#hiddenListId").val();
 	var status = "1";
 	$.ajax({
 			  type: "POST",
 			  url: "board/setCardArchive",
-			  data: {id:id,listId:listId,status:status},
+			  data: {id:id,listId:listId,status:status,boardId:boardId},
 			  success: function (response) {
 				  //alert(response);
 				  $("#card"+id).remove();
@@ -1980,11 +2082,12 @@ function changeArchive()// hilang dari board
 function changeArchiveMenu(id) //kembali ke board
 {
 	//send back
+	var boardId = $("#hiddenBoardId").val();
 	var status = 0;
 	$.ajax({
 		  type: "POST",
 		  url: "board/sendBackCard",
-		  data: {id:id,status:status},
+		  data: {id:id,status:status,boardId:boardId},
 		  success: function (response) {
 			  //alert(response);
 			  var split = response.split("%20");
@@ -2013,9 +2116,10 @@ function changeArchiveMenu(id) //kembali ke board
 				  		labelBlue = true;
 				  	}
 			    });
-			  var gabung	= '<a id="card'+id+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+id+'\')">';
+              var gabung = '<div class="dragable cDrag'+id+' cardUser'+listId+'" id="cDrag'+id+'" style="width:100%;height:100%;">';
+              gabung	+= '<a id="card'+id+'" href="javascript:void(0);" class="aCardUserLabel" onclick="ajaxModalCard(\''+id+'\')">';
 			  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
-			  gabung 		+= '<div class="row" id="labelCard'+id+'" style="margin:auto;">';
+			  gabung 		+= '<div class="row cardUserLabel" id="labelCard'+id+'" style="margin:auto;">';
 			  if(labelRed)
 			  {
 			  	gabung+= '<div class="task-cat red left-align red-text" style="width:45%;float:left;margin:2px;">';
@@ -2041,9 +2145,10 @@ function changeArchiveMenu(id) //kembali ke board
 			  	gabung+= "</div>";
 			  }
 			  gabung 		+= '</div>'
-			  gabung 		+= '<div class="left-align black-text" id="cardTitle'+listId+'">'+title+'</div>';
+			  gabung 		+= '<div class="left-align black-text" id="cardTitle'+id+'">'+title+'</div>';
 			  gabung 		+= '</div>';
 			  gabung 		+= '</a>';
+              gabung        += '</div>';
 			  $("#list"+listId).append(gabung);
 			  bindUiCard();
 			  $("#archiveC"+id).remove();
@@ -2088,7 +2193,6 @@ function changeArchiveList(id)
 			gabung += '</div>';
 			$(gabung).insertBefore("#listCreateList");
 			$('#listCreateList').prop('onclick',null).off('click');
-			bindUiList();
 				$('#listCreateList').on('click', function() {
 					//alert("klik + "+ cardId +" owner : "+owner);
 					//var href = $(this).attr("href");
@@ -2117,7 +2221,7 @@ function changeArchiveList(id)
 				  		labelBlue = true;
 				  	}
 				  var gabung 	= '<div class="dragable cDrag'+res.card.cardId+'" id="cDrag'+res.cardId+'" style="width:100%;height:100%;">';
-				  gabung		+= '<a id="card'+res.card.cardId+'" href="javascript:void(0);" class="cardUser'+listId+'" onclick="ajaxModalCard(\''+res.card.cardId+'\')">';
+				  gabung		+= '<a id="card'+res.card.cardId+'" href="javascript:void(0);" class="aCardUserLabel" onclick="ajaxModalCard(\''+res.card.cardId+'\')">';
 				  gabung 		+= '<div class="card-action" style="background-color:white;color:black;border-radius:5px;margin-top:8px;">';
 				  gabung 		+= '<div class="row" id="labelCard'+res.card.cardId+'" style="margin:auto;">';
 				  if(labelRed)
@@ -2145,7 +2249,7 @@ function changeArchiveList(id)
 				  	gabung+= "</div>";
 				  }
 				  gabung 		+= '</div>'
-				  gabung 		+= '<div class="left-align black-text" id="cardTitle'+listId+'">'+res.card.cardTitle+'</div>';
+				  gabung 		+= '<div class="left-align black-text" id="cardTitle'+res.card.cardId+'">'+res.card.cardTitle+'</div>';
 				  gabung 		+= '</div>';
 				  gabung 		+= '</a>';
 				  gabung 		+= '</div>';
@@ -2172,7 +2276,7 @@ function deleteList(id)
 	  url: "board/deleteList",
 	  data: {listId:listId},
 	  success: function (response) {
-		  alert(response);
+		  //(response);
 		  $("#archiveL"+id).remove();
 	  },
 	  error: function (xhr, ajaxOptions, thrownError) {
@@ -2191,7 +2295,7 @@ function deleteCard(id)
 	  url: "board/deleteCard",
 	  data: {cardId:cardId},
 	  success: function (response) {
-		  alert(response);
+		  //alert(response);
 		  $("#archiveC"+id).remove();
 		  $("#modal3").closeModal();
 	  },
@@ -2526,11 +2630,20 @@ function getAttachment(response)
 	  		{
 	  			img = "userAttachment/file.jpg";
 	  		}
+	  		var activityAttachment = $("#hiddenActivityAttachment").val();
 	  		gabung += '<img src="'+img+'" style="width:90px;height:70px;" alt="Profile" />';
 	  		gabung += '</div>';
 	  		gabung += '<div class="col s12 m6 l9" style="margin-left:15px;margin-top:-15px;">';
 	  		gabung += '<p>'+response.attachmentTitle+'</p>';
-	  		gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download <a class="roleActivityAttachment" style="" href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">- Delete</a>';
+	  		if(activityAttachment == "1")
+	  		{
+	  		    gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download </a><a class="roleActivityAttachment" style="" href="javascript:void(0);" onclick="deleteAttachment(\''+response.attachmentId+'\')">- Delete</a>';
+	  		    
+	  		}
+	  		else
+	  		{
+	  		    gabung += '<a onclick="downloadAttachment(\''+response.attachmentId+'\')" href="javascript:void(0);">Download </a>';
+	  		}
 	  		gabung += '</div>';
 	  		gabung += '</div>';
 	  		$("#ajaxAttachment").append(gabung);
@@ -2609,7 +2722,7 @@ function getBoardFavorite(response)
 {
 	if(response != null)
 	{
-		if(response.favoriteCheck == "1")
+		if(response == "1")
 		{
 			$("#testfav").prop('checked', true);
 		}
@@ -2621,7 +2734,7 @@ function getBoardSubscribe(response)
 {
 	if(response != null)
 	{
-		if(response.subscribeChecked == "1")
+		if(response == "1")
 		{
 			$("#testsub").prop('checked', true);
 		}
@@ -2690,11 +2803,12 @@ function changeEditBoard()
 
 function deleteAttachment(id)
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id=id;
 	$.ajax({
 		  type: "POST",
 		  url: "board/deleteAttachment",
-		  data: {id:id},
+		  data: {id:id,boardId:boardId},
 		  success: function (response) {
 		  	$("#attachmentUser"+id).remove();
 		  },
@@ -2709,11 +2823,12 @@ function deleteAttachment(id)
 
 function deleteChecklist(id)
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id=id;
 	$.ajax({
 		  type: "POST",
 		  url: "board/deleteChecklist",
-		  data: {id:id},
+		  data: {id:id,boardId:boardId},
 		  success: function (response) {
 		  	//alert(response);
 		  	$("#checklist"+id).remove();
@@ -2734,7 +2849,7 @@ function deleteChecklistItem(id)
 		  url: "board/deleteChecklistItem",
 		  data: {id:id},
 		  success: function (response) {
-		  	alert(response);
+		  	//alert(response);
 		  	$("#item"+id).remove();
 		  },
 		  error: function (xhr, ajaxOptions, thrownError) {
@@ -2786,11 +2901,12 @@ function changeItem(id)
 
 function deleteStartDate(id)
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id = id;
 	$.ajax({
 		  type: "POST",
 		  url: "board/deleteStartDate",
-		  data: {id:id},
+		  data: {id:id,boardId:boardId},
 		  success: function (response) {
 		  	//alert(response);
 		  	$("#ajaxStartDate").empty();
@@ -2832,12 +2948,12 @@ function changeStartDateChecked(id)
 
 function deleteDueDate(id)
 {
+	var boardId = $("#hiddenBoardId").val();
 	var id = id;
-	alert(id);
 	$.ajax({
 		  type: "POST",
 		  url: "board/deleteDueDate",
-		  data: {id:id},
+		  data: {id:id,boardId:boardId},
 		  success: function (response) {
 		  	//alert(response);
 		  	$("#ajaxDueDate").empty();
@@ -3266,7 +3382,6 @@ function openModalGanttChart()
 				        rows
 				    );
 
-
 			      var options = {
 			        gantt: {
 			          trackHeight: 30
@@ -3366,10 +3481,10 @@ function openStatus()
 		  data: {boardId:boardId},
 		  dataType:"json",
 		  success: function (response) {
+		  	console.log(response);
 		  	var date = response["date"];
 		  	var item = response["item"];
-		  	console.log(item);
-		  	if(date != false || date != null)
+		  	if(date != false)
 		  	{
 		  		var split = date.date.split(" ");
 		  		var date = split[0];
@@ -3393,7 +3508,14 @@ function openStatus()
 			//var item ='<p> <input type="checkbox" id="test3" /><label for="test3">Satu</label></p>';
 			gabung += '<div id="checklistItem'+"ProgressChecklist"+'"></div>';
 			gabung += '<div id="itemBoard'+'">';
-			gabung += '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+			if($("#hiddenUserRole").val() == "Creator")
+			{
+				gabung += '<p><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+			}
+			else
+			{
+				gabung += '<p style="display:none;"><a href="javascript:void(0);" onclick="changeInputBoard()">Add an item</a></p>';
+			}
 			gabung += '</div>';
 			gabung +=  '</div>';
 			gabung += '<div class="col s12 m6 l1 ">';
@@ -4244,6 +4366,7 @@ function showMemberRole()
 		  success: function (response) {
 			//alert(response);
 			$("#ajaxInviteMember").empty();
+			var boardGroup = $("#hiddenBoardGroup").val();
 			$.each(response, function(idx, response){
 				var directory = getDirectoryUser(response.userId);
 				var name = getNameUser(response.userId);
@@ -4265,10 +4388,18 @@ function showMemberRole()
 				}
 				else if(response.memberRole == "Collaborator")
 				{
+					if(boardGroup == "1")
+					{
+						gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToCreator(\''+response.userId+'\')" class="blue-text lighten-2 ultra-small"> Change to Creator</a>';
+					}
 					gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToClient(\''+response.userId+'\')" class="green-text lighten-2 ultra-small"> Change to Client</a>';
 				}
 				else if(response.memberRole == "Client")
 				{
+					if(boardGroup == "1")
+					{
+						gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToCreator(\''+response.userId+'\')" class="blue-text lighten-2 ultra-small"> Change to Creator</a>';
+					}
 					gabung += ' -<a href="javascript:void(0);" onclick="changeMemberToCollaborator(\''+response.userId+'\')" class="green-text lighten-2 ultra-small"> Change to Collaborator</a>';
 				}
 				if(userId != response.userId)
@@ -4329,6 +4460,14 @@ function changeMemberToClient(userId)
 	var userId = userId;
 	var boardId = $("#hiddenBoardId").val();
 	var role = "Client";
+	changeMember(role,userId,boardId);
+}
+
+function changeMemberToCreator(userId)
+{
+	var userId = userId;
+	var boardId = $("#hiddenBoardId").val();
+	var role = "Creator";
 	changeMember(role,userId,boardId);
 }
 
@@ -4403,38 +4542,18 @@ function createChat(name,directory,text)
     gabung +=     '<div class="col s8">';
     gabung +=         '<p>'+name+'</p>';
     gabung +=        '<p class="place black-text">'+text+'</p>';
-    gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
     gabung +=     '</div>';
     gabung += '</div>';
-    $("#ajaxChat").append(gabung);
-	$("#chatText").val("");
+    $("#ajaxChat").prepend(gabung);
 
 }
 
 $(document).ready(function() {
 	var boardId = $("#hiddenBoardId").val();
-	var conn = new WebSocket('ws://localhost:8080');
-	conn.onopen = function(e) {
-		console.log("Connection established!");
-	};
-
-	conn.onmessage = function(e) {
-		console.log(e.data);
-		var response = JSON.parse(e.data);
-		var gabung = "";
-  		var name = response.name;
-  		var directory = response.directory;
-  		gabung += '<div class="favorite-associate-list chat-out-list row">';
-        gabung +=     '<div class="col s4"><img src="'+directory+'" alt="" class="circle responsive-img online-user valign profile-image">';
-        gabung +=     '</div>';
-        gabung +=     '<div class="col s8">';
-        gabung +=         '<p>'+name+'</p>';
-        gabung +=        '<p class="place black-text">'+response.text+'</p>';
-        gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
-        gabung +=     '</div>';
-        gabung += '</div>';
-        $("#ajaxChat").append(gabung);
-	};
+    if($(".colListUser").length == 1)
+    {
+        Materialize.toast('<span>Your board is empty! <br>Create 3 list with title To Do, In Progress and Done! <br>Then, add a card for each of your task in list To Do.</span>', 10000);
+    }
 	$.ajax({
 		  type: "POST",
 		  url: "board/getChat",
@@ -4445,15 +4564,14 @@ $(document).ready(function() {
 			$("#ajaxChat").empty();
 			$.each(response, function(idx, response){
 			  		var gabung = "";
-			  		var name = getNameUser(response.userId);
-			  		var directory = getDirectoryUser(response.userId);
+			  		var name = response.userName;
+			  		var directory = response.userImage;
 			  		gabung += '<div class="favorite-associate-list chat-out-list row">';
                     gabung +=     '<div class="col s4"><img src="'+directory+'" alt="" class="circle responsive-img online-user valign profile-image">';
                     gabung +=     '</div>';
                     gabung +=     '<div class="col s8">';
                     gabung +=         '<p>'+name+'</p>';
-                    gabung +=        '<p class="place black-text">'+response.chatText+'</p>';
-                    gabung +=         '<p class="ultra-small grey-text lighten-3">just now</p>';
+                    gabung +=        '<p class="place black-text">'+response.chat.chatText+'</p>';
                     gabung +=     '</div>';
                     gabung += '</div>';
                     $("#ajaxChat").append(gabung);
@@ -4482,18 +4600,7 @@ $(document).ready(function() {
 					  data: {boardId:boardId,chatText:chatText},
 					  dataType:"json",
 					  success: function (response) {
-						//alert(response);
-						var gabung = "";
-				  		var name = response.userName;
-				  		var directory = response.userImage;
-				  		createChat(name,directory,chatText);
-			            var obj = { "name":name, 
-							        "directory":directory, 
-							        "text":chatText
-							      };
-			            var myJSON = JSON.stringify(obj);
-			            conn.send(myJSON);
-
+                        	$("#chatText").val("");
 					  },
 					  error: function (xhr, ajaxOptions, thrownError) {
 						alert(xhr.status);
@@ -4527,18 +4634,7 @@ $(document).ready(function() {
 					  data: {boardId:boardId,chatText:chatText},
 					  dataType:"json",
 					  success: function (response) {
-						//alert(response);
-						var gabung = "";
-				  		var name = response.userName;
-				  		var directory = response.userImage;
-				  		createChat(name,directory,chatText);
-			            var obj = { "name":name, 
-							        "directory":directory, 
-							        "text":chatText
-							      };
-			            var myJSON = JSON.stringify(obj);
-			            conn.send(myJSON);
-
+	                        $("#chatText").val("");
 					  },
 					  error: function (xhr, ajaxOptions, thrownError) {
 						alert(xhr.status);

@@ -1,12 +1,9 @@
-
-<!-- START HEADER -->
 <header id="header" class="page-topbar">
-	<!-- start header nav-->
 	<div class="navbar-fixed">
 		<nav class="navbar-color">
 			<div class="nav-wrapper">
 				<ul class="left">                      
-				  <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
+				  <li><h1 class="logo-wrapper"><a href="home" class="brand-logo darken-1"><img src="images/materialize-logo.png" alt="materialize logo"></a> <span class="logo-text">Materialize</span></h1></li>
 				</ul>
 				<div class="header-search-wrapper hide-on-med-and-down">
 					<i class="mdi-action-search"></i>
@@ -32,7 +29,6 @@
 		                    ?>" width="32px" height="32px" style="border-radius:50%" /></a>
 					</li>
 				</ul>
-				<!-- translation-button -->
 				<ul id="translation-dropdown" class="dropdown-content">
 				  <li>
 					<a href="userProfile?userId=<?php echo $userId ?>"><img src="<?php 
@@ -108,7 +104,7 @@
 				</li> 
 				<li>
 					<?php
-						if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+						if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardCreate == "1") || ($role == "Client" && $roleClient->cardCreate == "1") )
 						{
 							echo '<a href="#modalcreatecarddua" class="cyan-text modal-trigger roleCreateCard">';
 						}
@@ -151,13 +147,9 @@
 			  </ul>
 			</div>
 		  </nav>
-		<!-- HORIZONTL NAV END-->
 	</div>
-	<!-- end header nav-->
 </header>
-<!-- END HEADER -->
 
-<!-- START LEFT SIDEBAR NAV-->
 <aside id="left-sidebar-nav hide-on-large-only">
     <ul id="slide-out" class="side-nav leftside-navigation ">
         <li class="user-details cyan darken-2">
@@ -186,70 +178,177 @@
         </li>
         <li class="bold active"><a href="home" class="waves-effect waves-cyan"><i class="mdi-action-dashboard"></i> Home</a>
         </li>
-        <li class="bold active roleClient"><a href="javascript:void(0);" onclick="openModalInvite()" class="waves-effect waves-cyan"><i class="mdi-social-person-add"></i>Invite</a>
+    	<?php
+				if($role == "Creator")
+				{
+					echo '<li class="bold active roleCreator" style="">';
+				}
+				else
+				{
+					echo '<li class="bold active roleCreator" style="display:none;">';
+				}
+		?>
+        	<a href="javascript:void(0);" onclick="openModalInvite()" class="waves-effect waves-cyan">
+        	<i class="mdi-social-person-add"></i>Invite</a>
         </li>
-        <li class="bold active"><a href="#modalcreatelist" class="waves-effect waves-cyan modal-trigger"><i class="mdi-action-list"></i> Create List</a>
+        <li class="bold active"><a href="javascript:void(0);" onclick="openStatus()" class="cyan-text"><i class="mdi-action-assignment"></i>Status</a>
         </li>
-        <li class="bold active"><a href="#modalcreatecard" class="waves-effect waves-cyan modal-trigger"><i class="mdi-content-add"></i> Create Card</a>
+        <li class="bold active">
+        	<?php
+				if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+				{
+					echo '<a href="#modalcreatelist" class="waves-effect waves-cyan modal-trigger roleCreateList">';
+				}
+				else
+				{
+					echo '<a href="#modalcreatelist" class="waves-effect waves-cyan modal-trigger roleCreateList" style="display:none;">';
+				}
+			?>
+        		<i class="mdi-action-list"></i> 
+        		Create List
+        	</a>
+        </li>
+        <li class="bold active">
+        	<?php
+				if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardCreate == "1") || ($role == "Client" && $roleClient->cardCreate == "1") )
+				{
+					echo '<a href="#modalcreatecarddua" class="waves-effect waves-cyan modal-trigger roleCreateCard">';
+				}
+				else
+				{
+					echo '<a href="#modalcreatecarddua" class="waves-effect waves-cyan modal-trigger roleCreateCard" style="display:none;">';
+				}
+			?>
+        	<i class="mdi-content-add"></i> Create Card</a>
         </li>
         <li class="bold active"><a href="javascript:void(0);" class="cyan-text chat-collapse " data-activates="chat-out" data-sidenav="right" data-closeonclick="false"><i class="mdi-communication-chat"></i>Chat Board</a>
         </li>
-        <li class="bold active"><a href="calender" class="waves-effect waves-cyan"><i class="mdi-action-schedule"></i> Calender Board</a>
+        <li class="bold active"><a href="<?php 
+					$boardId = "";
+					foreach($board as $r)
+					{
+						$boardId = $r->boardId;
+					}
+					echo "calendar?id=".$boardId; 
+
+					?>" class="waves-effect waves-cyan"><i class="mdi-action-schedule"></i> Calender Board</a>
         </li>
-        <li class="bold active"><a href="#modalmore" class="waves-effect waves-cyan modal-trigger"><i class="mdi-navigation-more-horiz"></i> More</a>
+        <li class="bold active"><a href="javascript:void(0);" onclick="ajaxModalMore()" class="waves-effect waves-cyan"><i class="mdi-navigation-more-horiz"></i> More</a>
         </li>
         <div class="divider"></div>
-        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Profile</a>
+        <li class="bold active"><a href="userProfile?userId=<?php echo $userId ?>" class="waves-effect waves-cyan">Profile</a>
         </li>
-        <li class="bold active"><a href="javascript:void(0);" class="waves-effect waves-cyan">Log Out</a>
+        <li class="bold active"><a href="javascript:void(0);" onclick="cekLogout()" class="waves-effect waves-cyan">Log Out</a>
         </li>
     </ul>
     <a href="javascript:void(0);" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan"><i class="mdi-navigation-menu"></i></a>
 </aside>
 
-<!-- START MAIN -->
 <div id="main">
 	<div id="result"></div>
-	<!-- START WRAPPER -->
 	<div class="wrapper">
-
-		<!-- START CONTENT -->
 		<section id="content">
-
-			<!--start container-->
 			<div class="container">
-				<!-- trello start here -->
 				<div class="section">
-					<!-- BOARD -->
 					<div class="row" style="margin-top:-20px;">
 						<div class="col s6 m4 l4">
 							<h1><b>
 								<?php
 									foreach($board as $r)
 									{
-										echo "<p id='boardTitle'>".$r->boardTitle."</p>";
+										echo "<p id='boardTitle'>".$r->boardTitle." </p><p style='font-size:12px;'>".$userProfile->userName." as ".$role."</p> ";
 										echo "<input type='hidden' id='hiddenBoardId' value='".$r->boardId."'>";
 										echo "<input type='hidden' id='hiddenUserId' value='".$userId."'>";
 										echo "<input type='hidden' id='hiddenUserRole' value='".$role."'>";
-
+										echo "<input type='hidden' id='hiddenBoardGroup' value='".$r->boardGroup."'>";
 									}
+									$listCreate = "0";
+									$listEdit = "0";
+									$listDelete = "0";
+									$cardEdit = "0";
+									$cardDelete = "0";
+									$cardCreate = "0";
+									$activityAM = "0";
+									$activityLabel = "0";
+									$activityChecklist = "0";
+									$activityStartDate = "0";
+									$activityDueDate = "0";
+									$activityAttachment = "0";
+									if($role == "Creator")
+									{
+										$listCreate = "1";
+										$listEdit = "1";
+										$listDelete = "1";
+										$cardEdit = "1";
+										$cardDelete = "1";
+										$cardCreate = "1";
+										$activityAM = "1";
+										$activityLabel = "1";
+										$activityChecklist = "1";
+										$activityStartDate = "1";
+										$activityDueDate = "1";
+										$activityAttachment = "1";
+									}
+									else if($role == "Collaborator")
+									{
+										$listCreate = $roleCollaborator->listEdit;
+										$listEdit = $roleCollaborator->listEdit;
+										$listDelete = $roleCollaborator->listDelete;
+										$cardCreate = $roleCollaborator->cardCreate;
+										$cardEdit = $roleCollaborator->cardEdit;
+										$cardDelete = $roleCollaborator->cardDelete;
+										$activityAM = $roleCollaborator->activityAM;
+										$activityLabel = $roleCollaborator->activityLabel;
+										$activityChecklist = $roleCollaborator->activityChecklist;
+										$activityStartDate = $roleCollaborator->activityStartDate;
+										$activityDueDate = $roleCollaborator->activityDueDate;
+										$activityAttachment = $roleCollaborator->activityAttachment;
+									}
+									else if($role == "Client")
+									{
+										$listCreate = $roleClient->listEdit;
+										$listEdit = $roleClient->listEdit;
+										$listDelete = $roleClient->listDelete;
+										$cardCreate = $roleClient->cardCreate;
+										$cardEdit = $roleClient->cardEdit;
+										$cardDelete = $roleClient->cardDelete;
+										$activityAM = $roleClient->activityAM;
+										$activityLabel = $roleClient->activityLabel;
+										$activityChecklist = $roleClient->activityChecklist;
+										$activityStartDate = $roleClient->activityStartDate;
+										$activityDueDate = $roleClient->activityDueDate;
+										$activityAttachment = $roleClient->activityAttachment;
+									}
+									echo "<input type='hidden' id='hiddenListEdit' value='".$listEdit."'>";
+									echo "<input type='hidden' id='hiddenListCreate' value='".$listCreate."'>";
+									echo "<input type='hidden' id='hiddenListDelete' value='".$listDelete."'>";
+
+									echo "<input type='hidden' id='hiddenCardCreate' value='".$cardCreate."'>";
+									echo "<input type='hidden' id='hiddenCardEdit' value='".$cardEdit."'>";
+									echo "<input type='hidden' id='hiddenCardDelete' value='".$cardDelete."'>";
+
+									echo "<input type='hidden' id='hiddenActivityAM' value='".$activityAM."'>";
+									echo "<input type='hidden' id='hiddenActivityLabel' value='".$activityLabel."'>";
+									echo "<input type='hidden' id='hiddenActivityChecklist' value='".$activityChecklist."'>";
+									echo "<input type='hidden' id='hiddenActivityStartDate' value='".$activityStartDate."'>";
+									echo "<input type='hidden' id='hiddenActivityDueDate' value='".$activityDueDate."'>";
+									echo "<input type='hidden' id='hiddenActivityAttachment' value='".$activityAttachment."'>";
 								?>
 							</b></h1>
 						</div>
-						<div class="col s6 m4 l8">
+						<div class="col s6 m4 l8" style="">
 							<p><b><u>Filter Card</u></b></p>
 							<input type="checkbox" id="filterred" onchange="setFilter()" />
-	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+	                      	<label for="filterred"><div style="background-color:red;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;border:1px solid white;border-radius:15%;"></div></label>
                       		<input type="checkbox" id="filteryellow" onchange="setFilter()"/>
-	                      	<label for="filteryellow"><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+	                      	<label for="filteryellow"><div style="background-color:yellow;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;border:1px solid white;border-radius:15%;"></div></label>
                       		<input type="checkbox" id="filtergreen" onchange="setFilter()" />
-	                      	<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+	                      	<label for="filtergreen"><div style="background-color:green;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;border:1px solid white;border-radius:15%;"></div></label>
                       		<input type="checkbox" id="filterblue" onchange="setFilter()"/>
-	                      	<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;"></div></label>
+	                      	<label for="filterblue"><div style="background-color:blue;width:32px;height:32px;border-radius:15%;margin-left:-12px;margin-top:-5px;margin-right:12px;border:1px solid white;border-radius:15%;"></div></label>
 						</div>
 					</div>
 					</div>
-					<!-- MODAL MENU BOARD-->
 					<div id="modalinvite" class="modal">
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
@@ -263,8 +362,15 @@
 										<option value="Client">Client</option>
 									</select>
 									<a href="javacsript:void(0);" class="waves-effect waves-red btn" onclick="sendInvite()">Invite</a>
-
 								</div>
+								<div class="col s12 m6 l6">
+									<p><b>Invitation Link</b></p>
+									Collaborator : <input type="text" placeholder="Invitation link for Collaborator" value="http://www.taff.top/invite/getInvite/<?php echo $boardId ?>/Collaborator" disabled><br>
+									
+									Client : <input type="text" placeholder="Invitation link for Collaborator" value="http://www.taff.top/invite/getInvite/<?php echo $boardId ?>/Client" disabled><br>
+								</div>
+							</div>
+							<div class="row">
 								<div class="col s12 m6 l12">
 									<p><b>Members</b></p>
 									<div class="row" id="ajaxInviteMember">
@@ -300,7 +406,16 @@
 							<div class="row">
 								<h6><b>Board status..</b></h6>
 								<p>Board deadline..</p>
-									<input type="date" class="datepicker" id="progressDate">
+									<?php
+										if($role == "Creator")
+										{
+											echo '<input type="date" class="datepicker" id="progressDate">';
+										}
+										else
+										{
+											echo '<input type="date" class="datepicker" id="progressDate" disabled>';
+										}
+									?>
 								<p>Progress</p>
 									<div id="ajaxProgressChecklist">
 									</div>
@@ -320,6 +435,8 @@
 								<div class="divider"></div>
 								<p>Title</p>
 								<input type="text" placeholder="Title.." id="titleCard">
+								<p>Description</p>
+								<input type="text" value="" placeholder="Description.." id="descriptionCard">
 							</div>
 						</div>
 					  </div>
@@ -336,6 +453,8 @@
 								<div class="divider"></div>
 								<p>Title</p>
 								<input type="text" placeholder="Title.." id="titleCardManual">
+								<p>Description</p>
+								<input type="text" value="" placeholder="Description.." id="descriptionCardManual">
 								<select id="listCardManual">
 									<option value="0"  disabled selected>Choose list..</option>
 									<?php
@@ -344,7 +463,6 @@
 											echo '<option class="black-text" value="'.$l->listId.'">'.$l->listTitle.'</option>';
 										}
 									?>
-
 								</select>
 							</div>
 						</div>
@@ -403,6 +521,22 @@
 													</div>
 													<div class="col s12 m6 l2">
 														<i id="bgBlue" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
+													</div>
+												</li>
+												<li onclick="changeBackground('view1')">
+													<div class="col s12 m6 l9">
+														<div style="background:url('view1.jpg');width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
+													</div>
+													<div class="col s12 m6 l2">
+														<i id="bgView1" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
+													</div>
+												</li>
+												<li onclick="changeBackground('view2')">
+													<div class="col s12 m6 l9">
+														<div style="background:url('view2.jpg');width:100%;height:100%;margin:5px;top:0px;left:0px;border-radius:5%;">&nbsp</div>
+													</div>
+													<div class="col s12 m6 l2">
+														<i id="bgView2" style="margin:5px;display:none;" class="mdi-navigation-check black-text"></i>
 													</div>
 												</li>
 											</ul>
@@ -507,10 +641,6 @@
 						<a href="javascript:void(0);" class="waves-effect waves-red btn-flat modal-action modal-close">Close</a>
 					  </div>
 					</div>
-
-
-					<!-- END OF MODAL MENU BOARD-->
-					<!-- MODAL LIST-->
 					<div id="modallistmenu" class="modal">
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
@@ -653,8 +783,6 @@
 						<a href="javascript:void(0);" onclick="saveMoveAllCardList()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
-					<!-- END OF MODAL LIST-->
-					<!-- MODAL MENU MORE-->
 					<div id="modaleditboard" class="modal">
 					  <div class="modal-content">
 						<div class="col s12 m6 l12">
@@ -849,8 +977,6 @@
 						<a href="javascript:void(0);" onclick="createRole()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
-					<!-- END OF MODAL MENU MORE-->
-					<!-- MODAL ACTION CARD-->
 					<input type="hidden" id="hiddenCardId">
 					<div id="modaleditcard" class="modal">
 					  <div class="modal-content">
@@ -964,11 +1090,29 @@
 							<div class="row">
 								<h6><b>Archived items..</b></h6>
 								<div class="divider"></div>
-								<div class="col s12 m6 l6" id="archiveList">
+								<?php
+								    if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listDelete == "1") || ($role == "Client" && $roleClient->listDelete == "1") )
+									{
+										echo '<div id="archiveList" class="col s12 m6 l12 roleDeleteList" style="">';
+									}
+									else
+									{
+										echo '<div id="archiveList" class="col s12 m6 l12 roleDeleteList" style="display:none;">';
+									}
+								?>
 									<p><b>Lists</b></p>
 									<div class="divider"></div>
 								</div>
-								<div class="col s12 m6 l6" id="archiveCard">
+								<?php
+								    if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardDelete == "1") || ($role == "Client" && $roleClient->cardDelete == "1") )
+									{
+										echo '<div id="archiveCard" class="col s12 m6 l12 roleDeleteCard" style="">';
+									}
+									else
+									{
+										echo '<div id="archiveCard" class="col s12 m6 l12 roleDeleteCard" style="display:none;">';
+									}
+								?>
 									<p><b>Cards</b></p>
 									<div class="divider"></div>
 								</div>
@@ -1121,8 +1265,6 @@
 						<a href="javascript:void(0)" onclick="setCopyCard()" class="waves-effect waves-red btn-flat modal-action modal-close">Save</a>
 					  </div>
 					</div>
-					<!-- END OF MODAL ACTION CARD-->
-					<!-- MODAL CARD-->
 					<div id="modal3" class="modal modal-fixed-footer grey lighten-3" style="width:70%;">
 					  <div class="modal-content grey lighten-3 black-text left-align">
 							<div class="row">
@@ -1170,7 +1312,7 @@
 									</div>
 									<div class="divider"></div>
 									<div class="row">
-										<div class="col 12 m3 l4" id="iconMember">
+										<div class="col 12 m3 l4" id="iconMember" <?php if($role=="Client")echo "style='display:none;'"?>>
 											<h6><b>Members</b></h6>	
 										</div>
 										<div class="col 12 m3 l2">
@@ -1193,26 +1335,26 @@
 									</div>
 									<div class="divider"></div>
 									<div class="row" >
-										<div class="col s12 m6 l12" id="ajaxAttachment">
+										<div class="col s12 m6 l12" id="ajaxAttachment" <?php if($role=="Client")echo "style='display:none;'"?>>
 										</div>
 									</div>
 									<div class="divider"></div>
 									<div class="row" id="ajaxChecklist">
 									</div>
 									<div class="divider"></div>
-									<div class="row">
+									<div class="row" <?php if($role=="Client")echo "style='display:none;'"?>>
 										<div class="col s12 m6 l12">
 										<h6><b>Add Comment</b></h6>
 										<textarea id="textareaComment" class="materialize-textarea" ></textarea> <a class="waves-effect waves-light light-blue lighten-1 btn" onclick="createCardComment()">Save</a>
 										</div>
 									</div>
-									<div class="divider" style="margin-top:5px;"></div>
-									<div class="row">
+									<div class="divider" style="margin-top:5px;" ></div>
+									<div class="row" <?php if($role=="Client")echo "style='display:none;'"?>>
 										<div class="col s12 m6 l12">
 										<h6><b>Comments</b></h6>
 										</div>
 									</div>
-									<div id='ajaxComment'>
+									<div id='ajaxComment' <?php if($role=="Client")echo "style='display:none;'"?>>
 									</div>
 								</div>
 								<div class="col s12 m6 l3">
@@ -1326,7 +1468,7 @@
 										<a href="#modalmove" class="modal-trigger btn-flat waves-effect">Move</a>
 									</div>
 									<?php
-										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardCreate == "1") || ($role == "Client" && $roleClient->cardCreate == "1") )
 										{
 											echo '<div class="row roleCreateCard" style="margin-top:5px;">';
 										}
@@ -1348,7 +1490,6 @@
 											echo '<div id="changeArchive" class="row roleDeleteCard" style="margin-top:5px;display:none;">';
 										}
 									?>
-									
 										<a href="javascript:void(0);" class="btn-flat waves-effect" onclick="changeArchive()">Archive</a>
 									</div>
 									<div id="changeSend" style="display:none;">
@@ -1387,7 +1528,6 @@
 						<a class="waves-effect waves-green btn-flat  modal-close">Close</a>
 					  </div>
 					</div>
-					<!-- END OF MODAL ACTION CARD-->
 					<div id="card-stats">
 							<!-- LIST -->
 							<?php
@@ -1449,7 +1589,7 @@
 
 										}
 										echo 			'</div>';
-										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
+										if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->cardCreate == "1") || ($role == "Client" && $roleClient->cardCreate == "1") )
 										{
 											echo            '<div class="card-compare grey lighten-2 roleCreateCard" style="margin-top:8px;border-radius:5px;">';
 										}
@@ -1473,7 +1613,7 @@
 								}
 								else
 								{
-									echo '<div class="colListUser roleCreateList" style="" id="listCreateList">';	
+									echo '<div class="colListUser roleCreateList" style="display:none;" id="listCreateList">';	
 								}
 								echo	'<div class="card">';
 								echo		'<div class="card-content grey white-text">';
@@ -1487,29 +1627,8 @@
 					</div>
 				
 				</div>
-
-
-
-
-
-				<!-- Floating Action Button -->
-				<div class="fixed-action-btn" style="bottom: 50px; right: 19px;">
-					<a class="btn-floating btn-large">
-					  <i class="mdi-action-stars"></i>
-					</a>
-					<ul>
-					  <li><a href="css-helpers.html" class="btn-floating red"><i class="large mdi-communication-live-help"></i></a></li>
-					  <li><a href="app-widget.html" class="btn-floating yellow darken-1"><i class="large mdi-device-now-widgets"></i></a></li>
-					  <li><a href="app-calendar.html" class="btn-floating green"><i class="large mdi-editor-insert-invitation"></i></a></li>
-					  <li><a href="app-email.html" class="btn-floating blue"><i class="large mdi-communication-email"></i></a></li>
-					</ul>
-				</div>
-				<!-- Floating Action Button -->
 			</div>
-			<!--end container-->
 		</section>
-		<!-- END CONTENT -->
-		      <!-- START RIGHT SIDEBAR NAV-->
   	<aside id="right-sidebar-nav">
         <ul id="chat-out" class="side-nav rightside-navigation">
             <li class="li-hover">
@@ -1540,12 +1659,4 @@
     </aside>
 
 	</div>
-	<!-- END WRAPPER -->
 </div>
-<!-- END MAIN -->
-
-<script>
-//var myVar = setInterval(function(){ myTimer() }, 1000);
-
-//document.getElementById("btnDropbox").appendChild(button);
-</script>

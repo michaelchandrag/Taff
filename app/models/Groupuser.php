@@ -150,6 +150,21 @@ class Groupuser extends \Phalcon\Mvc\Model
         $group->save();
     }
 
+    public function changeDataAdmin($groupId,$groupName,$groupDescription,$groupWebsite,$groupLocation,$groupStatus)
+    {
+        $group = Groupuser::findFirst(
+            [
+                "groupId='".$groupId."'" 
+            ]
+        );
+        $group->groupName = $groupName;
+        $group->groupDescription = $groupDescription;
+        $group->groupWebsite = $groupWebsite;
+        $group->groupLocation = $groupLocation;
+        $group->groupStatus = $groupStatus;
+        $group->save();
+    }
+
     public function deleteGroup($groupId)
     {
         $group = Groupuser::findFirst(
