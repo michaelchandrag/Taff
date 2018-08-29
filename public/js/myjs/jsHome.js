@@ -17,6 +17,7 @@ function createBoard()
 			  url: "home/createBoard",
 			  data: {title:title,owner:owner},
 			  success: function (response) {
+			  	alert(response);
 				  var gabung = "";
 				  var date = new Date();
 				  var tgl = date.getDate();

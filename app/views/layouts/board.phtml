@@ -9,8 +9,8 @@
 <body id="layouts-horizontal" class="<?php echo $color ?>">
 	<?php echo $this->getContent(); ?>
     <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="vg8ohgasmo2ub48"></script>
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="js/myjs/jsBoard.js"></script>
+	  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="js/myjs/jsBoard.js?<?php echo filemtime('js/myjs/jsBoard.js')?>"></script>
     <script type="text/javascript" src="js/myjs/jsDrive.js"></script>
     <script type="text/javascript" src="js/pusher.min.js"></script>
     <script>

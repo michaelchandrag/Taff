@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class HomeController extends ControllerBase
 {
 
@@ -110,8 +111,9 @@ class HomeController extends ControllerBase
 
     public function createBoardAction()
     {
-        $title = $_POST["title"];
-        $owner = $_POST["owner"];
+        $request = new Request();
+        $title = $this->request->getPost("title");
+        $owner = $this->request->getPost("owner");
         $public = "1";
         $status = '1';
         $background = "blue";
@@ -198,12 +200,13 @@ class HomeController extends ControllerBase
             $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         }
         $this->view->disable();
-        echo $id;
+        $this->response->setContent($id);
+        return $this->response->send();
     }
 
     public function createGroupAction()
     {
-        $name = $_POST["name"];
+        $name = $this->request->getPost("name");
         $status = "1";
         $userId = $this->session->get("userId");
         $groupUser = new Groupuser();
@@ -215,8 +218,8 @@ class HomeController extends ControllerBase
         $role = "Admin";
         $groupMember->insertGroupMember($userId,$groupId,$role,$status);
         $this->view->disable();
-
-        echo $groupId;
+        $this->response->setContent($groupId);
+        return $this->response->send();
     }
 
     public function getClosedBoardAction()
@@ -228,13 +231,14 @@ class HomeController extends ControllerBase
             ]
         );
         $this->view->disable();
-        echo json_encode($board);
+        $this->response->setContent(json_encode($board));
+        return $this->response->send();
     }
 
     public function setClosedBoardAction()
     {
-        $boardId = $_POST["boardId"];
-        $status = $_POST["status"];
+        $boardId = $this->request->getPost("boardId");
+        $status = $this->request->getPost("status");
         $board = Board::findFirst(
             [
                 "boardId='".$boardId."'"
@@ -244,13 +248,14 @@ class HomeController extends ControllerBase
         $board->boardClosed = $status;
         $board->save();
         $this->view->disable();
-        echo $title;
+        $this->response->setContent($title);
+        return $this->response->send();
     }
 
     public function setStatusBoardAction()
     {
-        $boardId = $_POST["boardId"];
-        $status = $_POST["status"];
+        $boardId = $this->request->getPost("boardId");
+        $status = $this->request->getPost("status");
         $board = Board::findFirst(
             [
                 "boardId='".$boardId."'"
@@ -260,7 +265,8 @@ class HomeController extends ControllerBase
         $board->boardStatus = $status;
         $board->save();
         $this->view->disable();
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
 

@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class AdmloginController extends \Phalcon\Mvc\Controller
 {
 
@@ -10,8 +11,8 @@ class AdmloginController extends \Phalcon\Mvc\Controller
 
     public function loginAction()
     {
-        $email = $_POST["email"];
-        $password = $_POST["password"];
+        $email = $this->request->getPost("email");
+        $password = $this->request->getPost("password");
         $admin = Admin::findFirst(
             [
                 "conditions"=>"adminEmail='".$email."' AND adminStatus='1'"
@@ -31,7 +32,8 @@ class AdmloginController extends \Phalcon\Mvc\Controller
         }
         else
             $response = "false";
-        return $response;
+        $this->response->setContent($response);
+        return $this->response->send();
 
     }
 

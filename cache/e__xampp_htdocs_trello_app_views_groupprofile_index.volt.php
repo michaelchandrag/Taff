@@ -138,29 +138,34 @@
 		                    <img class="" src="images/user-profile-bg.jpg" alt="user background">                    
 		                </div>
 		                <figure class="card-profile-image">
-		                    <img id="groupImage" src="<?php 
-		                    if(strpos($groupUser->groupImage,"groupImage") !== false)
-		                    {
-		                   		echo $groupUser->groupImage."?".filemtime($groupUser->groupImage); 
-		                    }
-		                    else if(strpos($groupUser->groupImage,"googleusercontent.com") !== false)
-		                    {
-		                    	echo $groupUser->groupImage;
-		                    }
-		                    else
-		                    {
-		                    	echo "groupImage/group.png";
-		                    }
-
-		                    ?>" alt="profile image" class="circle z-depth-2 responsive-img">
 		                </figure>
-		                <div class="card-content">
-		                  <div class="row">                    
-		                    <div class="col s3 offset-s2">                        
+		                <div class="card-content" style="margin-top:6px;">
+		                  <div class="row">
+		                    <div class="col s5 m4 l2">
+		                    
+    		                    <img id="groupImage" src="<?php 
+    		                    if(strpos($groupUser->groupImage,"groupImage") !== false)
+    		                    {
+    		                   		echo $groupUser->groupImage."?".filemtime($groupUser->groupImage); 
+    		                    }
+    		                    else if(strpos($groupUser->groupImage,"googleusercontent.com") !== false)
+    		                    {
+    		                    	echo $groupUser->groupImage;
+    		                    }
+    		                    else
+    		                    {
+    		                    	echo "groupImage/group.png";
+    		                    }
+    
+    		                    ?>" alt="profile image" style="width:100px;height:100px;margin-left:10%;" class="circle">
+		                    </div>
+		                    <div class="col s3 m4 l8">                        
 		                        <h4 class="card-title grey-text text-darken-4"><b><?= $groupUser->groupName ?></b></h4>
 		                        <p class="medium-small grey-text"><?= $groupUser->groupWebsite ?></p>                        
 		                    </div>
-		                    <div class="col s2 center-align">
+		                  </div>
+		                  <div class="row">
+		                    <div class="col s3 center-align">
 		                        <h4 class="card-title grey-text text-darken-4">
 		                        	<?php $total = 0; ?>
 		                        	<?php foreach ($board as $b) { ?>
@@ -178,7 +183,7 @@
 		                        </h4>
 		                        <p class="medium-small grey-text">Boards</p>                        
 		                    </div>
-		                    <div class="col s2 center-align">
+		                    <div class="col s3 center-align">
 		                        <h4 class="card-title grey-text text-darken-4">
 	                        	<?php $total = 0; ?>
 	                        	<?php foreach ($groupMember as $g) { ?>
@@ -188,10 +193,11 @@
 		                    	</h4>
 		                        <p class="medium-small grey-text">Members</p>                        
 		                    </div>                   
-		                    <div class="col s2 center-align">
+		                    <div class="col s6 center-align">
 		                        <h4 class="card-title grey-text text-darken-4"><?php echo date_format(date_create($groupUser->groupCreated),"d F Y"); ?></h4>
 		                        <p class="medium-small grey-text">Created</p>                        
 		                    </div>
+		                   </div>
 		                  </div>
 		                </div>
 		            </div>
@@ -382,7 +388,7 @@
                             <div class="collapsible-header active"><i class="mdi-communication-email"></i> Profile</div>
                             <div class="collapsible-body" style="">
                               <p>
-			                    	<b id="visitGroupName"><?= $groupUser->groupName ?><?php echo $groupUser->groupName ?></b></br>
+			                    	<b id="visitGroupName"><?= $groupUser->groupName ?></b></br>
 			                    	<u><?= $groupUser->groupWebsite ?><?php echo $groupUser->groupWebsite ?></u>
                               </p>
                               <div class="divider"></div>

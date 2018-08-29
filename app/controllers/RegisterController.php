@@ -2,6 +2,8 @@
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\Email;
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class RegisterController extends \Phalcon\Mvc\Controller
 {
 
@@ -12,9 +14,9 @@ class RegisterController extends \Phalcon\Mvc\Controller
 
     public function registerAction()
     {
-        $name = $_POST["name"];
-        $email = $_POST["email"];
-        $password = $_POST["password"];
+        $name = $this->request->getPost("name");
+        $email = $this->request->getPost("email");
+        $password = $this->request->getPost("password");
         $validation = new Validation();
         $validation->add(
             'name',

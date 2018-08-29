@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class LoginController extends \Phalcon\Mvc\Controller
 {
 
@@ -10,8 +11,8 @@ class LoginController extends \Phalcon\Mvc\Controller
 
     public function loginAction()
     {
-        $email = $_POST["email"];
-        $password = $_POST["password"];
+        $email = $this->request->getPost("email");
+        $password = $this->request->getPost("password");
         $password = md5($password);
         $remember = $_POST["remember"];
         $user = new User();
@@ -28,11 +29,13 @@ class LoginController extends \Phalcon\Mvc\Controller
                 );
             }
             $this->session->set("userId", $id);
-            echo "Berhasil";
+            $this->response->setContent("Berhasil");
+            return $this->response->send();
         }
         else
         {
-            echo "Error";
+            $this->response->setContent("Error");
+            return $this->response->send();
         }
     }
 
@@ -48,21 +51,26 @@ class LoginController extends \Phalcon\Mvc\Controller
 
     public function googleLoginAction()
     {
-        $name       = $_POST["name"];
-        $email      = $_POST["email"];
-        $password   = $_POST["password"];
+        $name       = $this->request->getPost("name");
+        $email      = $this->request->getPost("email");
+        $password   = $this->request->getPost("password");
         $bio        = "";
-        $image      = $_POST["image"];
+        $image      = $this->request->getPost("image");
         $password   = md5($password);
-        $remember   = $_POST["remember"];
+        $remember   = $this->request->getPost("remember");
         $status     = "1";
         $user       = new User();
-        $match      = $user->validateUser($email);
+        //$match      = $user->validateUser($email);
+        $match = User::findFirst(
+                [
+                    "userEmail='".$email."'"    
+                ]
+            );
         $id         = "";
         $this->view->disable();
         if($match)
         {
-            $id = $user->doLogin($email,$password);
+            $id = $match->userId;
         }
         else
         {
@@ -77,7 +85,8 @@ class LoginController extends \Phalcon\Mvc\Controller
             time() + 15 * 86400
         );
         $this->session->set("userId", $id);
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
 }

@@ -1538,7 +1538,7 @@
 										echo '<div class="colListUser" id="colList'.$l->listId.'" style="">';
 										echo	'<div class="card">';
 										echo		'<div class="card-content grey lighten-2 white-text" style="height:100%;">'; //warna list
-							            echo            '<p class=" grey-text text-darken-4 truncate" style="font-weight:bold;font-size:150%;">'.$l->listTitle.'<a href="javascript:void(0);" onclick="openModalListMenu(\''.$l->listId.'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
+							            echo            '<p class="restrictedList grey-text text-darken-4 truncate" style="font-weight:bold;font-size:110%;">'.$l->listTitle.'<a href="javascript:void(0);" onclick="openModalListMenu(\''.$l->listId.'\')" class="black-text"><i class="mdi-navigation-more-vert right"></i></a></p>';
 							            echo 			'<div id="list'.$l->listId.'" class="listUser dropable sortable" style="height:100%;min-height:60px;width:100%;">';
 										
 										foreach($boardCard as $c)
@@ -1581,7 +1581,7 @@
 												}
 
 												echo 				'</div>';
-												echo				'<div class="left-align black-text" style="word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
+												echo				'<div class="restrictedCard restrictedList left-align black-text truncate" style="display:word-wrap:break-word;" id="cardTitle'.$c->cardId.'">'.$c->cardTitle.'</div>';
 												echo				'</div>';
 												echo			'</a>';
 												echo 			'</div>';
@@ -1609,11 +1609,11 @@
 								}
 								if($role == "Creator" || ($role == "Collaborator" && $roleCollaborator->listCreate == "1") || ($role == "Client" && $roleClient->listCreate == "1") )
 								{
-									echo '<div class="colListUser roleCreateList" style="" id="listCreateList">';
+									echo '<div class="restrictedList colListUser roleCreateList" style="" id="listCreateList">';
 								}
 								else
 								{
-									echo '<div class="colListUser roleCreateList" style="display:none;" id="listCreateList">';	
+									echo '<div class="restrictedList colListUser roleCreateList" style="display:none;" id="listCreateList">';	
 								}
 								echo	'<div class="card">';
 								echo		'<div class="card-content grey white-text">';

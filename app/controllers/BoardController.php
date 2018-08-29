@@ -7,6 +7,8 @@ use PhpOffice\PhpSpreadsheet\Helper\Sample;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class BoardController extends \Phalcon\Mvc\Controller
 {
 
@@ -372,7 +374,7 @@ class BoardController extends \Phalcon\Mvc\Controller
         $userNameNotification = $userNotification->userName;
         $message = $userNameNotification." copied a list called ".$title;
         $status = "1";
-        $notification->insertBoardNotification($id,$userId,$message,$status);
+        $notification->insertBoardNotification($boardId,$userId,$message,$status);
         $this->view->disable();
         echo json_encode($datas);
     }
@@ -1633,9 +1635,9 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createCommentAction()
     {
-        $boardId = $_POST["boardId"];
-        $cardId = $_POST["cardId"];
-        $text = $_POST["text"];
+        $boardId = $this->request->getPost("boardId");
+        $cardId = $this->request->getPost("cardId");
+        $text = $this->request->getPost("text");
         $userId = $this->session->get("userId");
         $status = "1";
         $comment = new Boardcomment();
@@ -1644,7 +1646,8 @@ class BoardController extends \Phalcon\Mvc\Controller
         $comment->insertBoardComment($cardId,$boardId,$userId,$text,$status);
 
         $this->view->disable();
-        echo $id;
+        $this->response->setContent($id);
+        return $this->response->send();
     }
 
     public function getCommentAction()
@@ -3454,14 +3457,16 @@ class BoardController extends \Phalcon\Mvc\Controller
             }
             $list_string .= '</div>';
         }
-        $mpdf = new \Mpdf\Mpdf();
-        //$mpdf->WriteHTML('<h1>Hello world!</h1>');
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 65,
+            'margin_bottom' => 25,
+            'margin_header' => 5,
+            'margin_footer' => 10
+        ]);
         $stylesheet = '';
         $stylesheet .= '
-            @page
-            {
-                margin:20px;
-            }
             .title{
                 font-weight:bold;
                 font-size:24px;
@@ -3527,30 +3532,42 @@ class BoardController extends \Phalcon\Mvc\Controller
             }
         ';
         $html = '';
-        $html .= '<div class="divTitle"><h1 class="title">'.'Taff.top'.'</h1></div>';
-        $html .= '<hr>';
+        $html = '<htmlpageheader name="MyHeader1">
+                    <div style="text-align: center;font-size:24px;"><b>Taff.top</b></div><br><hr>';
         $html .= '  <div class="row" style="margin-top:-15px;">
-                        <div class="col">
-                            <p><b>Board details</b><br>
-                            Title : '.$board->boardTitle.'<br>
-                            Creator : '.$creator_name.'<br>
-                            Created : '.date_format(new DateTime($b->boardCreated),"d M Y").'<br>
-                            Deadline : '.$pd.'<br>
-                            Progress : '.$pi_count.'%'.'<br>'
-                            .$pi_string.'</p>'.
-                        '</div>
-                        <div class="col">
-                            <p><b>Members</b><br>
-                            '.$bm_string.'
-                            </p>
-                        </div>'. 
-                    '</div>';
+                    <div class="col">
+                        <p><b>Board details</b><br>
+                        Title : '.$board->boardTitle.'<br>
+                        Creator : '.$creator_name.'<br>
+                        Created : '.date_format(new DateTime($b->boardCreated),"d M Y").'<br>
+                        Deadline : '.$pd.'<br>
+                        Progress : '.$pi_count.'%'.'<br>'
+                        .$pi_string.'</p>'.
+                    '</div>
+                    <div class="col">
+                        <p><b>Members</b><br>
+                        '.$bm_string.'
+                        </p>
+                    </div>'. 
+                '</div>';
         $html .= '<hr>';
+        $html .='</htmlpageheader>';
+        $html .='<htmlpagefooter name="MyFooter1">
+            <table width="100%">
+                <tr>
+                    <td width="33%"><span style="font-weight: bold; font-style: italic;">{DATE j-m-Y}</span></td>
+                    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right; ">Taff.top 2018</td>
+                </tr>
+            </table>
+        </htmlpagefooter>
+        <sethtmlpageheader name="MyHeader1" value="on" show-this-page="1" />
+        <sethtmlpagefooter name="MyFooter1" value="on" />
+        ';
         if($list_count != 0)
         {
             $html .= $list_string;
         }
-
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($html,2);
         $filename = $board->boardTitle.".pdf";
@@ -3887,9 +3904,9 @@ class BoardController extends \Phalcon\Mvc\Controller
 
     public function createInviteAction()
     {
-        $boardId = $_POST["boardId"];
-        $email = $_POST["email"];
-        $role = $_POST["role"];
+        $boardId = $this->request->getPost("boardId");
+        $email = $this->request->getPost("email");
+        $role = $this->request->getPost("role");
         $this->view->disable();
         $mail = new PHPMailer;
         $mail->isSMTP();

@@ -1,5 +1,9 @@
 <body class="cyan">
-	<?php echo $this->getContent(); ?>
-    <script type="text/javascript" src="js/myjs/jsRegister.js"></script>
+	<?php 
+        echo $this->getContent(); 
+        $src = 'js/myjs/jsRegister.js';
+        echo $this->tag->javascriptInclude(array('src'=>$src.'?'.filemtime($src)));
+    ?>
+    <!--<script type="text/javascript" src="js/myjs/jsRegister.js"></script>-->
     <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 </body>

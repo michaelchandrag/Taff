@@ -1,7 +1,17 @@
 <body id="layouts-horizontal" class="white">
-	<?php echo $this->getContent(); ?>
-    <script type="text/javascript" src="js/myjs/jsCalendar.js"></script>
+    <?php 
+        echo $this->getContent(); 
+        $src = 'js/myjs/jsCalendar.js';
+        echo $this->tag->javascriptInclude(array('src'=>$src.'?'.filemtime($src)));
+        $src = 'js/plugins/fullcalendar/lib/jquery-ui.custom.min.js';
+        echo $this->tag->javascriptInclude(array('src'=>$src.'?'.filemtime($src)));
+        $src = 'js/plugins/fullcalendar/lib/moment.min.js';
+        echo $this->tag->javascriptInclude(array('src'=>$src.'?'.filemtime($src)));
+        $src = 'js/plugins/fullcalendar/js/fullcalendar.min.js';
+        echo $this->tag->javascriptInclude(array('src'=>$src.'?'.filemtime($src)));
+    ?>
+    <!--<script type="text/javascript" src="js/myjs/jsCalendar.js"></script>
     <script type="text/javascript" src="js/plugins/fullcalendar/lib/jquery-ui.custom.min.js"></script>
     <script type="text/javascript" src="js/plugins/fullcalendar/lib/moment.min.js"></script>
-    <script type="text/javascript" src="js/plugins/fullcalendar/js/fullcalendar.min.js"></script>
+    <script type="text/javascript" src="js/plugins/fullcalendar/js/fullcalendar.min.js"></script>-->
 </body>

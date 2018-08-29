@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class McardController extends \Phalcon\Mvc\Controller
 {
 
@@ -55,9 +56,9 @@ class McardController extends \Phalcon\Mvc\Controller
 
     public function createCardAction()
     {
-        $cardTitle = $_POST["cardTitle"];
-        $listId = $_POST["listId"];
-        $userId = $_POST["userId"];
+        $cardTitle = $this->request->getPost("cardTitle");
+        $listId = $this->request->getPost("listId");
+        $userId = $this->request->getPost("userId");
         $list = Boardlist::findFirst(
             [
                 "listId='".$listId."'"

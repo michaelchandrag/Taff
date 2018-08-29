@@ -1,5 +1,7 @@
 <?php
 use Phalcon\Mvc\Url;
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class MboardController extends \Phalcon\Mvc\Controller
 {
 
@@ -55,13 +57,17 @@ class MboardController extends \Phalcon\Mvc\Controller
 
     public function createBoardAction()
     {
-        $title = $_POST["boardTitle"];
-        $owner = $_POST["groupId"];
+        $title = $this->request->getPost("boardTitle");
+        $owner = $this->request->getPost("groupId");
         $public = "1";
         $status = '1';
         $background = "blue";
         $group = "0";
-        $userId = $_POST["userId"];
+        $userId = $this->request->getPost("userId");
+        if($owner == "")
+        {
+            $owner = $userId;
+        }
         if(substr($owner,0,1) == "B")
         {
             $group = "0";
@@ -144,7 +150,8 @@ class MboardController extends \Phalcon\Mvc\Controller
             $client->insertBoardRoleClient($id,$listCreate,$listEdit,$listDelete,$cardCreate,$cardEdit,$cardDelete,$activityAM,$activityLabel,$activityChecklist,$activityStartDate,$activityDueDate,$activityAttachment,$roleStatus);
         }
         $this->view->disable();
-        echo $id;
+        $this->response->setContent($id);
+        return $this->response->send();
     }
 
     public function checkBoardAction($id)

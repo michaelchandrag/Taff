@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class MuserController extends \Phalcon\Mvc\Controller
 {
 
@@ -29,12 +30,12 @@ class MuserController extends \Phalcon\Mvc\Controller
 
     public function setUserByIdAction()
     {
-        $userId = $_POST["userId"];
-        $userName = $_POST["userName"];
-        $userBio = $_POST["userBio"];
-        $userLocation = $_POST["userLocation"];
-        $userGender = $_POST["userGender"];
-        $userStatus = $_POST["userStatus"];
+        $userId = $this->request->getPost("userId");
+        $userName = $this->request->getPost("userName");
+        $userBio = $this->request->getPost("userBio");
+        $userLocation = $this->request->getPost("userLocation");
+        $userGender = $this->request->getPost("userGender");
+        $userStatus = $this->request->getPost("userStatus");
         $profile = Userprofile::findFirst(
             [
                 "userId='".$userId."'"
@@ -46,9 +47,12 @@ class MuserController extends \Phalcon\Mvc\Controller
                 "userId='".$userId."'"
             ]
         );
-        $user->setNameAdmin($userId,$userName,$userStatus);
+        $user->userName = $userName;
+        $user->userStatus = $userStatus;
+        $user->save();
         $this->view->disable();
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
     public function createUserAction()

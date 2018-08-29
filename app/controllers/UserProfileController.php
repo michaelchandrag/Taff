@@ -1,11 +1,12 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class UserprofileController extends \Phalcon\Mvc\Controller
 {
 
     public function indexAction()
     {
-    	$userId = "";
+      $userId = "";
         if(isset($_GET["userId"]))
         {
             $userId = $_GET["userId"];
@@ -20,16 +21,16 @@ class UserprofileController extends \Phalcon\Mvc\Controller
           $owner = "true";
         else
           $owner = "false";
-       	$profile = Userprofile::findFirst(
-       		[
-       			"userId='".$userId."'"
-       		]
-       	);
-       	$board = Board::find(
-       		[
-       			"boardOwner='".$userId."'"
-       		]
-       	);
+        $profile = Userprofile::findFirst(
+          [
+            "userId='".$userId."'"
+          ]
+        );
+        $board = Board::find(
+          [
+            "boardOwner='".$userId."'"
+          ]
+        );
         $groupUser = Groupuser::find(
           [
             "groupStatus='1'"
@@ -48,17 +49,24 @@ class UserprofileController extends \Phalcon\Mvc\Controller
         $this->view->user = $user;
         $this->view->groupMember = $groupMember;
         $this->view->groupUser = $groupUser;
-       	$this->view->userProfile 	= $profile;
-       	$this->view->userId 		= $userId;
-       	$this->view->board 			= $board;
+        $this->view->userProfile  = $profile;
+        $this->view->userId     = $userId;
+        $this->view->board      = $board;
         $this->view->owner = $owner;
     }
 
     public function submitImageAction()
     {
         $this->view->disable();
-        $userId = $_POST["userId"];
+        $userId = $this->request->getPost("userId");
         $name = "userImage/".$userId.".jpg";
+        $user = Userprofile::findFirst(
+            [
+                "userId='".$userId."'"    
+            ]    
+        );
+        $user->userImage = $name;
+        $user->save();
         if ( 0 < $_FILES['file1']['error'] ) 
         {
           echo 'Error: ' . $_FILES['file1']['error'] . '<br>';
@@ -72,11 +80,11 @@ class UserprofileController extends \Phalcon\Mvc\Controller
 
     public function changeDataAction()
     {
-      $userId = $_POST["userId"];
-      $userName = $_POST["userName"];
-      $userBio = $_POST["userBio"];
-      $userLocation = $_POST["userLocation"];
-      $userGender = $_POST["userGender"];
+      $userId = $this->request->getPost("userId");
+      $userName = $this->request->getPost("userName");
+      $userBio = $this->request->getPost("userBio");
+      $userLocation = $this->request->getPost("userLocation");
+      $userGender = $this->request->getPost("userGender");
       $profile = Userprofile::findFirst(
             [
                 "userId='".$userId."'"
@@ -90,13 +98,14 @@ class UserprofileController extends \Phalcon\Mvc\Controller
       );
       $user->setName($userId,$userName);
       $this->view->disable();
-      echo "Berhasil";
+      $this->response->setContent("Berhasil");
+      return $this->response->send();
     }
 
     public function changePasswordAction()
     {
-      $userId = $_POST["userId"];
-      $userPassword = $_POST["userPassword"];
+      $userId = $this->request->getPost("userId");
+      $userPassword = $this->request->getPost("userPassword");
       $userPassword = md5($userPassword);
       $user = User::findFirst(
         [
@@ -104,8 +113,8 @@ class UserprofileController extends \Phalcon\Mvc\Controller
         ]
       );
       $user->setPassword($userId,$userPassword);
-      $this->view->disable();
-      echo "Berhasil";
+      $this->response->setContent("Berhasil");
+      return $this->response->send();
     }
 
 }

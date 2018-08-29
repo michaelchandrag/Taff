@@ -1,6 +1,8 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class GroupprofileController extends \Phalcon\Mvc\Controller
 {
 
@@ -88,11 +90,11 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
 
     public function changeDataAction()
     {
-        $groupId = $_POST["groupId"];
-        $groupName = $_POST["groupName"];
-        $groupDescription = $_POST["groupDescription"];
-        $groupWebsite = $_POST["groupWebsite"];
-        $groupLocation = $_POST["groupLocation"];
+        $groupId = $this->request->getPost("groupId");
+        $groupName = $this->request->getPost("groupName");
+        $groupDescription = $this->request->getPost("groupDescription");
+        $groupWebsite = $this->request->getPost("groupWebsite");
+        $groupLocation = $this->request->getPost("groupLocation");
         $group = Groupuser::findFirst(
             [
                 "groupId='".$groupId."'"
@@ -100,13 +102,14 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
         );
         $group->changeData($groupId,$groupName,$groupDescription,$groupWebsite,$groupLocation);
         $this->view->disable();
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
     public function submitImageAction()
     {
         $this->view->disable();
-        $groupId = $_POST["groupId"];
+        $groupId = $this->request->getPost("groupId");
         $group = Groupuser::findFirst(
             [
                 "groupId='".$groupId."'"
@@ -129,7 +132,7 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
     public function leaveGroupAction()
     {
         $sess_userId = $this->session->get("userId");
-        $groupId = $_POST["groupId"];
+        $groupId = $this->request->getPost("groupId");
         $groupMember = Groupmember::findFirst(
             [
                 "conditions" => "groupUserId='".$groupId."' and userId='".$sess_userId."'"
@@ -137,20 +140,23 @@ class GroupprofileController extends \Phalcon\Mvc\Controller
         );
         $groupMember->leaveGroup($groupId,$sess_userId);
         $this->view->disable();
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
     public function deleteGroupAction()
     {
-        $groupId = $_POST["groupId"];
+        $groupId = $this->request->getPost("groupId");
         $group = Groupuser::findFirst(
             [
                 "groupId='".$groupId."'"
             ]
         );
-        $group->deleteGroup($groupId);
+        $group->groupStatus = "0";
+        $group->save();
         $this->view->disable();
-        echo "Berhasil";
+        $this->response->setContent("Berhasil");
+        return $this->response->send();
     }
 
     public function createInviteAction()

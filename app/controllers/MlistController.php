@@ -1,5 +1,6 @@
 <?php
-
+use Phalcon\Http\Request;
+use Phalcon\Http\Response;
 class MlistController extends \Phalcon\Mvc\Controller
 {
 
@@ -52,8 +53,8 @@ class MlistController extends \Phalcon\Mvc\Controller
 
     public function createListAction()
     {
-        $listTitle = $_POST["listTitle"];
-        $boardId = $_POST["boardId"];
+        $listTitle = $this->request->getPost("listTitle");
+        $boardId = $this->request->getPost("boardId");
         $archive = "0";
         $status = "1";
         $list = new Boardlist();

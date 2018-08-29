@@ -249,14 +249,16 @@ class RepadminController extends \Phalcon\Mvc\Controller
             }
             $list_string .= '</div>';
         }
-        $mpdf = new \Mpdf\Mpdf();
-        //$mpdf->WriteHTML('<h1>Hello world!</h1>');
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 65,
+            'margin_bottom' => 25,
+            'margin_header' => 5,
+            'margin_footer' => 10
+        ]);
         $stylesheet = '';
         $stylesheet .= '
-            @page
-            {
-                margin:20px;
-            }
             .title{
                 font-weight:bold;
                 font-size:24px;
@@ -322,30 +324,42 @@ class RepadminController extends \Phalcon\Mvc\Controller
             }
         ';
         $html = '';
-        $html .= '<div class="divTitle"><h1 class="title">'.'Taff.top'.'</h1></div>';
-        $html .= '<hr>';
+        $html = '<htmlpageheader name="MyHeader1">
+                    <div style="text-align: center;font-size:24px;"><b>Taff.top</b></div><br><hr>';
         $html .= '  <div class="row" style="margin-top:-15px;">
-                        <div class="col">
-                            <p><b>Board details</b><br>
-                            Title : '.$board->boardTitle.'<br>
-                            Creator : '.$creator_name.'<br>
-                            Created : '.date_format(new DateTime($b->boardCreated),"d M Y").'<br>
-                            Deadline : '.$pd.'<br>
-                            Progress : '.$pi_count.'%'.'<br>'
-                            .$pi_string.'</p>'.
-                        '</div>
-                        <div class="col">
-                            <p><b>Members</b><br>
-                            '.$bm_string.'
-                            </p>
-                        </div>'. 
-                    '</div>';
+                    <div class="col">
+                        <p><b>Board details</b><br>
+                        Title : '.$board->boardTitle.'<br>
+                        Creator : '.$creator_name.'<br>
+                        Created : '.date_format(new DateTime($b->boardCreated),"d M Y").'<br>
+                        Deadline : '.$pd.'<br>
+                        Progress : '.$pi_count.'%'.'<br>'
+                        .$pi_string.'</p>'.
+                    '</div>
+                    <div class="col">
+                        <p><b>Members</b><br>
+                        '.$bm_string.'
+                        </p>
+                    </div>'. 
+                '</div>';
         $html .= '<hr>';
+        $html .='</htmlpageheader>';
+        $html .='<htmlpagefooter name="MyFooter1">
+            <table width="100%">
+                <tr>
+                    <td width="33%"><span style="font-weight: bold; font-style: italic;">{DATE j-m-Y}</span></td>
+                    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right; ">Taff.top 2018</td>
+                </tr>
+            </table>
+        </htmlpagefooter>
+        <sethtmlpageheader name="MyHeader1" value="on" show-this-page="1" />
+        <sethtmlpagefooter name="MyFooter1" value="on" />
+        ';
         if($list_count != 0)
         {
             $html .= $list_string;
         }
-
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($html,2);
         $filename = $board->boardTitle.".pdf";
@@ -692,41 +706,11 @@ class RepadminController extends \Phalcon\Mvc\Controller
             ->bind(["from" => $from,"until"=>$until])
             ->orderBy("boardCreated ASC")
             ->execute();
+        $today = date('Y-m-d');
         $incoming = Boardprogressdate::query()
-            ->where('date >= :from:')
-            ->andWhere('date <= :until:')
+            ->where('date >= :today:')
             ->andWhere('dateStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->execute();
-        $board_closed = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardClosed="1"')
-            ->andWhere('boardStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
-            ->execute();
-        $board_active = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardClosed="0"')
-            ->andWhere('boardStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
-            ->execute();
-        $board_deleted = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardStatus="0"')
-            ->andWhere('boardClosed="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
-            ->execute();
-        $group = Groupuser::query()
-            ->where('groupCreated >= :from:')
-            ->andWhere('groupCreated <= :until:')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("groupCreated ASC")
+            ->bind(["today" => $today])
             ->execute();
         $from = date_format(new DateTime($from),"Y-m-d");
         $until = date_format(new DateTime($until),"Y-m-d");
@@ -761,14 +745,17 @@ class RepadminController extends \Phalcon\Mvc\Controller
         }
         $this->view->disable();
         
-        $mpdf = new \Mpdf\Mpdf();
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 40,
+            'margin_bottom' => 25,
+            'margin_header' => 5,
+            'margin_footer' => 10
+        ]);
         //$mpdf->WriteHTML('<h1>Hello world!</h1>');
         $stylesheet = '';
         $stylesheet .= '
-            @page
-            {
-                margin:20px;
-            }
             .title{
                 font-weight:bold;
                 font-size:24px;
@@ -840,8 +827,8 @@ class RepadminController extends \Phalcon\Mvc\Controller
             }
         ';
         $html = '';
-        $html .= '<div class="divTitle"><h1 class="title">'.'Taff.top'.'</h1></div>';
-        $html .= '<hr>';
+        $html = '<htmlpageheader name="MyHeader1">
+                    <div style="text-align: center;font-size:24px;"><b>Taff.top</b></div><br>';
         $html .= '  <div class="row" style="margin-top:-15px;">
                         <div class="col">
                             <p><b>Website Report</b><br>
@@ -850,15 +837,51 @@ class RepadminController extends \Phalcon\Mvc\Controller
                         '</div>'.
                     '</div>';
         $html .= '<hr>';
-        $html .= '<div class="row">';
-        $html .= '<p>Board created : '.count($board)."<br>";
-        $html .= '- Active : '.count($board_active).'<br>';
-        $html .= '- Closed : '.count($board_closed).'<br>';
-        $html .= '- Deleted : '.count($board_deleted).'<br></p>';
-        $html .= '</div>';
-        foreach($board_active as $b) 
+        $html .='</htmlpageheader>';
+        $html .='<htmlpagefooter name="MyFooter1">
+            <table width="100%">
+                <tr>
+                    <td width="33%"><span style="font-weight: bold; font-style: italic;">{DATE j-m-Y}</span></td>
+                    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right; ">Taff.top 2018</td>
+                </tr>
+            </table>
+        </htmlpagefooter>
+        <sethtmlpageheader name="MyHeader1" value="on" show-this-page="1" />
+        <sethtmlpagefooter name="MyFooter1" value="on" />
+        ';
+        $html .= "<div>List of board created</div><br>";
+        $html .= ' <table width="100%">
+                        <colgroup>
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                        </colgroup>
+                        <tr width="100%">
+                            <td colspan=19 style="text-align:center;border: 1px solid #ddd;"><b>Board</b></td>
+                            <td colspan=1 style="text-align:center;border: 1px solid #ddd;"><b>List</b></td>
+                            <td colspan=1 style="text-align:center;border: 1px solid #ddd;"><b>Card</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">ID</td>
+                            <td colspan=4 style="text-align:center;font-size:12px;border: 1px solid #ddd;">Title</td>
+                            <td colspan=4 style="text-align:center;font-size:12px;border: 1px solid #ddd;">Creator</td>
+                            <td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">Created</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Status</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Deadline</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Progress</td>
+                            <td colspan=1 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Total</td>
+                            <td colspan=1 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Total</td>
+                        </tr>';
+        foreach($board as $b)
         {
-            $html .= '<div class="row">';
             $boardId = $b->boardId;
             $pd = getProgressDate($boardId);
             if($pd == null)
@@ -866,9 +889,8 @@ class RepadminController extends \Phalcon\Mvc\Controller
             else
                 $pd = date_format(new DateTime($pd->date),"d M Y");
             $pi = getProgressItem($boardId);
-            $pi_string = "";
             $pi_count = 0;
-            if($pi != null)
+            if($pi != null )
             {
                 $pi_total = 0;
                 $pi_checked = 0;
@@ -879,6 +901,7 @@ class RepadminController extends \Phalcon\Mvc\Controller
 
                     $pi_total++;
                 }
+                if($pi_total > 0)
                 $pi_count = $pi_checked*100/$pi_total;
             }
             $status = "Active";
@@ -894,115 +917,70 @@ class RepadminController extends \Phalcon\Mvc\Controller
             {
                 $status = "Deleted";
             }
-
-            $html .= '<div class="col2">';
-            $html .= '<p>Board title : '.$b->boardTitle."<br>";
-            $html .= 'Board ID : '.$boardId."<br>";
-            $html .= 'Created : '.date_format(new DateTime($b->boardCreated),"d M Y")."<br>";
-            $html .= 'Status : '.$status."<br>";
-            $html .= 'Deadline : '.$pd."<br>";
-            $html .= 'Progress : '.$pi_count."%<br>";
-            $html .= '</div>';
-            $html .= '<div class="col2">';
-            $html .= '<div class="col">';
             //list dan card
             $total_list = Boardlist::count(
                 [
                     "listBoardId='".$boardId."'"
                 ]
             );
-            $list_active = Boardlist::count(
-                [
-                    "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'"
-                ]
-            );
-            $list_archive = Boardlist::count(
-                [
-                    "conditions"=>"listBoardId='".$boardId."' AND listArchive='1' AND listStatus='1'"
-                ]
-            );
-            $list_deleted = Boardlist::count(
-                [
-                    "conditions"=>"listBoardId='".$boardId."' AND listArchive='1' AND listStatus='0'"
-                ]
-            );
-            $html .= '<p>Total list : '.$total_list."<br>";
-            $html .= '- Active : '.$list_active."<br>";
-            $html .= '- Archived : '.$list_archive."<br>";
-            $html .= '- Deleted : '.$list_deleted."<br>";
-            $html .= '</p></div>';
-            $html .= '<div class="col">';
             $total_card = Boardcard::count(
                 [
                     "cardBoardId='".$boardId."'"
                 ]
             );
-            $card_active = Boardcard::count(
-                [
-                    "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='0' and cardStatus='1'"
-                ]
-            );
-            $card_archived = Boardcard::count(
-                [
-                    "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='1' and cardStatus='1'"
-                ]
-            );
-            $card_deleted = Boardcard::count(
-                [
-                    "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='1' and cardStatus='0'"
-                ]
-            );
-            $html .= '<p>Total card : '.$total_card."<br>";
-            $html .= '- Active : '.$card_active."<br>";
-            $html .= '- Archived : '.$card_archived."<br>";
-            $html .= '- Deleted : '.$card_deleted."<br></p>";
-            $html .= '</div>';
-            $html .= '</div>';
-            $html .= '<div class="col2"><p>';
-            $member = Boardmember::find(
-                [
-                    "conditions"=>"boardId='".$boardId."' AND memberStatus='1'"
-                ]
-            );
-            $ctr = 1;
-            foreach($member as $m)
-            {
-                $user = getUser($m->userId);
-                $userName = $user->userName;
-                $html .= $ctr.". ".$userName."(".$m->memberRole.")<br>";
-                $ctr++;
-            }
-            $html .= '</p></div>';
-            $html .= '</p></div>';
-            $html .= '<hr>';
-            
+            $html .= '<tr>
+                            <td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardId.'</td>
+                            <td colspan=4 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardTitle.'</td>
+                            <td colspan=4 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardOwner.'</td>
+                            <td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.date_format(new DateTime($b->boardCreated),"d M Y").'</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$status.'</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$pd.'</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$pi_count.'%</td>
+                            <td colspan=1 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$total_list.'</td>
+                            <td colspan=1 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$total_card.'</td>
+                        </tr>';
         }
-        $html .= "Board with incoming deadline: "."<br>";
-            foreach($incoming as $i)
+        $html .= '</table>';
+        $html .= '<br><div>Board with incoming deadline</div><br>';
+        $html .= ' <table width="100%">
+                        <tr>
+                            <td width="18%" style="text-align:center;border: 1px solid #ddd;"><b>Board ID</b></td>
+                            <td width="18%" style="text-align:center;border: 1px solid #ddd;"><b>Board Title</b></td>
+                            <td width="18%" style="text-align:center;border: 1px solid #ddd;"><b>Board Creator</b></td>
+                            <td width="18%" style="text-align:center;border: 1px solid #ddd;"><b>Board Created</b></td>
+                            <td width="18%" style="text-align:center;border: 1px solid #ddd;"><b>Deadline</b></td>
+                            <td width="10%" style="text-align:center;border: 1px solid #ddd;"><b>Board Status</b></td>
+                        </tr>';
+        foreach($incoming as $i)
+        {
+            $pd = $i->date;
+            $boardId = $i->boardId;
+            $boardIncoming = Board::findFirstByBoardId($boardId);
+            $status = "Active";
+            if($boardIncoming->boardClosed == "0" && $boardIncoming->boardStatus == "1")
             {
-                $boardId = $i->boardId;
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$boardId."'"
-                    ]
-                );
-                $pd = getProgressDate($boardId);
-                if($pd == null)
-                    $pd = "";
-                else
-                    $pd = date_format(new DateTime($pd->date),"d M Y");
-                $html .= "<p>";
-                $html .= "Board title : ".$board->boardTitle."<br>";
-                $html .= "Board ID : ".$board->boardId."<br>";
-                $user = getUser($board->boardOwner);
-                $creator = $user->userName;
-                $html .= "Creator : ".$creator."<br>";
-                $html .= 'Created : '.date_format(new DateTime($board->boardCreated),"d M Y")."<br>";
-                $html .= 'Deadline : '.$pd."<br>";
-                $html .= "</p>";
-                $html .= "<hr>";
+                $status = "Active";
             }
-                $mpdf->WriteHTML($stylesheet,1);
+            else if($boardIncoming->boardClosed == "1" && $boardIncoming->boardStatus == "1")
+            {
+                $status = "Closed";
+            }
+            else if($boardIncoming->boardClosed == "1" && $boardIncoming->boardStatus == "0")
+            {
+                $status = "Deleted";
+            }
+            $html .= '<tr>
+                <td width="19%" style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardId.'</td>
+                <td width="19%" style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardTitle.'</td>
+                <td width="19%" style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.$b->boardOwner.'</td>
+                <td width="19%" style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.date_format(new DateTime($b->boardCreated),"d M Y").'</td>
+                <td width="19%" style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.date_format(new DateTime($pd),"d M Y").'</td>
+                <td width="19%" style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$status.'</td>
+            </tr>';    
+        }
+        
+        $html .= '</table>';
+        $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($html,2);
         $filename = "report.pdf";
         $mpdf->Output($filename, \Mpdf\Output\Destination::DOWNLOAD);
@@ -1045,14 +1023,17 @@ class RepadminController extends \Phalcon\Mvc\Controller
         }
         $this->view->disable();
         
-        $mpdf = new \Mpdf\Mpdf();
+        $mpdf = new \Mpdf\Mpdf([
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 40,
+            'margin_bottom' => 25,
+            'margin_header' => 5,
+            'margin_footer' => 10
+        ]);
         //$mpdf->WriteHTML('<h1>Hello world!</h1>');
         $stylesheet = '';
         $stylesheet .= '
-            @page
-            {
-                margin:20px;
-            }
             .title{
                 font-weight:bold;
                 font-size:24px;
@@ -1122,10 +1103,13 @@ class RepadminController extends \Phalcon\Mvc\Controller
                 float:left;
                 margin-left:5px;
             }
+            th, td {
+                border-bottom: 1px solid #ddd;
+            }
         ';
         $html = '';
-        $html .= '<div class="divTitle"><h1 class="title">'.'Taff.top'.'</h1></div>';
-        $html .= '<hr>';
+        $html = '<htmlpageheader name="MyHeader1">
+                    <div style="text-align: center;font-size:24px;"><b>Taff.top</b></div><br>';
         $html .= '  <div class="row" style="margin-top:-15px;">
                         <div class="col">
                             <p><b>Website Report</b><br>
@@ -1134,27 +1118,68 @@ class RepadminController extends \Phalcon\Mvc\Controller
                         '</div>'.
                     '</div>';
         $html .= '<hr>';
-        $html .= '<div class="row">';
-        $html .= '<p>Total user : '.$user."<br>";
-        $html .= 'User created : '.count($user_created)."<br>";
-        $html .= '- Active : '.count($user_active).'<br>';
-        $html .= '- Deactive : '.count($user_deactive).'<br></p>';
-        $html .= '</div>';
-        $html .= '<div class="row">';
-        $html .= 'List of user created<br>';
+        $html .='</htmlpageheader>';
+        $html .='<htmlpagefooter name="MyFooter1">
+            <table width="100%">
+                <tr>
+                    <td width="33%"><span style="font-weight: bold; font-style: italic;">{DATE j-m-Y}</span></td>
+                    <td width="33%" align="center" style="font-weight: bold; font-style: italic;">{PAGENO}/{nbpg}</td>
+                    <td width="33%" style="text-align: right; ">Taff.top 2018</td>
+                </tr>
+            </table>
+        </htmlpagefooter>
+        <sethtmlpageheader name="MyHeader1" value="on" show-this-page="1" />
+        <sethtmlpagefooter name="MyFooter1" value="on" />
+        ';
+        $html .= "<div>List of user created</div><br>";
+        $html .= ' <table width="100%">
+                        <tr>
+                            <td width="20%"><b>User ID</b></td>
+                            <td width="20%"><b>User Name</b></td>
+                            <td width="25%"><b>User Email</b></td>
+                            <td width="20%"><b>User Joined</b></td>
+                            <td width="15%"><b>User Status</b></td>
+                        </tr>';
         foreach($user_created as $u)
         {
-            $html .= '<p>';
-            $html .= 'User Id : '.$u->userId.'<br>';
-            $html .= 'User Name : '.$u->userName.'<br>';
-            $html .= 'User Email : '.$u->userEmail.'<br>';
-            $html .= 'User Joined : '.date_format(new DateTime($u->userJoined),"d M Y").'<br>';
-            $html .= 'User Status : '.$u->userStatus.'<br>';
-            $html .= '</p>';
-        }
-        $html .= '</div>';
-        $html .= '<hr>';
-        $html .= 'Detail user';
+            $html .= '<tr>';
+            $html .= '<td width="20%">'.$u->userId.'</td>';
+            $html .= '<td width="20%">'.$u->userName.'</td>';
+            $html .= '<td width="25%">'.$u->userEmail.'</td>';
+            $html .= '<td width="20%">'.date_format(new DateTime($u->userJoined),"d M Y").'</td>';
+            $html .= '<td width="15%" style="text-align:center;">'.$u->userStatus.'</td>';
+            $html .= '</tr>';
+        }          
+        $html .= '</table><br> ';
+        $html .= '<div>Detail all user</div><br>';
+        $html .= ' <table width="100%">
+                        <colgroup>
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                            <col width="5%"><col width="5%">
+                        </colgroup>
+                        <tr width="100%">
+                            <td colspan=9 style="text-align:center;border: 1px solid #ddd;"><b>User</b></td>
+                            <td colspan=4 style="text-align:center;border: 1px solid #ddd;"><b>Groups</b></td>
+                            <td colspan=7 style="text-align:center;border: 1px solid #ddd;"><b>Boards</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">User ID</td>
+                            <td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">User Name</td>
+                            <td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">User Email</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Admin</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Member</td>
+                            <td colspan=3 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Creator</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Collabrator</td>
+                            <td colspan=2 style="text-align:center;font-size:10px;border: 1px solid #ddd;">Client</td>
+                        </tr>';
         foreach($user_active as $u)
         {
             $userId = $u->userId;
@@ -1183,74 +1208,20 @@ class RepadminController extends \Phalcon\Mvc\Controller
                     "conditions"=>"userId='".$userId."' and memberRole='Client' and memberStatus='1'"
                 ]
             );
-            $html .= '<div class="row"><p>';
-            $html .= '<div class="col2">';
-            $html .= "<p>User Id : ".$u->userId."<br>";
-            $html .= "User Name : ".$u->userName."<br>";
-            $html .= "User Email : ".$u->userEmail."<br>";
-            $html .= '</p></div>';
-            $html .= '<div class="col2"><p>';
-            $html .= "Group as Admin : ".count($gmAdmin)."<br>";
-            foreach($gmAdmin as $admin)
-            {
-                $groupId = $admin->groupUserId;
-                $group = Groupuser::findFirst(
-                    [
-                        "groupId='".$groupId."'"
-                    ]
-                );
-                $html .= "- ".$group->groupName."<br>";
-            }
-            $html .= "Group as Member : ".count($gmMember)."<br>";
-            foreach($gmMember as $admin)
-            {
-                $groupId = $admin->groupUserId;
-                $group = Groupuser::findFirst(
-                    [
-                        "groupId='".$groupId."'"
-                    ]
-                );
-                $html .= "- ".$group->groupName."<br>";
-            }
-            $html .= "</p></div>";
-            $html .= "<div class='col2'><p>";
-            $html .= "Board as Creator : ".count($boardCreator)."<br>";
-            foreach($boardCreator as $b)
-            {
-                $boardId = $b->boardId;
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$boardId."'"
-                    ]
-                );
-                $html .= "- ".$board->boardTitle."<br>";
-            }
-            $html .= "Board as Collaborator : ".count($boardCollaborator)."<br>";
-            foreach($boardCollaborator as $b)
-            {
-                $boardId = $b->boardId;
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$boardId."'"
-                    ]
-                );
-                $html .= "- ".$board->boardTitle."<br>";
-            }
-            $html .= "Board as Client : ".count($boardClient)."<br>";
-            foreach($boardClient as $b)
-            {
-                $boardId = $b->boardId;
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$boardId."'"
-                    ]
-                );
-                $html .= "- ".$board->boardTitle."<br>";
-            }
-            $html .= '<p></div>';
-            $html .= '</p></div>';
-            $html .= "<hr>";
+            $html .= '<tr>';
+            $html .= '<td colspan=3 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$u->userId.'</td>';
+            $html .= '<td colspan=3 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$u->userName.'</td>';
+            $html .= '<td colspan=3 style="text-align:center;font-size:10px;border: 1px solid #ddd;">'.$u->userName.'</td>';
+            $html .= '<td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.count($gmAdmin).'</td>';
+            $html .= '<td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.count($gmMember).'</td>';
+            $html .= '<td colspan=3 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.count($boardCreator).'</td>';
+            $html .= '<td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.count($boardCollaborator).'</td>';
+            $html .= '<td colspan=2 style="text-align:center;font-size:12px;border: 1px solid #ddd;">'.count($boardClient).'</td>';
+            $html .= '<tr>';
         }
+        $html .= '</table>';
+        
+
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($html,2);
         $filename = "report.pdf";
@@ -1263,6 +1234,7 @@ class RepadminController extends \Phalcon\Mvc\Controller
         set_time_limit(0);
         $from = date('Y-m-d', strtotime($from)); // Modify according to your date format
         $until = date('Y-m-d', strtotime($until));
+        $today = date('Y-m-d');
         $board = Board::query()
             ->where('boardCreated >= :from:')
             ->andWhere('boardCreated <= :until:')
@@ -1270,34 +1242,9 @@ class RepadminController extends \Phalcon\Mvc\Controller
             ->orderBy("boardCreated ASC")
             ->execute();
         $incoming = Boardprogressdate::query()
-            ->where('date >= :from:')
-            ->andWhere('date <= :until:')
+            ->where('date >= :today:')
             ->andWhere('dateStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->execute();
-        $board_closed = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardClosed="1"')
-            ->andWhere('boardStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
-            ->execute();
-        $board_active = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardClosed="0"')
-            ->andWhere('boardStatus="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
-            ->execute();
-        $board_deleted = Board::query()
-            ->where('boardCreated >= :from:')
-            ->andWhere('boardCreated <= :until:')
-            ->andWhere('boardStatus="0"')
-            ->andWhere('boardClosed="1"')
-            ->bind(["from" => $from,"until"=>$until])
-            ->orderBy("boardCreated ASC")
+            ->bind(["today" => $today])
             ->execute();
         $from = date_format(new DateTime($from),"Y-m-d");
         $until = date_format(new DateTime($until),"Y-m-d");
@@ -1340,31 +1287,55 @@ class RepadminController extends \Phalcon\Mvc\Controller
             ->setDescription('Taff.top report.')
             ->setKeywords('office 2007 openxml php')
             ->setCategory('Report');
-
+        $styleArray = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ],
+                ],
+            ];
         // Add some data
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'Taff.top')
             ->setCellValue('A2', 'From : '.$from)
-            ->setCellValue('A3', 'Until :'.$until)
-            ->setCellValue('D1','Board created : '.count($board))
-            ->setCellValue('D2','- Active : '.count($board_active))
-            ->setCellValue('D3','- Closed : '.count($board_closed))
-            ->setCellValue('D4','- Deleted : '.count($board_deleted));
+            ->setCellValue('A3', 'Until :'.$until);
 
         $ctr = 6;
-        $huruf2 = ["A","F"];
+        $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("List of board created");
+        $huruf = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y"];
+        $detail_awal = $ctr;
+        $detail_awal++;
+        $ctr++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_awal)->setValue("Board");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[16].$detail_awal)->setValue("List");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[19].$detail_awal)->setValue("Card");
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_awal.':'.$huruf[15].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[16].$detail_awal.':'.$huruf[18].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[19].$detail_awal.':'.$huruf[21].$detail_awal);
+        $detail_awal++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_awal)->setValue("ID");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_awal)->setValue("Title");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_awal)->setValue("Creator");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_awal)->setValue("Created");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_awal)->setValue("Status");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_awal)->setValue("Deadline");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[14].$detail_awal)->setValue("Progress");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[16].$detail_awal)->setValue("Active");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[17].$detail_awal)->setValue("Archived");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[18].$detail_awal)->setValue("Deleted");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[19].$detail_awal)->setValue("Active");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[20].$detail_awal)->setValue("Archived");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[21].$detail_awal)->setValue("Deleted");
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_awal.':'.$huruf[1].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_awal.':'.$huruf[5].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_awal.':'.$huruf[7].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[10].$detail_awal.':'.$huruf[11].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[12].$detail_awal.':'.$huruf[13].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[14].$detail_awal.':'.$huruf[15].$detail_awal);
         foreach($board as $b)
         {
-            $awal_list = $ctr;
-            $awal_card = $ctr;
-            $awal_member = $ctr;
+            $detail_awal++;
             $boardId = $b->boardId;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Board Title : ".$b->boardTitle);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Board ID : ".$b->boardId);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Created at : ".date_format(new DateTime($b->boardCreated),"d M Y"));
-            $ctr++;
             $status = "Active";
             if($b->boardClosed == "0" && $b->boardStatus == "1")
             {
@@ -1378,8 +1349,6 @@ class RepadminController extends \Phalcon\Mvc\Controller
             {
                 $status = "Deleted";
             }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Status : ".$status);
-            $ctr++;
             $pd = getProgressDate($boardId);
             if($pd == null)
                 $pd = "";
@@ -1402,13 +1371,6 @@ class RepadminController extends \Phalcon\Mvc\Controller
                 if($pi_total != 0)
                 $pi_count = $pi_checked*100/$pi_total;
             }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Deadline : ".$pd);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Progress : ".$pi_count."%");
-            $ctr++;
-            $list_count = Boardlist::count(
-                "listBoardId='".$b->boardId."'"
-            );
             $list_active = Boardlist::count(
                 [
                     "conditions"=>"listBoardId='".$boardId."' AND listArchive='0' AND listStatus='1'"
@@ -1422,11 +1384,6 @@ class RepadminController extends \Phalcon\Mvc\Controller
             $list_deleted = Boardlist::count(
                 [
                     "conditions"=>"listBoardId='".$boardId."' AND listArchive='1' AND listStatus='0'"
-                ]
-            );
-            $total_card = Boardcard::count(
-                [
-                    "cardBoardId='".$boardId."'"
                 ]
             );
             $card_active = Boardcard::count(
@@ -1444,51 +1401,80 @@ class RepadminController extends \Phalcon\Mvc\Controller
                     "conditions"=>"cardBoardId='".$boardId."' AND cardArchive='1' and cardStatus='0'"
                 ]
             );
-            $spreadsheet->setActiveSheetIndex(0)->getCell("D".$awal_list)->setValue("Total list : ".$list_count);
-            $awal_list++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("D".$awal_list)->setValue("- Active : ".$list_active);
-            $awal_list++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("D".$awal_list)->setValue("- Archive : ".$list_archive);
-            $awal_list++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("D".$awal_list)->setValue("- Deleted : ".$list_deleted);
-            $awal_list++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_card)->setValue("Total card : ".$total_card);
-            $awal_card++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_card)->setValue("- Active : ".$card_active);
-            $awal_card++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_card)->setValue("- Archive : ".$card_archived);
-            $awal_card++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_card)->setValue("- Deleted : ".$card_deleted);
-            $awal_card++;
-            $member = Boardmember::find(
-                [
-                    "conditions"=>"boardId='".$b->boardId."' and memberStatus='1'"
-                ]
-            );
-            $int = 0;
-            foreach($member as $m)
-            {
-                $int++;
-                $user = getUser($m->userId);
-                $spreadsheet->setActiveSheetIndex(0)->getCell("H".$awal_member)->setValue($int.". ".$user->userName."(".$m->memberRole.")");
-                $awal_member++;
-            }
-            //$ctr++;
-            if($ctr < $awal_list)
-            {
-                $ctr = $awal_list;
-            }
-            if($ctr < $awal_card)
-            {
-                $ctr = $awal_card;
-            }
-            if($ctr < $awal_member)
-            {
-                $ctr = $awal_member;
-            }
-            $ctr++;
-        }
 
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_awal)->setValue($boardId);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_awal)->setValue($b->boardTitle);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_awal)->setValue($b->boardOwner);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_awal)->setValue($b->boardCreated);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_awal)->setValue($status);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_awal)->setValue($pd);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[14].$detail_awal)->setValue($pi_count."%");
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[16].$detail_awal)->setValue($list_active);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[17].$detail_awal)->setValue($list_archive);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[18].$detail_awal)->setValue($list_deleted);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[19].$detail_awal)->setValue($card_active);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[20].$detail_awal)->setValue($card_archived);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[21].$detail_awal)->setValue($card_deleted);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_awal.':'.$huruf[1].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_awal.':'.$huruf[5].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_awal.':'.$huruf[7].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_awal.':'.$huruf[9].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[10].$detail_awal.':'.$huruf[11].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[12].$detail_awal.':'.$huruf[13].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[14].$detail_awal.':'.$huruf[15].$detail_awal);
+        }
+        $spreadsheet->getActiveSheet()->getStyle('A'.$ctr.':V'.$detail_awal)->applyFromArray($styleArray);
+        $ctr = $detail_awal;
+        $ctr++;
+        $ctr++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$ctr)->setValue("Board with incoming deadline");
+        $ctr++;
+        $detail_awal = $ctr;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_awal)->setValue("Board ID");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_awal)->setValue("Board Title");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_awal)->setValue("Board Creator");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_awal)->setValue("Board Created");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_awal)->setValue("Deadline");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_awal)->setValue("Board Status");
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_awal.':'.$huruf[1].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_awal.':'.$huruf[5].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_awal.':'.$huruf[7].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_awal.':'.$huruf[9].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[10].$detail_awal.':'.$huruf[11].$detail_awal);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[12].$detail_awal.':'.$huruf[13].$detail_awal);
+        foreach($incoming as $i)
+        {
+            $detail_awal++;
+            $pd = $i->date;
+            $boardId = $i->boardId;
+            $boardIncoming = Board::findFirstByBoardId($boardId);
+            $status = "Active";
+            if($boardIncoming->boardClosed == "0" && $boardIncoming->boardStatus == "1")
+            {
+                $status = "Active";
+            }
+            else if($boardIncoming->boardClosed == "1" && $boardIncoming->boardStatus == "1")
+            {
+                $status = "Closed";
+            }
+            else if($boardIncoming->boardClosed == "1" && $boardIncoming->boardStatus == "0")
+            {
+                $status = "Deleted";
+            }
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_awal)->setValue($boardId);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_awal)->setValue($b->boardTitle);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_awal)->setValue($b->boardOwner);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_awal)->setValue($b->boardCreated);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_awal)->setValue(date_format(new DateTime($pd),"d M Y"));
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_awal)->setValue($status);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_awal.':'.$huruf[1].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_awal.':'.$huruf[5].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_awal.':'.$huruf[7].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_awal.':'.$huruf[9].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[10].$detail_awal.':'.$huruf[11].$detail_awal);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[12].$detail_awal.':'.$huruf[13].$detail_awal);
+        }
+        $spreadsheet->getActiveSheet()->getStyle('A'.($ctr).':N'.$detail_awal)->applyFromArray($styleArray);
         // Rename worksheet
         $spreadsheet->getActiveSheet()->setTitle('Simple');
 
@@ -1575,147 +1561,122 @@ class RepadminController extends \Phalcon\Mvc\Controller
             ->setDescription('Taff.top report.')
             ->setKeywords('office 2007 openxml php')
             ->setCategory('Report');
-
+        
+        $styleArray = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+                    ],
+                ],
+            ];
         // Add some data
         $spreadsheet->setActiveSheetIndex(0)
             ->setCellValue('A1', 'Taff.top')
             ->setCellValue('A2', 'From : '.$from)
-            ->setCellValue('A3', 'Until :'.$until)
-            ->setCellValue('D1','Total user : '.count($user))
-            ->setCellValue('D2','User created : '.count($user_created))
-            ->setCellValue('D3','- Active : '.count($user_active))
-            ->setCellValue('D4','- Deactive : '.count($user_deactive));
-
+            ->setCellValue('A3', 'Until :'.$until);
+        $huruf = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q"];
         $ctr = 6;
-        $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("List of user created ");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$ctr)->setValue("List of user created ");
+        $detail_start = 7;
+        $ctr = $detail_start;
+        $ctr_huruf = 0;
         $ctr++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_start)->setValue("User ID");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_start)->setValue("User Name");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[4].$detail_start)->setValue("User Email");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_start)->setValue("User Joined");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_start)->setValue("User Status");
+
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_start.':'.$huruf[1].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_start.':'.$huruf[3].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[4].$detail_start.':'.$huruf[5].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_start.':'.$huruf[7].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_start.':'.$huruf[9].$detail_start);
         foreach($user_created as $user)
         {
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User ID : ".$user->userId);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Name : ".$user->userName);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Email : ".$user->userEmail);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Joined : ".date_format(new DateTime($user->userJoined),"d M Y"));
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Status : ".$user->userStatus);
-            $ctr++;
-            $ctr++;
+            $detail_start++;
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_start)->setValue($user->userId);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_start)->setValue($user->userName);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[4].$detail_start)->setValue($user->userEmail);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[6].$detail_start)->setValue(date_format(new DateTime($user->userJoined),"d M Y"));
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_start)->setValue($user->userStatus);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_start.':'.$huruf[1].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_start.':'.$huruf[3].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[4].$detail_start.':'.$huruf[5].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[6].$detail_start.':'.$huruf[7].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_start.':'.$huruf[9].$detail_start);
         }
-        $ctr++;
-        $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Detail User ");
+        $spreadsheet->getActiveSheet()->getStyle('A'.($ctr-1).':J'.$detail_start)->applyFromArray($styleArray);
+        $detail_start++;
+        $detail_start++;
+        $ctr = $detail_start;
+        $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("Detail All User ");
+        $detail_start++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_start)->setValue("User");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_start)->setValue("Groups");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_start)->setValue("Boards");
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_start.':'.$huruf[7].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_start.':'.$huruf[9].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[10].$detail_start.':'.$huruf[12].$detail_start);
+
+        $detail_start++;
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_start)->setValue("User ID");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_start)->setValue("User Name");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[4].$detail_start)->setValue("User Email");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_start)->setValue("Admin");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[9].$detail_start)->setValue("Member");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_start)->setValue("Creator");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[11].$detail_start)->setValue("Collaborator");
+        $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_start)->setValue("Client");
+
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_start.':'.$huruf[1].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_start.':'.$huruf[3].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[4].$detail_start.':'.$huruf[7].$detail_start);
+        $spreadsheet->getActiveSheet()->mergeCells($huruf[8].$detail_start.':'.$huruf[9].$detail_start);
         $ctr++;
         foreach($user_active as $u)
         {
-            $awal_group = $ctr;
-            $awal_board = $ctr;
             $userId = $u->userId;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User ID : ".$u->userId);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Name : ".$u->userName);
-            $ctr++;
-            $spreadsheet->setActiveSheetIndex(0)->getCell("A".$ctr)->setValue("User Email : ".$u->userEmail);
-            $ctr++;
-            $gmAdmin = Groupmember::find(
+            $detail_start++;
+            $gmAdmin = Groupmember::count(
                 [
                     "conditions"=>"userId='".$userId."' and memberRole='Admin' and memberStatus ='1'"
                 ]
             );
-            $gmMember = Groupmember::find(
+            $gmMember = Groupmember::count(
                 [
                     "conditions"=>"userId='".$userId."' and memberRole='Member' and memberStatus ='1'"
                 ]
             );
-            $boardCreator = Boardmember::find(
+            $boardCreator = Boardmember::count(
                 [
                     "conditions"=>"userId='".$userId."' and memberRole='Creator' and memberStatus='1'"
                 ]
             );
-            $boardCollaborator = Boardmember::find(
+            $boardCollaborator = Boardmember::count(
                 [
                     "conditions"=>"userId='".$userId."' and memberRole='Collaborator' and memberStatus='1'"
                 ]
             );
-            $boardClient = Boardmember::find(
+            $boardClient = Boardmember::count(
                 [
                     "conditions"=>"userId='".$userId."' and memberRole='Client' and memberStatus='1'"
                 ]
             );
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_group)->setValue("Group as Admin : ".count($gmAdmin));
-            $awal_group++;
-            foreach($gmAdmin as $gm)
-            {
-                $groupId = $gm->groupUserId;
-                $group = Groupuser::findFirst(
-                    [
-                        "groupId='".$groupId."'"
-                    ]
-                );
-                $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_group)->setValue("- ".$group->groupName);
-                $awal_group++;
-            }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_group)->setValue("Group as Member : ".count($gmMember));
-            $awal_group++;
-            foreach($gmMember as $gm)
-            {
-                $groupId = $gm->groupUserId;
-                $group = Groupuser::findFirst(
-                    [
-                        "groupId='".$groupId."'"
-                    ]
-                );
-                $spreadsheet->setActiveSheetIndex(0)->getCell("F".$awal_group)->setValue("- ".$group->groupName);
-                $awal_group++;
-            }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("Board as Creator : ".count($boardCreator));
-            $awal_board++;
-            foreach($boardCreator as $b)
-            {
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$b->boardId."'"
-                    ]
-                );
-                $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("- ".$board->boardTitle);
-                $awal_board++; 
-            }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("Board as Collaborator : ".count($boardCollaborator));
-            $awal_board++;
-            foreach($boardCollaborator as $b)
-            {
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$b->boardId."'"
-                    ]
-                );
-                $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("- ".$board->boardTitle);
-                $awal_board++; 
-            }
-            $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("Board as Client : ".count($boardClient));
-            $awal_board++;
-            foreach($boardClient as $b)
-            {
-                $board = Board::findFirst(
-                    [
-                        "boardId='".$b->boardId."'"
-                    ]
-                );
-                $spreadsheet->setActiveSheetIndex(0)->getCell("I".$awal_board)->setValue("- ".$board->boardTitle);
-                $awal_board++; 
-            }
-
-            if($ctr < $awal_group)
-            {
-                $ctr = $awal_group;
-            }
-            if($ctr < $awal_board)
-            {
-                $ctr = $awal_board;
-            }
-            $ctr++;
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[0].$detail_start)->setValue($u->userId);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[2].$detail_start)->setValue($u->userName);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[4].$detail_start)->setValue($u->userEmail);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[8].$detail_start)->setValue($gmAdmin);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[9].$detail_start)->setValue($gmMember);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[10].$detail_start)->setValue($boardCreator);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[11].$detail_start)->setValue($boardCollaborator);
+            $spreadsheet->setActiveSheetIndex(0)->getCell($huruf[12].$detail_start)->setValue($boardClient);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[0].$detail_start.':'.$huruf[1].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[2].$detail_start.':'.$huruf[3].$detail_start);
+            $spreadsheet->getActiveSheet()->mergeCells($huruf[4].$detail_start.':'.$huruf[7].$detail_start);
+            
         }
-
+        $spreadsheet->getActiveSheet()->getStyle('A'.($ctr).':M'.$detail_start)->applyFromArray($styleArray);
         // Rename worksheet
         $spreadsheet->getActiveSheet()->setTitle('Simple');
 
@@ -1737,7 +1698,8 @@ class RepadminController extends \Phalcon\Mvc\Controller
 
         $writer = IOFactory::createWriter($spreadsheet, 'Xls');
         $writer->save('php://output');
-        exit;    }
+        exit;    
+    }
 
 }
 
