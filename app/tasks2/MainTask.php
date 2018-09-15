@@ -11,16 +11,8 @@ class MainTask extends Task
 {
     public function mainAction()
     {
-        echo "This is the default task and the default action" . PHP_EOL;
-		$server = IoServer::factory(
-			new HttpServer(
-				new WsServer(
-					new Chat()
-				)
-			),
-			8080
-		);
-
-		$server->run();
+        echo "This is the default task and the default action" . PHP_EOL;   
+        $user = User::findFirst();
+        print_r($user);
     }
 }

@@ -11,8 +11,8 @@ class LoginController extends \Phalcon\Mvc\Controller
 
     public function loginAction()
     {
-        $email = $this->request->getPost("email");
-        $password = $this->request->getPost("password");
+        $email = $this->request->getPost("email","email");
+        $password = $this->request->getPost("password","string");
         $password = md5($password);
         $remember = $_POST["remember"];
         $user = new User();
